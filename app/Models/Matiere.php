@@ -1,4 +1,5 @@
 <?php
+// app/Models/Matiere.php
 
 namespace App\Models;
 
@@ -31,18 +32,22 @@ class Matiere extends Model
             : asset('admin/images/default-matiere.jpg');
     }
 
-    // Relation avec les classes
+    // Relation avec les classes (many-to-many)
     public function classes()
     {
-        return $this->belongsToMany(Classe::class, 'classe_matiere');
+        return $this->belongsToMany(Classe::class, 'classe_matiere')
+                    ->withTimestamps();
     }
+
+    // Relation avec les épreuves (one-to-many)
     public function epreuves()
     {
         return $this->hasMany(Epreuve::class);
     }
 
-    public function cours()
+    // Relation avec les chapitres (one-to-many) - AJOUT IMPORTANT
+    public function chapitres()
     {
-        return $this->hasMany(Cours::class);
+        return $this->hasMany(Chapitre::class);
     }
 }

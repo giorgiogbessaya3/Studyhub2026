@@ -11,6 +11,7 @@ class Classe extends Model
 
     protected $fillable = [
         'nom',
+        'cycle',        // Ajout du champ cycle
         'niveau',
         'description',
         'ordre',
@@ -40,11 +41,11 @@ class Classe extends Model
     }
 
     /**
-     * Relation avec les cours (one-to-many)
+     * Relation avec les chapitres (one-to-many)
      */
-    public function cours()
+    public function chapitres()
     {
-        return $this->hasMany(Cours::class);
+        return $this->hasMany(Chapitre::class);
     }
 
     /**
@@ -64,10 +65,42 @@ class Classe extends Model
     }
 
     /**
+     * Scope pour le cycle collège
+     */
+    public function scopeCollege($query)
+    {
+        return $query->where('cycle', 'college');
+    }
+
+    /**
+     * Scope pour le cycle lycée
+     */
+    public function scopeLycee($query)
+    {
+        return $query->where('cycle', 'lycee');
+    }
+
+    /**
      * Scope pour l'ordre
      */
     public function scopeOrdonnees($query)
     {
         return $query->orderBy('ordre')->orderBy('nom');
+    }
+
+    /**
+     * Vérifier si la classe est au collège
+     */
+    public function isCollege()
+    {
+        return $this->cycle === 'college';
+    }
+
+    /**
+     * Vérifier si la classe est au lycée
+     */
+    public function isLycee()
+    {
+        return $this->cycle === 'lycee';
     }
 }

@@ -14,12 +14,12 @@
         </a>
     </div>
     <div class="btn-group">
-        @if($chapitrePrecedent)
+        @if(isset($chapitrePrecedent) && $chapitrePrecedent)
             <a href="{{ route('admin.chapitres.show', $chapitrePrecedent) }}" class="btn btn-outline-secondary btn-sm">
                 <i class="ti ti-chevron-left me-1"></i>Précédent
             </a>
         @endif
-        @if($chapitreSuivant)
+        @if(isset($chapitreSuivant) && $chapitreSuivant)
             <a href="{{ route('admin.chapitres.show', $chapitreSuivant) }}" class="btn btn-outline-secondary btn-sm">
                 Suivant<i class="ti ti-chevron-right ms-1"></i>
             </a>
@@ -33,10 +33,16 @@
         <nav aria-label="breadcrumb">
             <ol class="breadcrumb mb-0">
                 <li class="breadcrumb-item">
-                    <a href="{{ route('admin.classes.index') }}">{{ $chapitre->classe->nom }}</a>
+                    <a href="{{ route('admin.classes.index') }}">Classes</a>
                 </li>
                 <li class="breadcrumb-item">
-                    <a href="{{ route('admin.matieres.index') }}">{{ $chapitre->matiere->nom }}</a>
+                    <span>{{ $chapitre->classe->nom }}</span>
+                </li>
+                <li class="breadcrumb-item">
+                    <a href="{{ route('admin.matieres.index') }}">Matières</a>
+                </li>
+                <li class="breadcrumb-item">
+                    <span>{{ $chapitre->matiere->nom }}</span>
                 </li>
                 <li class="breadcrumb-item active">{{ $chapitre->titre }}</li>
             </ol>
@@ -110,7 +116,7 @@
                     <h6 class="mb-0"><i class="ti ti-file-text me-2"></i>Contenus du chapitre</h6>
                     <small class="text-muted">{{ $chapitre->contenus->count() }} élément(s)</small>
                 </div>
-                <a href="#" class="btn btn-primary btn-sm">
+                <a href="{{ route('admin.contenus.create', $chapitre) }}" class="btn btn-primary btn-sm">
                     <i class="ti ti-plus me-1"></i>Ajouter un contenu
                 </a>
             </div>
@@ -124,28 +130,26 @@
                                     <div class="d-flex align-items-center gap-2 mb-2">
                                         <span class="badge bg-secondary">#{{ $contenu->ordre }}</span>
                                         <strong>{{ $contenu->titre }}</strong>
-                                        @if(!$contenu->statut)
-                                            <span class="badge bg-secondary">Inactif</span>
-                                        @endif
                                     </div>
-                                    <p class="text-muted small mb-2">{{ Str::limit(strip_tags($contenu->contenu), 150) }}</p>
+                                    <p class="text-muted small mb-2">{{ Str::limit(strip_tags($contenu->resume ?? ''), 150) }}</p>
                                     <div class="d-flex gap-3">
+                                        @if($contenu->images && count($contenu->images) > 0)
                                         <small class="text-muted">
-                                            <i class="ti ti-clock me-1"></i>{{ $contenu->duree_estimee ?? 'Durée non définie' }}
+                                            <i class="ti ti-photo me-1"></i>{{ count($contenu->images) }} image(s)
                                         </small>
+                                        @endif
+                                        @if($contenu->exercices && count($contenu->exercices) > 0)
                                         <small class="text-muted">
-                                            <i class="ti ti-video me-1"></i>{{ $contenu->videos_count ?? 0 }} vidéo(s)
+                                            <i class="ti ti-checklist me-1"></i>{{ count($contenu->exercices) }} exercice(s)
                                         </small>
-                                        <small class="text-muted">
-                                            <i class="ti ti-file me-1"></i>{{ $contenu->documents_count ?? 0 }} document(s)
-                                        </small>
+                                        @endif
                                     </div>
                                 </div>
                                 <div class="btn-group btn-group-sm ms-2">
-                                    <a href="#" class="btn btn-outline-info" title="Voir">
+                                    <a href="{{ route('admin.contenus.show', $contenu) }}" class="btn btn-outline-info" title="Voir">
                                         <i class="ti ti-eye"></i>
                                     </a>
-                                    <a href="#" class="btn btn-outline-primary" title="Modifier">
+                                    <a href="{{ route('admin.contenus.edit', $contenu) }}" class="btn btn-outline-primary" title="Modifier">
                                         <i class="ti ti-edit"></i>
                                     </a>
                                 </div>
@@ -157,7 +161,7 @@
                     <div class="text-center p-5">
                         <i class="ti ti-file-text-off fs-1 text-muted mb-3"></i>
                         <p class="text-muted mb-3">Aucun contenu dans ce chapitre</p>
-                        <a href="#" class="btn btn-primary btn-sm">
+                        <a href="{{ route('admin.contenus.create', $chapitre) }}" class="btn btn-primary btn-sm">
                             <i class="ti ti-plus me-1"></i>Ajouter le premier contenu
                         </a>
                     </div>
@@ -168,7 +172,7 @@
 
     <!-- Colonne latérale -->
     <div class="col-lg-4">
-        <!-- Carte Classe (sans route show) -->
+        <!-- Carte Classe (sans lien show) -->
         <div class="card border-0 shadow-sm mb-4">
             <div class="card-header bg-white py-3">
                 <h6 class="mb-0"><i class="ti ti-school me-2"></i>Classe</h6>
@@ -180,7 +184,7 @@
                     </div>
                     <div>
                         <h6 class="mb-1">{{ $chapitre->classe->nom }}</h6>
-                        <small class="text-muted">{{ $chapitre->classe->description ?? 'Aucune description' }}</small>
+                        <small class="text-muted">{{ Str::limit($chapitre->classe->description ?? 'Aucune description', 50) }}</small>
                     </div>
                 </div>
                 <a href="{{ route('admin.chapitres.index', ['classe_id' => $chapitre->classe_id]) }}" class="btn btn-light btn-sm w-100">
@@ -189,7 +193,7 @@
             </div>
         </div>
 
-        <!-- Carte Matière (sans route show) -->
+        <!-- Carte Matière (sans lien show) -->
         <div class="card border-0 shadow-sm mb-4">
             <div class="card-header bg-white py-3">
                 <h6 class="mb-0"><i class="ti ti-book me-2"></i>Matière</h6>
@@ -201,7 +205,7 @@
                     </div>
                     <div>
                         <h6 class="mb-1">{{ $chapitre->matiere->nom }}</h6>
-                        <small class="text-muted">{{ $chapitre->matiere->description ?? 'Aucune description' }}</small>
+                        <small class="text-muted">{{ Str::limit($chapitre->matiere->description ?? 'Aucune description', 50) }}</small>
                     </div>
                 </div>
                 <a href="{{ route('admin.chapitres.index', ['matiere_id' => $chapitre->matiere_id]) }}" class="btn btn-light btn-sm w-100">
@@ -216,31 +220,28 @@
                 <h6 class="mb-0"><i class="ti ti-chart-bar me-2"></i>Statistiques</h6>
             </div>
             <div class="card-body">
-                <div class="mb-3">
-                    <div class="d-flex justify-content-between align-items-center mb-2">
-                        <small class="text-muted">Progression</small>
-                        <small class="text-muted">0%</small>
-                    </div>
-                    <div class="progress" style="height: 6px;">
-                        <div class="progress-bar bg-success" style="width: 0%"></div>
-                    </div>
-                </div>
+                @php
+                    $totalContenus = $chapitre->contenus->count();
+                    $contenusAvecImages = $chapitre->contenus->filter(function($c) { 
+                        return $c->images && count($c->images) > 0; 
+                    })->count();
+                    $contenusAvecExercices = $chapitre->contenus->filter(function($c) { 
+                        return $c->exercices && count($c->exercices) > 0; 
+                    })->count();
+                @endphp
+                
                 <ul class="list-group list-group-flush">
                     <li class="list-group-item d-flex justify-content-between align-items-center px-0">
                         <span><i class="ti ti-file-text me-2 text-primary"></i>Contenus</span>
-                        <span class="badge bg-primary rounded-pill">{{ $chapitre->contenus->count() }}</span>
+                        <span class="badge bg-primary rounded-pill">{{ $totalContenus }}</span>
                     </li>
                     <li class="list-group-item d-flex justify-content-between align-items-center px-0">
-                        <span><i class="ti ti-video me-2 text-info"></i>Vidéos</span>
-                        <span class="badge bg-info rounded-pill">0</span>
+                        <span><i class="ti ti-photo me-2 text-info"></i>Avec images</span>
+                        <span class="badge bg-info rounded-pill">{{ $contenusAvecImages }}</span>
                     </li>
                     <li class="list-group-item d-flex justify-content-between align-items-center px-0">
-                        <span><i class="ti ti-file me-2 text-warning"></i>Documents</span>
-                        <span class="badge bg-warning rounded-pill">0</span>
-                    </li>
-                    <li class="list-group-item d-flex justify-content-between align-items-center px-0">
-                        <span><i class="ti ti-checklist me-2 text-success"></i>Exercices</span>
-                        <span class="badge bg-success rounded-pill">0</span>
+                        <span><i class="ti ti-checklist me-2 text-success"></i>Avec exercices</span>
+                        <span class="badge bg-success rounded-pill">{{ $contenusAvecExercices }}</span>
                     </li>
                 </ul>
             </div>
@@ -262,10 +263,23 @@
                     <dt class="col-sm-4">ID</dt>
                     <dd class="col-sm-8">{{ $chapitre->id }}</dd>
                     
-                    <dt class="col-sm-4">Créé par</dt>
-                    <dd class="col-sm-8">Système</dd>
+                    <dt class="col-sm-4">Classe ID</dt>
+                    <dd class="col-sm-8">{{ $chapitre->classe_id }}</dd>
+                    
+                    <dt class="col-sm-4">Matière ID</dt>
+                    <dd class="col-sm-8">{{ $chapitre->matiere_id }}</dd>
                 </dl>
             </div>
+        </div>
+        
+        <!-- Actions rapides -->
+        <div class="d-grid gap-2 mt-4">
+            <a href="{{ route('admin.contenus.create', $chapitre) }}" class="btn btn-primary">
+                <i class="ti ti-plus me-1"></i>Nouveau contenu
+            </a>
+            <a href="{{ route('admin.chapitres.edit', $chapitre) }}" class="btn btn-outline-primary">
+                <i class="ti ti-edit me-1"></i>Modifier le chapitre
+            </a>
         </div>
     </div>
 </div>
@@ -281,6 +295,13 @@
             <div class="modal-body">
                 <p>Êtes-vous sûr de vouloir supprimer le chapitre <strong>{{ $chapitre->titre }}</strong> ?</p>
                 <p class="text-danger mb-0"><small>Cette action est irréversible et supprimera également tous les contenus associés.</small></p>
+                
+                @if($chapitre->contenus->count() > 0)
+                <div class="alert alert-warning mt-3">
+                    <i class="ti ti-alert-triangle me-1"></i>
+                    Ce chapitre contient <strong>{{ $chapitre->contenus->count() }} contenu(s)</strong> qui seront également supprimés.
+                </div>
+                @endif
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-light" data-bs-dismiss="modal">Annuler</button>
@@ -288,7 +309,7 @@
                     @csrf
                     @method('DELETE')
                     <button type="submit" class="btn btn-danger">
-                        <i class="ti ti-trash me-1"></i>Supprimer
+                        <i class="ti ti-trash me-1"></i>Supprimer définitivement
                     </button>
                 </form>
             </div>

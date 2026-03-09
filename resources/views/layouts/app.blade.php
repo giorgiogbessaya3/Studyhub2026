@@ -179,7 +179,7 @@
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div class="flex justify-between items-center h-20">
                     <!-- Logo -->
-                    <a href="{{ route('home') }}" class="flex items-center gap-3 group">
+                    <a href="/" class="flex items-center gap-3 group">
                         <div class="w-12 h-12 bg-gradient-to-br from-primary-600 to-primary-800 rounded-xl flex items-center justify-center shadow-lg transform group-hover:rotate-12 transition-transform duration-300">
                             <i class="fas fa-graduation-cap text-white text-xl"></i>
                         </div>
@@ -191,19 +191,19 @@
 
                     <!-- Desktop Menu -->
                     <div class="hidden lg:flex items-center space-x-1">
-                        <a href="{{ route('home') }}" class="px-4 py-2 rounded-lg text-slate-600 hover:text-primary-600 hover:bg-primary-50 transition-all {{ request()->routeIs('home') ? 'text-primary-600 bg-primary-50 font-medium' : '' }}">
+                        <a href="/" class="px-4 py-2 rounded-lg text-slate-600 hover:text-primary-600 hover:bg-primary-50 transition-all {{ request()->is('/') ? 'text-primary-600 bg-primary-50 font-medium' : '' }}">
                             Accueil
                         </a>
-                        <a href="{{ route('classes') }}" class="px-4 py-2 rounded-lg text-slate-600 hover:text-primary-600 hover:bg-primary-50 transition-all {{ request()->routeIs('classes*', 'classe.*', 'matiere.*', 'chapitre.*') ? 'text-primary-600 bg-primary-50 font-medium' : '' }}">
+                        <a href="/cours" class="px-4 py-2 rounded-lg text-slate-600 hover:text-primary-600 hover:bg-primary-50 transition-all {{ request()->is('cours*') ? 'text-primary-600 bg-primary-50 font-medium' : '' }}">
                             Cours
                         </a>
-                        <a href="{{ route('epreuves') }}" class="px-4 py-2 rounded-lg text-slate-600 hover:text-primary-600 hover:bg-primary-50 transition-all {{ request()->routeIs('epreuves*') ? 'text-primary-600 bg-primary-50 font-medium' : '' }}">
+                        <a href="/epreuves" class="px-4 py-2 rounded-lg text-slate-600 hover:text-primary-600 hover:bg-primary-50 transition-all {{ request()->is('epreuves*') ? 'text-primary-600 bg-primary-50 font-medium' : '' }}">
                             Épreuves
                         </a>
-                        <a href="{{ route('quiz.list') }}" class="px-4 py-2 rounded-lg text-slate-600 hover:text-primary-600 hover:bg-primary-50 transition-all {{ request()->routeIs('quiz*') ? 'text-primary-600 bg-primary-50 font-medium' : '' }}">
+                        <a href="/quiz" class="px-4 py-2 rounded-lg text-slate-600 hover:text-primary-600 hover:bg-primary-50 transition-all {{ request()->is('quiz*') ? 'text-primary-600 bg-primary-50 font-medium' : '' }}">
                             Quiz
                         </a>
-                        <a href="{{ route('assistance') }}" class="px-4 py-2 rounded-lg text-slate-600 hover:text-primary-600 hover:bg-primary-50 transition-all {{ request()->routeIs('assistance*') ? 'text-primary-600 bg-primary-50 font-medium' : '' }}">
+                        <a href="/assistance" class="px-4 py-2 rounded-lg text-slate-600 hover:text-primary-600 hover:bg-primary-50 transition-all {{ request()->is('assistance*') ? 'text-primary-600 bg-primary-50 font-medium' : '' }}">
                             Assistance
                         </a>
                     </div>
@@ -230,17 +230,17 @@
                                         <p class="font-semibold text-slate-800">{{ Auth::user()->name }}</p>
                                         <p class="text-sm text-slate-500">{{ Auth::user()->email }}</p>
                                     </div>
-                                    <a href="{{ route('user.dashboard') }}" class="block px-4 py-3 hover:bg-slate-50 text-slate-700">
+                                    <a href="/dashboard" class="block px-4 py-3 hover:bg-slate-50 text-slate-700">
                                         <i class="fas fa-chart-line mr-2 text-primary-500"></i> Tableau de bord
                                     </a>
-                                    <a href="{{ route('profile') }}" class="block px-4 py-3 hover:bg-slate-50 text-slate-700">
+                                    <a href="/profile" class="block px-4 py-3 hover:bg-slate-50 text-slate-700">
                                         <i class="fas fa-user mr-2 text-primary-500"></i> Mon profil
                                     </a>
-                                    <a href="{{ route('mes.cours') }}" class="block px-4 py-3 hover:bg-slate-50 text-slate-700">
+                                    <a href="/mes-cours" class="block px-4 py-3 hover:bg-slate-50 text-slate-700">
                                         <i class="fas fa-book mr-2 text-primary-500"></i> Mes cours
                                     </a>
                                     <div class="border-t border-slate-100">
-                                        <form action="{{ route('logout') }}" method="POST" class="block">
+                                        <form action="/logout" method="POST" class="block">
                                             @csrf
                                             <button type="submit" class="w-full text-left px-4 py-3 hover:bg-red-50 text-red-600">
                                                 <i class="fas fa-sign-out-alt mr-2"></i> Déconnexion
@@ -250,10 +250,10 @@
                                 </div>
                             </div>
                         @else
-                            <a href="{{ route('login') }}" class="hidden md:block px-6 py-2.5 text-primary-600 font-medium hover:bg-primary-50 rounded-full transition-colors">
+                            <a href="/login" class="hidden md:block px-6 py-2.5 text-primary-600 font-medium hover:bg-primary-50 rounded-full transition-colors">
                                 Connexion
                             </a>
-                            <a href="{{ route('register') }}" class="px-6 py-2.5 bg-primary-600 hover:bg-primary-700 text-white font-medium rounded-full shadow-lg shadow-primary-500/30 transition-all hover:scale-105 btn-shine">
+                            <a href="/register" class="px-6 py-2.5 bg-primary-600 hover:bg-primary-700 text-white font-medium rounded-full shadow-lg shadow-primary-500/30 transition-all hover:scale-105 btn-shine">
                                 S'inscrire
                             </a>
                         @endauth
@@ -282,10 +282,10 @@
                 <div class="p-4 bg-slate-50">
                     <p class="text-sm text-slate-500 mb-3">Suggestions populaires</p>
                     <div class="flex flex-wrap gap-2">
-                        <a href="{{ route('epreuves') }}?classe=terminale" class="px-3 py-1.5 bg-white rounded-full text-sm text-slate-600 hover:text-primary-600 hover:shadow-sm transition-all">Bac 2024</a>
-                        <a href="{{ route('classes') }}?type=cours" class="px-3 py-1.5 bg-white rounded-full text-sm text-slate-600 hover:text-primary-600 hover:shadow-sm transition-all">Cours de maths</a>
-                        <a href="{{ route('epreuves') }}?type=devoir" class="px-3 py-1.5 bg-white rounded-full text-sm text-slate-600 hover:text-primary-600 hover:shadow-sm transition-all">Devoirs surveillés</a>
-                        <a href="{{ route('quiz.list') }}" class="px-3 py-1.5 bg-white rounded-full text-sm text-slate-600 hover:text-primary-600 hover:shadow-sm transition-all">Quiz en ligne</a>
+                        <a href="/epreuves?classe=terminale" class="px-3 py-1.5 bg-white rounded-full text-sm text-slate-600 hover:text-primary-600 hover:shadow-sm transition-all">Bac 2024</a>
+                        <a href="/cours/recherche?q=maths" class="px-3 py-1.5 bg-white rounded-full text-sm text-slate-600 hover:text-primary-600 hover:shadow-sm transition-all">Cours de maths</a>
+                        <a href="/epreuves?type=devoir" class="px-3 py-1.5 bg-white rounded-full text-sm text-slate-600 hover:text-primary-600 hover:shadow-sm transition-all">Devoirs surveillés</a>
+                        <a href="/quiz" class="px-3 py-1.5 bg-white rounded-full text-sm text-slate-600 hover:text-primary-600 hover:shadow-sm transition-all">Quiz en ligne</a>
                     </div>
                 </div>
             </div>
@@ -301,37 +301,37 @@
             </button>
         </div>
         <div class="p-4 space-y-2">
-            <a href="{{ route('home') }}" class="flex items-center gap-3 p-4 rounded-xl {{ request()->routeIs('home') ? 'bg-primary-50 text-primary-600' : 'text-slate-600 hover:bg-slate-50' }}">
+            <a href="/" class="flex items-center gap-3 p-4 rounded-xl {{ request()->is('/') ? 'bg-primary-50 text-primary-600' : 'text-slate-600 hover:bg-slate-50' }}">
                 <i class="fas fa-home w-6"></i>
                 <span class="font-medium">Accueil</span>
             </a>
-            <a href="{{ route('classes') }}" class="flex items-center gap-3 p-4 rounded-xl {{ request()->routeIs('classes*', 'classe.*', 'matiere.*') ? 'bg-primary-50 text-primary-600' : 'text-slate-600 hover:bg-slate-50' }}">
+            <a href="/cours" class="flex items-center gap-3 p-4 rounded-xl {{ request()->is('cours*') ? 'bg-primary-50 text-primary-600' : 'text-slate-600 hover:bg-slate-50' }}">
                 <i class="fas fa-book w-6"></i>
                 <span class="font-medium">Cours</span>
             </a>
-            <a href="{{ route('epreuves') }}" class="flex items-center gap-3 p-4 rounded-xl {{ request()->routeIs('epreuves*') ? 'bg-primary-50 text-primary-600' : 'text-slate-600 hover:bg-slate-50' }}">
+            <a href="/epreuves" class="flex items-center gap-3 p-4 rounded-xl {{ request()->is('epreuves*') ? 'bg-primary-50 text-primary-600' : 'text-slate-600 hover:bg-slate-50' }}">
                 <i class="fas fa-file-alt w-6"></i>
                 <span class="font-medium">Épreuves</span>
             </a>
-            <a href="{{ route('quiz.list') }}" class="flex items-center gap-3 p-4 rounded-xl {{ request()->routeIs('quiz*') ? 'bg-primary-50 text-primary-600' : 'text-slate-600 hover:bg-slate-50' }}">
+            <a href="/quiz" class="flex items-center gap-3 p-4 rounded-xl {{ request()->is('quiz*') ? 'bg-primary-50 text-primary-600' : 'text-slate-600 hover:bg-slate-50' }}">
                 <i class="fas fa-question-circle w-6"></i>
                 <span class="font-medium">Quiz</span>
             </a>
-            <a href="{{ route('assistance') }}" class="flex items-center gap-3 p-4 rounded-xl {{ request()->routeIs('assistance*') ? 'bg-primary-50 text-primary-600' : 'text-slate-600 hover:bg-slate-50' }}">
+            <a href="/assistance" class="flex items-center gap-3 p-4 rounded-xl {{ request()->is('assistance*') ? 'bg-primary-50 text-primary-600' : 'text-slate-600 hover:bg-slate-50' }}">
                 <i class="fas fa-hands-helping w-6"></i>
                 <span class="font-medium">Assistance</span>
             </a>
-            <a href="{{ route('contact') }}" class="flex items-center gap-3 p-4 rounded-xl {{ request()->routeIs('contact') ? 'bg-primary-50 text-primary-600' : 'text-slate-600 hover:bg-slate-50' }}">
+            <a href="/contact" class="flex items-center gap-3 p-4 rounded-xl {{ request()->is('contact') ? 'bg-primary-50 text-primary-600' : 'text-slate-600 hover:bg-slate-50' }}">
                 <i class="fas fa-envelope w-6"></i>
                 <span class="font-medium">Contact</span>
             </a>
         </div>
         @guest
         <div class="p-4 border-t border-slate-100 space-y-3">
-            <a href="{{ route('login') }}" class="block w-full py-3 text-center text-primary-600 font-medium border-2 border-primary-600 rounded-xl hover:bg-primary-50 transition-colors">
+            <a href="/login" class="block w-full py-3 text-center text-primary-600 font-medium border-2 border-primary-600 rounded-xl hover:bg-primary-50 transition-colors">
                 Connexion
             </a>
-            <a href="{{ route('register') }}" class="block w-full py-3 text-center bg-primary-600 text-white font-medium rounded-xl hover:bg-primary-700 transition-colors">
+            <a href="/register" class="block w-full py-3 text-center bg-primary-600 text-white font-medium rounded-xl hover:bg-primary-700 transition-colors">
                 Créer un compte
             </a>
         </div>
@@ -381,10 +381,10 @@
                 <div>
                     <h4 class="text-white font-semibold mb-6">Ressources</h4>
                     <ul class="space-y-3">
-                        <li><a href="{{ route('classes') }}" class="hover:text-primary-400 transition-colors flex items-center gap-2"><i class="fas fa-chevron-right text-xs text-primary-500"></i> Cours par classe</a></li>
-                        <li><a href="{{ route('epreuves') }}" class="hover:text-primary-400 transition-colors flex items-center gap-2"><i class="fas fa-chevron-right text-xs text-primary-500"></i> Banque d'épreuves</a></li>
-                        <li><a href="{{ route('quiz.list') }}" class="hover:text-primary-400 transition-colors flex items-center gap-2"><i class="fas fa-chevron-right text-xs text-primary-500"></i> Quiz interactifs</a></li>
-                        <li><a href="{{ route('assistance') }}" class="hover:text-primary-400 transition-colors flex items-center gap-2"><i class="fas fa-chevron-right text-xs text-primary-500"></i> Assistance pédagogique</a></li>
+                        <li><a href="/cours" class="hover:text-primary-400 transition-colors flex items-center gap-2"><i class="fas fa-chevron-right text-xs text-primary-500"></i> Cours par classe</a></li>
+                        <li><a href="/epreuves" class="hover:text-primary-400 transition-colors flex items-center gap-2"><i class="fas fa-chevron-right text-xs text-primary-500"></i> Banque d'épreuves</a></li>
+                        <li><a href="/quiz" class="hover:text-primary-400 transition-colors flex items-center gap-2"><i class="fas fa-chevron-right text-xs text-primary-500"></i> Quiz interactifs</a></li>
+                        <li><a href="/assistance" class="hover:text-primary-400 transition-colors flex items-center gap-2"><i class="fas fa-chevron-right text-xs text-primary-500"></i> Assistance pédagogique</a></li>
                     </ul>
                 </div>
 
@@ -392,10 +392,10 @@
                 <div>
                     <h4 class="text-white font-semibold mb-6">Classes</h4>
                     <ul class="space-y-3">
-                        <li><a href="{{ route('classe.detail', '6eme') }}" class="hover:text-primary-400 transition-colors flex items-center gap-2"><i class="fas fa-chevron-right text-xs text-primary-500"></i> Collège (6ème - 3ème)</a></li>
-                        <li><a href="{{ route('classe.detail', 'seconde') }}" class="hover:text-primary-400 transition-colors flex items-center gap-2"><i class="fas fa-chevron-right text-xs text-primary-500"></i> Seconde</a></li>
-                        <li><a href="{{ route('classe.detail', 'premiere') }}" class="hover:text-primary-400 transition-colors flex items-center gap-2"><i class="fas fa-chevron-right text-xs text-primary-500"></i> Première</a></li>
-                        <li><a href="{{ route('classe.detail', 'terminale') }}" class="hover:text-primary-400 transition-colors flex items-center gap-2"><i class="fas fa-chevron-right text-xs text-primary-500"></i> Terminale (Bac)</a></li>
+                        <li><a href="/cours/classe/6eme" class="hover:text-primary-400 transition-colors flex items-center gap-2"><i class="fas fa-chevron-right text-xs text-primary-500"></i> Collège (6ème - 3ème)</a></li>
+                        <li><a href="/cours/classe/seconde" class="hover:text-primary-400 transition-colors flex items-center gap-2"><i class="fas fa-chevron-right text-xs text-primary-500"></i> Seconde</a></li>
+                        <li><a href="/cours/classe/premiere" class="hover:text-primary-400 transition-colors flex items-center gap-2"><i class="fas fa-chevron-right text-xs text-primary-500"></i> Première</a></li>
+                        <li><a href="/cours/classe/terminale" class="hover:text-primary-400 transition-colors flex items-center gap-2"><i class="fas fa-chevron-right text-xs text-primary-500"></i> Terminale (Bac)</a></li>
                     </ul>
                 </div>
 
@@ -444,36 +444,36 @@
     <!-- Mobile Bottom Navigation (visible only on mobile) -->
     <nav class="lg:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-slate-200 safe-bottom z-40 shadow-lg">
         <div class="flex justify-around items-center h-16">
-            <a href="{{ route('home') }}" class="flex flex-col items-center justify-center w-full h-full gap-1 {{ request()->routeIs('home') ? 'text-primary-600' : 'text-slate-400' }}">
-                <div class="w-10 h-10 rounded-full flex items-center justify-center {{ request()->routeIs('home') ? 'bg-primary-100' : '' }}">
+            <a href="/" class="flex flex-col items-center justify-center w-full h-full gap-1 {{ request()->is('/') ? 'text-primary-600' : 'text-slate-400' }}">
+                <div class="w-10 h-10 rounded-full flex items-center justify-center {{ request()->is('/') ? 'bg-primary-100' : '' }}">
                     <i class="fas fa-home text-lg"></i>
                 </div>
                 <span class="text-xs font-medium">Accueil</span>
             </a>
             
-            <a href="{{ route('classes') }}" class="flex flex-col items-center justify-center w-full h-full gap-1 {{ request()->routeIs('classes*', 'classe.*', 'matiere.*', 'chapitre.*') ? 'text-primary-600' : 'text-slate-400' }}">
-                <div class="w-10 h-10 rounded-full flex items-center justify-center {{ request()->routeIs('classes*', 'classe.*', 'matiere.*', 'chapitre.*') ? 'bg-primary-100' : '' }}">
+            <a href="/cours" class="flex flex-col items-center justify-center w-full h-full gap-1 {{ request()->is('cours*') ? 'text-primary-600' : 'text-slate-400' }}">
+                <div class="w-10 h-10 rounded-full flex items-center justify-center {{ request()->is('cours*') ? 'bg-primary-100' : '' }}">
                     <i class="fas fa-book text-lg"></i>
                 </div>
                 <span class="text-xs font-medium">Cours</span>
             </a>
             
-            <a href="{{ route('epreuves') }}" class="flex flex-col items-center justify-center w-full h-full gap-1 {{ request()->routeIs('epreuves*') ? 'text-primary-600' : 'text-slate-400' }}">
-                <div class="w-10 h-10 rounded-full flex items-center justify-center {{ request()->routeIs('epreuves*') ? 'bg-primary-100' : '' }}">
+            <a href="/epreuves" class="flex flex-col items-center justify-center w-full h-full gap-1 {{ request()->is('epreuves*') ? 'text-primary-600' : 'text-slate-400' }}">
+                <div class="w-10 h-10 rounded-full flex items-center justify-center {{ request()->is('epreuves*') ? 'bg-primary-100' : '' }}">
                     <i class="fas fa-file-alt text-lg"></i>
                 </div>
                 <span class="text-xs font-medium">Épreuves</span>
             </a>
             
-            <a href="{{ route('assistance') }}" class="flex flex-col items-center justify-center w-full h-full gap-1 {{ request()->routeIs('assistance*') ? 'text-primary-600' : 'text-slate-400' }}">
-                <div class="w-10 h-10 rounded-full flex items-center justify-center {{ request()->routeIs('assistance*') ? 'bg-primary-100' : '' }}">
+            <a href="/assistance" class="flex flex-col items-center justify-center w-full h-full gap-1 {{ request()->is('assistance*') ? 'text-primary-600' : 'text-slate-400' }}">
+                <div class="w-10 h-10 rounded-full flex items-center justify-center {{ request()->is('assistance*') ? 'bg-primary-100' : '' }}">
                     <i class="fas fa-question-circle text-lg"></i>
                 </div>
                 <span class="text-xs font-medium">Aide</span>
             </a>
             
-            <a href="{{ route('user.dashboard') }}" class="flex flex-col items-center justify-center w-full h-full gap-1 {{ request()->routeIs('user.dashboard') ? 'text-primary-600' : 'text-slate-400' }}">
-                <div class="w-10 h-10 rounded-full flex items-center justify-center {{ request()->routeIs('user.dashboard') ? 'bg-primary-100' : '' }}">
+            <a href="/dashboard" class="flex flex-col items-center justify-center w-full h-full gap-1 {{ request()->is('dashboard') ? 'text-primary-600' : 'text-slate-400' }}">
+                <div class="w-10 h-10 rounded-full flex items-center justify-center {{ request()->is('dashboard') ? 'bg-primary-100' : '' }}">
                     <i class="fas fa-user text-lg"></i>
                 </div>
                 <span class="text-xs font-medium">Profil</span>
@@ -554,6 +554,11 @@
             }
         });
     </script>
+    <!-- CKEditor 5 -->
+<script src="https://cdn.ckeditor.com/ckeditor5/39.0.1/classic/ckeditor.js"></script>
+<script src="https://cdn.ckeditor.com/ckeditor5/39.0.1/classic/translations/fr.js"></script>
+<!-- MathType pour les formules -->
+<script src="https://cdn.jsdelivr.net/npm/@wiris/mathtype-ckeditor5@8.3.0/dist/mathtype-ckeditor5.js"></script>
 
     @yield('scripts')
 </body>

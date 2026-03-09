@@ -1,0 +1,560 @@
+{{-- resources/views/layouts/app.blade.php --}}
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#3b82f6">
+    <title>@yield('title', 'StudyHub - Plateforme Éducative')</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- AOS Animation Library -->
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        display: ['Poppins', 'sans-serif'],
+                    },
+                    colors: {
+                        primary: {
+                            50: '#eff6ff',
+                            100: '#dbeafe',
+                            200: '#bfdbfe',
+                            300: '#93c5fd',
+                            400: '#60a5fa',
+                            500: '#3b82f6',
+                            600: '#2563eb',
+                            700: '#1d4ed8',
+                            800: '#1e40af',
+                            900: '#1e3a8a',
+                        },
+                        secondary: {
+                            500: '#f59e0b',
+                            600: '#d97706',
+                        }
+                    },
+                    animation: {
+                        'float': 'float 6s ease-in-out infinite',
+                        'pulse-slow': 'pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                        'slide-up': 'slideUp 0.5s ease-out',
+                        'fade-in': 'fadeIn 0.5s ease-out',
+                    },
+                    keyframes: {
+                        float: {
+                            '0%, 100%': { transform: 'translateY(0px)' },
+                            '50%': { transform: 'translateY(-20px)' },
+                        },
+                        slideUp: {
+                            '0%': { transform: 'translateY(30px)', opacity: '0' },
+                            '100%': { transform: 'translateY(0)', opacity: '1' },
+                        },
+                        fadeIn: {
+                            '0%': { opacity: '0' },
+                            '100%': { opacity: '1' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f5f9;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #3b82f6;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #2563eb;
+        }
+
+        /* Glass Effect */
+        .glass {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+        }
+
+        /* Gradient Text */
+        .gradient-text {
+            background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 50%, #06b6d4 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        /* Card Hover Effects */
+        .card-hover {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .card-hover:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 20px 40px -15px rgba(59, 130, 246, 0.3);
+        }
+
+        /* Button Shine Effect */
+        .btn-shine {
+            position: relative;
+            overflow: hidden;
+        }
+        .btn-shine::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+            transition: left 0.5s;
+        }
+        .btn-shine:hover::after {
+            left: 100%;
+        }
+
+        /* Blob Animation */
+        .blob {
+            position: absolute;
+            filter: blur(80px);
+            opacity: 0.4;
+            animation: blob-move 20s infinite alternate;
+        }
+        @keyframes blob-move {
+            from { transform: translate(0, 0) scale(1); }
+            to { transform: translate(50px, -50px) scale(1.1); }
+        }
+
+        /* Hide scrollbar for horizontal scroll */
+        .hide-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .hide-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+
+        /* Mobile Bottom Nav Safe Area */
+        .safe-bottom {
+            padding-bottom: env(safe-area-inset-bottom, 20px);
+        }
+
+        /* Loading Skeleton */
+        .skeleton {
+            background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+            background-size: 200% 100%;
+            animation: loading 1.5s infinite;
+        }
+        @keyframes loading {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+        }
+    </style>
+    
+    @yield('styles')
+</head>
+<body class="font-sans antialiased bg-slate-50 text-slate-800 overflow-x-hidden">
+
+    <!-- Navigation -->
+    <nav id="navbar" class="fixed w-full z-50 transition-all duration-300">
+        <div class="glass border-b border-white/20">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="flex justify-between items-center h-20">
+                    <!-- Logo -->
+                    <a href="{{ route('home') }}" class="flex items-center gap-3 group">
+                        <div class="w-12 h-12 bg-gradient-to-br from-primary-600 to-primary-800 rounded-xl flex items-center justify-center shadow-lg transform group-hover:rotate-12 transition-transform duration-300">
+                            <i class="fas fa-graduation-cap text-white text-xl"></i>
+                        </div>
+                        <div class="hidden sm:block">
+                            <span class="font-display text-2xl font-bold text-slate-900">StudyHub</span>
+                            <span class="block text-xs text-primary-600 font-medium -mt-1">Apprenez. Révisez. Réussissez.</span>
+                        </div>
+                    </a>
+
+                    <!-- Desktop Menu -->
+                    <div class="hidden lg:flex items-center space-x-1">
+                        <a href="{{ route('home') }}" class="px-4 py-2 rounded-lg text-slate-600 hover:text-primary-600 hover:bg-primary-50 transition-all {{ request()->routeIs('home') ? 'text-primary-600 bg-primary-50 font-medium' : '' }}">
+                            Accueil
+                        </a>
+                        <a href="{{ route('classes') }}" class="px-4 py-2 rounded-lg text-slate-600 hover:text-primary-600 hover:bg-primary-50 transition-all {{ request()->routeIs('classes*', 'classe.*', 'matiere.*', 'chapitre.*') ? 'text-primary-600 bg-primary-50 font-medium' : '' }}">
+                            Cours
+                        </a>
+                        <a href="{{ route('epreuves') }}" class="px-4 py-2 rounded-lg text-slate-600 hover:text-primary-600 hover:bg-primary-50 transition-all {{ request()->routeIs('epreuves*') ? 'text-primary-600 bg-primary-50 font-medium' : '' }}">
+                            Épreuves
+                        </a>
+                        <a href="{{ route('quiz.list') }}" class="px-4 py-2 rounded-lg text-slate-600 hover:text-primary-600 hover:bg-primary-50 transition-all {{ request()->routeIs('quiz*') ? 'text-primary-600 bg-primary-50 font-medium' : '' }}">
+                            Quiz
+                        </a>
+                        <a href="{{ route('assistance') }}" class="px-4 py-2 rounded-lg text-slate-600 hover:text-primary-600 hover:bg-primary-50 transition-all {{ request()->routeIs('assistance*') ? 'text-primary-600 bg-primary-50 font-medium' : '' }}">
+                            Assistance
+                        </a>
+                    </div>
+
+                    <!-- Right Side -->
+                    <div class="flex items-center gap-4">
+                        <!-- Search Button -->
+                        <button onclick="toggleSearch()" class="hidden md:flex w-10 h-10 items-center justify-center rounded-full hover:bg-slate-100 transition-colors">
+                            <i class="fas fa-search text-slate-600"></i>
+                        </button>
+
+                        @auth
+                            <!-- User Menu -->
+                            <div class="relative" x-data="{ open: false }">
+                                <button onclick="toggleUserMenu()" class="flex items-center gap-3 pl-2 pr-4 py-2 rounded-full hover:bg-slate-100 transition-colors">
+                                    <img src="https://ui-avatars.com/api/?name={{ urlencode(Auth::user()->name) }}&background=3b82f6&color=fff" alt="Avatar" class="w-10 h-10 rounded-full border-2 border-primary-200">
+                                    <span class="hidden md:block font-medium text-slate-700">{{ explode(' ', Auth::user()->name)[0] }}</span>
+                                    <i class="fas fa-chevron-down text-xs text-slate-400 hidden md:block"></i>
+                                </button>
+                                
+                                <!-- Dropdown -->
+                                <div id="userMenu" class="hidden absolute right-0 mt-2 w-56 bg-white rounded-2xl shadow-xl border border-slate-100 overflow-hidden">
+                                    <div class="p-4 border-b border-slate-100">
+                                        <p class="font-semibold text-slate-800">{{ Auth::user()->name }}</p>
+                                        <p class="text-sm text-slate-500">{{ Auth::user()->email }}</p>
+                                    </div>
+                                    <a href="{{ route('user.dashboard') }}" class="block px-4 py-3 hover:bg-slate-50 text-slate-700">
+                                        <i class="fas fa-chart-line mr-2 text-primary-500"></i> Tableau de bord
+                                    </a>
+                                    <a href="{{ route('profile') }}" class="block px-4 py-3 hover:bg-slate-50 text-slate-700">
+                                        <i class="fas fa-user mr-2 text-primary-500"></i> Mon profil
+                                    </a>
+                                    <a href="{{ route('mes.cours') }}" class="block px-4 py-3 hover:bg-slate-50 text-slate-700">
+                                        <i class="fas fa-book mr-2 text-primary-500"></i> Mes cours
+                                    </a>
+                                    <div class="border-t border-slate-100">
+                                        <form action="{{ route('logout') }}" method="POST" class="block">
+                                            @csrf
+                                            <button type="submit" class="w-full text-left px-4 py-3 hover:bg-red-50 text-red-600">
+                                                <i class="fas fa-sign-out-alt mr-2"></i> Déconnexion
+                                            </button>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        @else
+                            <a href="{{ route('login') }}" class="hidden md:block px-6 py-2.5 text-primary-600 font-medium hover:bg-primary-50 rounded-full transition-colors">
+                                Connexion
+                            </a>
+                            <a href="{{ route('register') }}" class="px-6 py-2.5 bg-primary-600 hover:bg-primary-700 text-white font-medium rounded-full shadow-lg shadow-primary-500/30 transition-all hover:scale-105 btn-shine">
+                                S'inscrire
+                            </a>
+                        @endauth
+
+                        <!-- Mobile Menu Button -->
+                        <button onclick="toggleMobileMenu()" class="lg:hidden w-10 h-10 flex items-center justify-center rounded-lg hover:bg-slate-100 transition-colors">
+                            <i class="fas fa-bars text-slate-600 text-xl"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Search Overlay -->
+    <div id="searchOverlay" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 hidden opacity-0 transition-opacity duration-300">
+        <div class="max-w-3xl mx-auto mt-32 px-4">
+            <div class="bg-white rounded-2xl shadow-2xl overflow-hidden transform scale-95 transition-transform duration-300" id="searchBox">
+                <div class="flex items-center p-4 border-b border-slate-100">
+                    <i class="fas fa-search text-slate-400 text-xl mr-3"></i>
+                    <input type="text" placeholder="Rechercher un cours, une épreuve, une matière..." class="flex-1 text-lg outline-none text-slate-700 placeholder-slate-400" autofocus>
+                    <button onclick="toggleSearch()" class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-slate-100 text-slate-400">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                <div class="p-4 bg-slate-50">
+                    <p class="text-sm text-slate-500 mb-3">Suggestions populaires</p>
+                    <div class="flex flex-wrap gap-2">
+                        <a href="{{ route('epreuves') }}?classe=terminale" class="px-3 py-1.5 bg-white rounded-full text-sm text-slate-600 hover:text-primary-600 hover:shadow-sm transition-all">Bac 2024</a>
+                        <a href="{{ route('classes') }}?type=cours" class="px-3 py-1.5 bg-white rounded-full text-sm text-slate-600 hover:text-primary-600 hover:shadow-sm transition-all">Cours de maths</a>
+                        <a href="{{ route('epreuves') }}?type=devoir" class="px-3 py-1.5 bg-white rounded-full text-sm text-slate-600 hover:text-primary-600 hover:shadow-sm transition-all">Devoirs surveillés</a>
+                        <a href="{{ route('quiz.list') }}" class="px-3 py-1.5 bg-white rounded-full text-sm text-slate-600 hover:text-primary-600 hover:shadow-sm transition-all">Quiz en ligne</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Mobile Menu -->
+    <div id="mobileMenu" class="fixed inset-0 bg-white z-40 transform translate-x-full transition-transform duration-300 lg:hidden">
+        <div class="p-4 border-b border-slate-100 flex justify-between items-center">
+            <span class="font-display text-xl font-bold text-slate-900">Menu</span>
+            <button onclick="toggleMobileMenu()" class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-slate-100">
+                <i class="fas fa-times text-slate-600 text-xl"></i>
+            </button>
+        </div>
+        <div class="p-4 space-y-2">
+            <a href="{{ route('home') }}" class="flex items-center gap-3 p-4 rounded-xl {{ request()->routeIs('home') ? 'bg-primary-50 text-primary-600' : 'text-slate-600 hover:bg-slate-50' }}">
+                <i class="fas fa-home w-6"></i>
+                <span class="font-medium">Accueil</span>
+            </a>
+            <a href="{{ route('classes') }}" class="flex items-center gap-3 p-4 rounded-xl {{ request()->routeIs('classes*', 'classe.*', 'matiere.*') ? 'bg-primary-50 text-primary-600' : 'text-slate-600 hover:bg-slate-50' }}">
+                <i class="fas fa-book w-6"></i>
+                <span class="font-medium">Cours</span>
+            </a>
+            <a href="{{ route('epreuves') }}" class="flex items-center gap-3 p-4 rounded-xl {{ request()->routeIs('epreuves*') ? 'bg-primary-50 text-primary-600' : 'text-slate-600 hover:bg-slate-50' }}">
+                <i class="fas fa-file-alt w-6"></i>
+                <span class="font-medium">Épreuves</span>
+            </a>
+            <a href="{{ route('quiz.list') }}" class="flex items-center gap-3 p-4 rounded-xl {{ request()->routeIs('quiz*') ? 'bg-primary-50 text-primary-600' : 'text-slate-600 hover:bg-slate-50' }}">
+                <i class="fas fa-question-circle w-6"></i>
+                <span class="font-medium">Quiz</span>
+            </a>
+            <a href="{{ route('assistance') }}" class="flex items-center gap-3 p-4 rounded-xl {{ request()->routeIs('assistance*') ? 'bg-primary-50 text-primary-600' : 'text-slate-600 hover:bg-slate-50' }}">
+                <i class="fas fa-hands-helping w-6"></i>
+                <span class="font-medium">Assistance</span>
+            </a>
+            <a href="{{ route('contact') }}" class="flex items-center gap-3 p-4 rounded-xl {{ request()->routeIs('contact') ? 'bg-primary-50 text-primary-600' : 'text-slate-600 hover:bg-slate-50' }}">
+                <i class="fas fa-envelope w-6"></i>
+                <span class="font-medium">Contact</span>
+            </a>
+        </div>
+        @guest
+        <div class="p-4 border-t border-slate-100 space-y-3">
+            <a href="{{ route('login') }}" class="block w-full py-3 text-center text-primary-600 font-medium border-2 border-primary-600 rounded-xl hover:bg-primary-50 transition-colors">
+                Connexion
+            </a>
+            <a href="{{ route('register') }}" class="block w-full py-3 text-center bg-primary-600 text-white font-medium rounded-xl hover:bg-primary-700 transition-colors">
+                Créer un compte
+            </a>
+        </div>
+        @endguest
+    </div>
+
+    <!-- Main Content -->
+    <main class="pt-20 min-h-screen">
+        @yield('content')
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-slate-900 text-slate-300 relative overflow-hidden">
+        <!-- Background Pattern -->
+        <div class="absolute inset-0 opacity-5">
+            <div class="absolute inset-0" style="background-image: radial-gradient(circle at 2px 2px, white 1px, transparent 0); background-size: 40px 40px;"></div>
+        </div>
+        
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 relative z-10">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12">
+                <!-- Brand -->
+                <div class="lg:col-span-1">
+                    <div class="flex items-center gap-3 mb-6">
+                        <div class="w-12 h-12 bg-gradient-to-br from-primary-500 to-primary-700 rounded-xl flex items-center justify-center">
+                            <i class="fas fa-graduation-cap text-white text-xl"></i>
+                        </div>
+                        <span class="font-display text-2xl font-bold text-white">StudyHub</span>
+                    </div>
+                    <p class="text-slate-400 mb-6 leading-relaxed">La plateforme éducative complète pour les élèves du collège au lycée. Réussissez vos examens avec nos ressources pédagogiques de qualité.</p>
+                    <div class="flex gap-3">
+                        <a href="#" class="w-10 h-10 rounded-full bg-slate-800 flex items-center justify-center hover:bg-primary-600 transition-colors text-white">
+                            <i class="fab fa-facebook-f"></i>
+                        </a>
+                        <a href="#" class="w-10 h-10 rounded-full bg-slate-800 flex items-center justify-center hover:bg-primary-600 transition-colors text-white">
+                            <i class="fab fa-twitter"></i>
+                        </a>
+                        <a href="#" class="w-10 h-10 rounded-full bg-slate-800 flex items-center justify-center hover:bg-primary-600 transition-colors text-white">
+                            <i class="fab fa-instagram"></i>
+                        </a>
+                        <a href="#" class="w-10 h-10 rounded-full bg-slate-800 flex items-center justify-center hover:bg-primary-600 transition-colors text-white">
+                            <i class="fab fa-youtube"></i>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Links -->
+                <div>
+                    <h4 class="text-white font-semibold mb-6">Ressources</h4>
+                    <ul class="space-y-3">
+                        <li><a href="{{ route('classes') }}" class="hover:text-primary-400 transition-colors flex items-center gap-2"><i class="fas fa-chevron-right text-xs text-primary-500"></i> Cours par classe</a></li>
+                        <li><a href="{{ route('epreuves') }}" class="hover:text-primary-400 transition-colors flex items-center gap-2"><i class="fas fa-chevron-right text-xs text-primary-500"></i> Banque d'épreuves</a></li>
+                        <li><a href="{{ route('quiz.list') }}" class="hover:text-primary-400 transition-colors flex items-center gap-2"><i class="fas fa-chevron-right text-xs text-primary-500"></i> Quiz interactifs</a></li>
+                        <li><a href="{{ route('assistance') }}" class="hover:text-primary-400 transition-colors flex items-center gap-2"><i class="fas fa-chevron-right text-xs text-primary-500"></i> Assistance pédagogique</a></li>
+                    </ul>
+                </div>
+
+                <!-- Classes -->
+                <div>
+                    <h4 class="text-white font-semibold mb-6">Classes</h4>
+                    <ul class="space-y-3">
+                        <li><a href="{{ route('classe.detail', '6eme') }}" class="hover:text-primary-400 transition-colors flex items-center gap-2"><i class="fas fa-chevron-right text-xs text-primary-500"></i> Collège (6ème - 3ème)</a></li>
+                        <li><a href="{{ route('classe.detail', 'seconde') }}" class="hover:text-primary-400 transition-colors flex items-center gap-2"><i class="fas fa-chevron-right text-xs text-primary-500"></i> Seconde</a></li>
+                        <li><a href="{{ route('classe.detail', 'premiere') }}" class="hover:text-primary-400 transition-colors flex items-center gap-2"><i class="fas fa-chevron-right text-xs text-primary-500"></i> Première</a></li>
+                        <li><a href="{{ route('classe.detail', 'terminale') }}" class="hover:text-primary-400 transition-colors flex items-center gap-2"><i class="fas fa-chevron-right text-xs text-primary-500"></i> Terminale (Bac)</a></li>
+                    </ul>
+                </div>
+
+                <!-- Contact -->
+                <div>
+                    <h4 class="text-white font-semibold mb-6">Contact</h4>
+                    <ul class="space-y-4">
+                        <li class="flex items-start gap-3">
+                            <i class="fas fa-envelope text-primary-500 mt-1"></i>
+                            <span>contact@studyhub.fr</span>
+                        </li>
+                        <li class="flex items-start gap-3">
+                            <i class="fas fa-phone text-primary-500 mt-1"></i>
+                            <span>+33 1 23 45 67 89</span>
+                        </li>
+                        <li class="flex items-start gap-3">
+                            <i class="fas fa-map-marker-alt text-primary-500 mt-1"></i>
+                            <span>Paris, France</span>
+                        </li>
+                    </ul>
+                    
+                    <!-- Newsletter -->
+                    <div class="mt-6">
+                        <p class="text-sm text-slate-400 mb-3">Restez informé</p>
+                        <form class="flex gap-2">
+                            <input type="email" placeholder="Votre email" class="flex-1 bg-slate-800 border border-slate-700 rounded-lg px-4 py-2 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-primary-500">
+                            <button type="submit" class="bg-primary-600 hover:bg-primary-700 text-white px-4 py-2 rounded-lg transition-colors">
+                                <i class="fas fa-paper-plane"></i>
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <div class="border-t border-slate-800 mt-12 pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
+                <p class="text-sm text-slate-500">&copy; {{ date('Y') }} StudyHub. Tous droits réservés.</p>
+                <div class="flex gap-6 text-sm text-slate-500">
+                    <a href="#" class="hover:text-white transition-colors">Mentions légales</a>
+                    <a href="#" class="hover:text-white transition-colors">Confidentialité</a>
+                    <a href="#" class="hover:text-white transition-colors">CGU</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Mobile Bottom Navigation (visible only on mobile) -->
+    <nav class="lg:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-slate-200 safe-bottom z-40 shadow-lg">
+        <div class="flex justify-around items-center h-16">
+            <a href="{{ route('home') }}" class="flex flex-col items-center justify-center w-full h-full gap-1 {{ request()->routeIs('home') ? 'text-primary-600' : 'text-slate-400' }}">
+                <div class="w-10 h-10 rounded-full flex items-center justify-center {{ request()->routeIs('home') ? 'bg-primary-100' : '' }}">
+                    <i class="fas fa-home text-lg"></i>
+                </div>
+                <span class="text-xs font-medium">Accueil</span>
+            </a>
+            
+            <a href="{{ route('classes') }}" class="flex flex-col items-center justify-center w-full h-full gap-1 {{ request()->routeIs('classes*', 'classe.*', 'matiere.*', 'chapitre.*') ? 'text-primary-600' : 'text-slate-400' }}">
+                <div class="w-10 h-10 rounded-full flex items-center justify-center {{ request()->routeIs('classes*', 'classe.*', 'matiere.*', 'chapitre.*') ? 'bg-primary-100' : '' }}">
+                    <i class="fas fa-book text-lg"></i>
+                </div>
+                <span class="text-xs font-medium">Cours</span>
+            </a>
+            
+            <a href="{{ route('epreuves') }}" class="flex flex-col items-center justify-center w-full h-full gap-1 {{ request()->routeIs('epreuves*') ? 'text-primary-600' : 'text-slate-400' }}">
+                <div class="w-10 h-10 rounded-full flex items-center justify-center {{ request()->routeIs('epreuves*') ? 'bg-primary-100' : '' }}">
+                    <i class="fas fa-file-alt text-lg"></i>
+                </div>
+                <span class="text-xs font-medium">Épreuves</span>
+            </a>
+            
+            <a href="{{ route('assistance') }}" class="flex flex-col items-center justify-center w-full h-full gap-1 {{ request()->routeIs('assistance*') ? 'text-primary-600' : 'text-slate-400' }}">
+                <div class="w-10 h-10 rounded-full flex items-center justify-center {{ request()->routeIs('assistance*') ? 'bg-primary-100' : '' }}">
+                    <i class="fas fa-question-circle text-lg"></i>
+                </div>
+                <span class="text-xs font-medium">Aide</span>
+            </a>
+            
+            <a href="{{ route('user.dashboard') }}" class="flex flex-col items-center justify-center w-full h-full gap-1 {{ request()->routeIs('user.dashboard') ? 'text-primary-600' : 'text-slate-400' }}">
+                <div class="w-10 h-10 rounded-full flex items-center justify-center {{ request()->routeIs('user.dashboard') ? 'bg-primary-100' : '' }}">
+                    <i class="fas fa-user text-lg"></i>
+                </div>
+                <span class="text-xs font-medium">Profil</span>
+            </a>
+        </div>
+    </nav>
+
+    <!-- Scripts -->
+    <script>
+        // Initialize AOS Animation
+        AOS.init({
+            duration: 800,
+            easing: 'ease-out-cubic',
+            once: true,
+            offset: 50
+        });
+
+        // Navbar scroll effect
+        window.addEventListener('scroll', () => {
+            const navbar = document.getElementById('navbar');
+            if (window.scrollY > 50) {
+                navbar.classList.add('shadow-lg');
+            } else {
+                navbar.classList.remove('shadow-lg');
+            }
+        });
+
+        // Toggle functions
+        function toggleSearch() {
+            const overlay = document.getElementById('searchOverlay');
+            const box = document.getElementById('searchBox');
+            
+            if (overlay.classList.contains('hidden')) {
+                overlay.classList.remove('hidden');
+                setTimeout(() => {
+                    overlay.classList.remove('opacity-0');
+                    box.classList.remove('scale-95');
+                    box.classList.add('scale-100');
+                }, 10);
+            } else {
+                overlay.classList.add('opacity-0');
+                box.classList.remove('scale-100');
+                box.classList.add('scale-95');
+                setTimeout(() => overlay.classList.add('hidden'), 300);
+            }
+        }
+
+        function toggleMobileMenu() {
+            const menu = document.getElementById('mobileMenu');
+            if (menu.classList.contains('translate-x-full')) {
+                menu.classList.remove('translate-x-full');
+            } else {
+                menu.classList.add('translate-x-full');
+            }
+        }
+
+        function toggleUserMenu() {
+            const menu = document.getElementById('userMenu');
+            menu.classList.toggle('hidden');
+        }
+
+        // Close user menu when clicking outside
+        document.addEventListener('click', (e) => {
+            const menu = document.getElementById('userMenu');
+            const button = e.target.closest('[onclick="toggleUserMenu()"]');
+            if (!button && menu && !menu.classList.contains('hidden')) {
+                menu.classList.add('hidden');
+            }
+        });
+
+        // Close search on escape key
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                const overlay = document.getElementById('searchOverlay');
+                if (!overlay.classList.contains('hidden')) {
+                    toggleSearch();
+                }
+            }
+        });
+    </script>
+
+    @yield('scripts')
+</body>
+</html>

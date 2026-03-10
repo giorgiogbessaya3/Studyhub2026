@@ -10,6 +10,7 @@ use App\Models\Contenu;
 use App\Models\Setting;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Log;
 
 class CoursController extends Controller
 {
@@ -63,8 +64,10 @@ class CoursController extends Controller
         }
         
         // Récupérer les matières associées à cette classe via la table pivot
+        // On sélectionne explicitement tous les champs, y compris icone et couleur
         $matieres = $classe->matieres()
             ->where('matieres.statut', true)
+            ->select('matieres.*') // IMPORTANT: Sélectionne tous les champs
             ->orderBy('matieres.nom')
             ->get();
         
@@ -82,6 +85,27 @@ class CoursController extends Controller
                   ->where('classe_id', $classe->id)
                   ->where('statut', true);
             })->count();
+            
+            // S'assurer que l'icône n'est pas null
+            if (empty($matiere->icone)) {
+                // Attribuer une icône par défaut basée sur le nom de la matière
+                $matiere->icone = $this->getDefaultIcone($matiere->nom);
+            }
+            
+            // S'assurer que la couleur n'est pas null
+            if (empty($matiere->couleur)) {
+                // Attribuer une couleur par défaut basée sur le nom de la matière
+                $matiere->couleur = $this->getDefaultCouleur($matiere->nom);
+            }
+            
+            // Log pour déboguer (à supprimer en production)
+            Log::info('Matière chargée', [
+                'nom' => $matiere->nom,
+                'icone' => $matiere->icone,
+                'couleur' => $matiere->couleur,
+                'chapitres' => $matiere->chapitres_count,
+                'contenus' => $matiere->contenus_count
+            ]);
         }
 
         return view('frontend.cours.classe', compact(
@@ -307,5 +331,81 @@ class CoursController extends Controller
         }
         
         return Chapitre::where('slug', $identifier)->first();
+    }
+
+    /**
+     * Obtenir une icône par défaut basée sur le nom de la matière
+     */
+    private function getDefaultIcone($nomMatiere)
+    {
+        $nom = strtolower($nomMatiere);
+        
+        $icones = [
+            'math' => 'fas fa-calculator',
+            'franc' => 'fas fa-book',
+            'phys' => 'fas fa-flask',
+            'chim' => 'fas fa-vial',
+            'svt' => 'fas fa-leaf',
+            'hist' => 'fas fa-landmark',
+            'geo' => 'fas fa-earth-africa',
+            'angl' => 'fas fa-language',
+            'esp' => 'fas fa-language',
+            'allem' => 'fas fa-language',
+            'philo' => 'fas fa-brain',
+            'ses' => 'fas fa-chart-line',
+            'emc' => 'fas fa-scale-balanced',
+            'arts' => 'fas fa-paint-brush',
+            'musique' => 'fas fa-music',
+            'sport' => 'fas fa-futbol',
+            'techno' => 'fas fa-gears',
+            'nsi' => 'fas fa-laptop-code',
+            'num' => 'fas fa-laptop',
+        ];
+        
+        foreach ($icones as $key => $icone) {
+            if (str_contains($nom, $key)) {
+                return $icone;
+            }
+        }
+        
+        return 'fas fa-book'; // Icône par défaut
+    }
+
+    /**
+     * Obtenir une couleur par défaut basée sur le nom de la matière
+     */
+    private function getDefaultCouleur($nomMatiere)
+    {
+        $nom = strtolower($nomMatiere);
+        
+        $couleurs = [
+            'math' => '#3b82f6', // bleu
+            'franc' => '#10b981', // vert
+            'phys' => '#8b5cf6', // violet
+            'chim' => '#ec4899', // rose
+            'svt' => '#84cc16', // lime
+            'hist' => '#f59e0b', // orange
+            'geo' => '#14b8a6', // teal
+            'angl' => '#6366f1', // indigo
+            'esp' => '#f97316', // orange vif
+            'allem' => '#eab308', // jaune
+            'philo' => '#a855f7', // violet clair
+            'ses' => '#ef4444', // rouge
+            'emc' => '#06b6d4', // cyan
+            'arts' => '#d946ef', // fuchsia
+            'musique' => '#f43f5e', // rose
+            'sport' => '#0ea5e9', // ciel
+            'techno' => '#6b7280', // gris
+            'nsi' => '#1e40af', // bleu foncé
+            'num' => '#312e81', // indigo foncé
+        ];
+        
+        foreach ($couleurs as $key => $couleur) {
+            if (str_contains($nom, $key)) {
+                return $couleur;
+            }
+        }
+        
+        return '#3b82f6'; // Couleur par défaut (bleu)
     }
 }

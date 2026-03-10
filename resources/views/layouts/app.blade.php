@@ -3,9 +3,14 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="theme-color" content="#3b82f6">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+    <meta name="theme-color" content="#0642a3">
     <title>@yield('title', 'StudyHub - Plateforme Éducative')</title>
+    
+    <!-- Favicon (icône de l'onglet du navigateur) -->
+    <link rel="icon" type="image/png" href="{{ asset('img/logo.png') }}">
+    <link rel="shortcut icon" href="{{ asset('img/logo.png') }}">
+    <link rel="apple-touch-icon" href="{{ asset('img/logo.png') }}">
     
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -154,7 +159,7 @@
 
         /* Mobile Bottom Nav Safe Area */
         .safe-bottom {
-            padding-bottom: env(safe-area-inset-bottom, 20px);
+            padding-bottom: env(safe-area-inset-bottom, 12px);
         }
 
         /* Loading Skeleton */
@@ -167,14 +172,21 @@
             0% { background-position: 200% 0; }
             100% { background-position: -200% 0; }
         }
+
+        /* Mobile adjustments */
+        @media (max-width: 1023px) {
+            main {
+                padding-bottom: 80px; /* Space for bottom nav */
+            }
+        }
     </style>
     
     @yield('styles')
 </head>
 <body class="font-sans antialiased bg-slate-50 text-slate-800 overflow-x-hidden">
 
-    <!-- Navigation -->
-    <nav id="navbar" class="fixed w-full z-50 transition-all duration-300">
+    <!-- Navigation Desktop (visible on lg screens and above) -->
+    <nav id="navbar" class="hidden lg:block fixed w-full z-50 transition-all duration-300">
         <div class="glass border-b border-white/20">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div class="flex justify-between items-center h-20">
@@ -183,14 +195,13 @@
                         <div class="w-12 h-12 bg-gradient-to-br from-primary-600 to-primary-800 rounded-xl flex items-center justify-center shadow-lg transform group-hover:rotate-12 transition-transform duration-300">
                             <i class="fas fa-graduation-cap text-white text-xl"></i>
                         </div>
-                        <div class="hidden sm:block">
+                        <div>
                             <span class="font-display text-2xl font-bold text-slate-900">StudyHub</span>
-                            <span class="block text-xs text-primary-600 font-medium -mt-1">Apprenez. Révisez. Réussissez.</span>
                         </div>
                     </a>
 
                     <!-- Desktop Menu -->
-                    <div class="hidden lg:flex items-center space-x-1">
+                    <div class="flex items-center space-x-1">
                         <a href="/" class="px-4 py-2 rounded-lg text-slate-600 hover:text-primary-600 hover:bg-primary-50 transition-all {{ request()->is('/') ? 'text-primary-600 bg-primary-50 font-medium' : '' }}">
                             Accueil
                         </a>
@@ -208,20 +219,20 @@
                         </a>
                     </div>
 
-                    <!-- Right Side -->
+                    <!-- Right Side Desktop -->
                     <div class="flex items-center gap-4">
                         <!-- Search Button -->
-                        <button onclick="toggleSearch()" class="hidden md:flex w-10 h-10 items-center justify-center rounded-full hover:bg-slate-100 transition-colors">
+                        <button onclick="toggleSearch()" class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-slate-100 transition-colors">
                             <i class="fas fa-search text-slate-600"></i>
                         </button>
 
                         @auth
-                            <!-- User Menu -->
+                            <!-- User Menu Desktop -->
                             <div class="relative" x-data="{ open: false }">
                                 <button onclick="toggleUserMenu()" class="flex items-center gap-3 pl-2 pr-4 py-2 rounded-full hover:bg-slate-100 transition-colors">
                                     <img src="https://ui-avatars.com/api/?name={{ urlencode(Auth::user()->name) }}&background=3b82f6&color=fff" alt="Avatar" class="w-10 h-10 rounded-full border-2 border-primary-200">
-                                    <span class="hidden md:block font-medium text-slate-700">{{ explode(' ', Auth::user()->name)[0] }}</span>
-                                    <i class="fas fa-chevron-down text-xs text-slate-400 hidden md:block"></i>
+                                    <span class="font-medium text-slate-700">{{ explode(' ', Auth::user()->name)[0] }}</span>
+                                    <i class="fas fa-chevron-down text-xs text-slate-400"></i>
                                 </button>
                                 
                                 <!-- Dropdown -->
@@ -250,25 +261,80 @@
                                 </div>
                             </div>
                         @else
-                            <a href="/login" class="hidden md:block px-6 py-2.5 text-primary-600 font-medium hover:bg-primary-50 rounded-full transition-colors">
+                            <a href="/login" class="px-6 py-2.5 text-primary-600 font-medium hover:bg-primary-50 rounded-full transition-colors">
                                 Connexion
                             </a>
                             <a href="/register" class="px-6 py-2.5 bg-primary-600 hover:bg-primary-700 text-white font-medium rounded-full shadow-lg shadow-primary-500/30 transition-all hover:scale-105 btn-shine">
                                 S'inscrire
                             </a>
                         @endauth
-
-                        <!-- Mobile Menu Button -->
-                        <button onclick="toggleMobileMenu()" class="lg:hidden w-10 h-10 flex items-center justify-center rounded-lg hover:bg-slate-100 transition-colors">
-                            <i class="fas fa-bars text-slate-600 text-xl"></i>
-                        </button>
                     </div>
                 </div>
             </div>
         </div>
     </nav>
 
-    <!-- Search Overlay -->
+    <!-- Mobile Header (visible only on mobile) -->
+    <div class="lg:hidden fixed top-0 left-0 right-0 z-50">
+        <div class="glass border-b border-white/20">
+            <div class="px-4 h-16 flex items-center justify-between">
+                <!-- Logo and Name -->
+                <a href="/" class="flex items-center gap-2">
+                    <div class="w-10 h-10 bg-gradient-to-br from-primary-600 to-primary-800 rounded-xl flex items-center justify-center shadow-lg">
+                        <i class="fas fa-graduation-cap text-white text-sm"></i>
+                    </div>
+                    <span class="font-display text-xl font-bold text-slate-900">StudyHub</span>
+                </a>
+
+                <!-- Right side icons -->
+                <div class="flex items-center gap-3">
+                    <!-- Search Icon -->
+                    <button onclick="toggleSearch()" class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-slate-100 transition-colors">
+                        <i class="fas fa-search text-slate-600 text-lg"></i>
+                    </button>
+
+                    @auth
+                        <!-- User Avatar (clickable to open menu) -->
+                        <button onclick="toggleMobileUserMenu()" class="relative">
+                            <img src="https://ui-avatars.com/api/?name={{ urlencode(Auth::user()->name) }}&background=3b82f6&color=fff" alt="Avatar" class="w-10 h-10 rounded-full border-2 border-primary-200">
+                        </button>
+
+                        <!-- Mobile User Menu (hidden by default) -->
+                        <div id="mobileUserMenu" class="hidden absolute top-16 right-4 w-64 bg-white rounded-2xl shadow-xl border border-slate-100 overflow-hidden z-50">
+                            <div class="p-4 border-b border-slate-100">
+                                <p class="font-semibold text-slate-800">{{ Auth::user()->name }}</p>
+                                <p class="text-sm text-slate-500 truncate">{{ Auth::user()->email }}</p>
+                            </div>
+                            <a href="/dashboard" class="flex items-center gap-3 px-4 py-3 hover:bg-slate-50 text-slate-700">
+                                <i class="fas fa-chart-line w-5 text-primary-500"></i> Tableau de bord
+                            </a>
+                            <a href="/profile" class="flex items-center gap-3 px-4 py-3 hover:bg-slate-50 text-slate-700">
+                                <i class="fas fa-user w-5 text-primary-500"></i> Mon profil
+                            </a>
+                            <a href="/mes-cours" class="flex items-center gap-3 px-4 py-3 hover:bg-slate-50 text-slate-700">
+                                <i class="fas fa-book w-5 text-primary-500"></i> Mes cours
+                            </a>
+                            <div class="border-t border-slate-100">
+                                <form action="/logout" method="POST">
+                                    @csrf
+                                    <button type="submit" class="w-full flex items-center gap-3 px-4 py-3 hover:bg-red-50 text-red-600">
+                                        <i class="fas fa-sign-out-alt w-5"></i> Déconnexion
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    @else
+                        <!-- Default avatar for non-authenticated users -->
+                        <a href="/login" class="w-10 h-10 rounded-full bg-slate-200 flex items-center justify-center border-2 border-primary-200">
+                            <i class="fas fa-user text-slate-500 text-lg"></i>
+                        </a>
+                    @endauth
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Search Overlay (same for all devices) -->
     <div id="searchOverlay" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 hidden opacity-0 transition-opacity duration-300">
         <div class="max-w-3xl mx-auto mt-32 px-4">
             <div class="bg-white rounded-2xl shadow-2xl overflow-hidden transform scale-95 transition-transform duration-300" id="searchBox">
@@ -292,59 +358,62 @@
         </div>
     </div>
 
-    <!-- Mobile Menu -->
-    <div id="mobileMenu" class="fixed inset-0 bg-white z-40 transform translate-x-full transition-transform duration-300 lg:hidden">
-        <div class="p-4 border-b border-slate-100 flex justify-between items-center">
-            <span class="font-display text-xl font-bold text-slate-900">Menu</span>
-            <button onclick="toggleMobileMenu()" class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-slate-100">
-                <i class="fas fa-times text-slate-600 text-xl"></i>
-            </button>
+    <!-- Mobile Bottom Navigation (visible only on mobile) -->
+    <nav class="lg:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-slate-200 safe-bottom z-40 shadow-lg">
+        <div class="flex justify-around items-center h-16">
+            <a href="/" class="flex flex-col items-center justify-center w-full h-full gap-1 {{ request()->is('/') ? 'text-primary-600' : 'text-slate-400' }}">
+                <div class="w-10 h-10 rounded-full flex items-center justify-center {{ request()->is('/') ? 'bg-primary-100' : '' }}">
+                    <i class="fas fa-home text-lg"></i>
+                </div>
+                <span class="text-xs font-medium">Accueil</span>
+            </a>
+            
+            <a href="/cours" class="flex flex-col items-center justify-center w-full h-full gap-1 {{ request()->is('cours*') ? 'text-primary-600' : 'text-slate-400' }}">
+                <div class="w-10 h-10 rounded-full flex items-center justify-center {{ request()->is('cours*') ? 'bg-primary-100' : '' }}">
+                    <i class="fas fa-book text-lg"></i>
+                </div>
+                <span class="text-xs font-medium">Cours</span>
+            </a>
+            
+            <a href="/epreuves" class="flex flex-col items-center justify-center w-full h-full gap-1 {{ request()->is('epreuves*') ? 'text-primary-600' : 'text-slate-400' }}">
+                <div class="w-10 h-10 rounded-full flex items-center justify-center {{ request()->is('epreuves*') ? 'bg-primary-100' : '' }}">
+                    <i class="fas fa-file-alt text-lg"></i>
+                </div>
+                <span class="text-xs font-medium">Épreuves</span>
+            </a>
+            
+            <a href="/assistance" class="flex flex-col items-center justify-center w-full h-full gap-1 {{ request()->is('assistance*') ? 'text-primary-600' : 'text-slate-400' }}">
+                <div class="w-10 h-10 rounded-full flex items-center justify-center {{ request()->is('assistance*') ? 'bg-primary-100' : '' }}">
+                    <i class="fas fa-question-circle text-lg"></i>
+                </div>
+                <span class="text-xs font-medium">Aide</span>
+            </a>
+            
+            @auth
+                <a href="/dashboard" class="flex flex-col items-center justify-center w-full h-full gap-1 {{ request()->is('dashboard') ? 'text-primary-600' : 'text-slate-400' }}">
+                    <div class="w-10 h-10 rounded-full flex items-center justify-center {{ request()->is('dashboard') ? 'bg-primary-100' : '' }}">
+                        <i class="fas fa-user text-lg"></i>
+                    </div>
+                    <span class="text-xs font-medium">Profil</span>
+                </a>
+            @else
+                <a href="/login" class="flex flex-col items-center justify-center w-full h-full gap-1 text-slate-400">
+                    <div class="w-10 h-10 rounded-full flex items-center justify-center">
+                        <i class="fas fa-sign-in-alt text-lg"></i>
+                    </div>
+                    <span class="text-xs font-medium">Connexion</span>
+                </a>
+            @endauth
         </div>
-        <div class="p-4 space-y-2">
-            <a href="/" class="flex items-center gap-3 p-4 rounded-xl {{ request()->is('/') ? 'bg-primary-50 text-primary-600' : 'text-slate-600 hover:bg-slate-50' }}">
-                <i class="fas fa-home w-6"></i>
-                <span class="font-medium">Accueil</span>
-            </a>
-            <a href="/cours" class="flex items-center gap-3 p-4 rounded-xl {{ request()->is('cours*') ? 'bg-primary-50 text-primary-600' : 'text-slate-600 hover:bg-slate-50' }}">
-                <i class="fas fa-book w-6"></i>
-                <span class="font-medium">Cours</span>
-            </a>
-            <a href="/epreuves" class="flex items-center gap-3 p-4 rounded-xl {{ request()->is('epreuves*') ? 'bg-primary-50 text-primary-600' : 'text-slate-600 hover:bg-slate-50' }}">
-                <i class="fas fa-file-alt w-6"></i>
-                <span class="font-medium">Épreuves</span>
-            </a>
-            <a href="/quiz" class="flex items-center gap-3 p-4 rounded-xl {{ request()->is('quiz*') ? 'bg-primary-50 text-primary-600' : 'text-slate-600 hover:bg-slate-50' }}">
-                <i class="fas fa-question-circle w-6"></i>
-                <span class="font-medium">Quiz</span>
-            </a>
-            <a href="/assistance" class="flex items-center gap-3 p-4 rounded-xl {{ request()->is('assistance*') ? 'bg-primary-50 text-primary-600' : 'text-slate-600 hover:bg-slate-50' }}">
-                <i class="fas fa-hands-helping w-6"></i>
-                <span class="font-medium">Assistance</span>
-            </a>
-            <a href="/contact" class="flex items-center gap-3 p-4 rounded-xl {{ request()->is('contact') ? 'bg-primary-50 text-primary-600' : 'text-slate-600 hover:bg-slate-50' }}">
-                <i class="fas fa-envelope w-6"></i>
-                <span class="font-medium">Contact</span>
-            </a>
-        </div>
-        @guest
-        <div class="p-4 border-t border-slate-100 space-y-3">
-            <a href="/login" class="block w-full py-3 text-center text-primary-600 font-medium border-2 border-primary-600 rounded-xl hover:bg-primary-50 transition-colors">
-                Connexion
-            </a>
-            <a href="/register" class="block w-full py-3 text-center bg-primary-600 text-white font-medium rounded-xl hover:bg-primary-700 transition-colors">
-                Créer un compte
-            </a>
-        </div>
-        @endguest
-    </div>
+    </nav>
 
     <!-- Main Content -->
-    <main class="pt-20 min-h-screen">
+    <main class="lg:pt-20 pt-16 min-h-screen">
         @yield('content')
     </main>
 
-    <!-- Footer -->
-    <footer class="bg-slate-900 text-slate-300 relative overflow-hidden">
+    <!-- Footer (visible on lg screens and above, hidden on mobile) -->
+    <footer class="hidden lg:block bg-slate-900 text-slate-300 relative overflow-hidden">
         <!-- Background Pattern -->
         <div class="absolute inset-0 opacity-5">
             <div class="absolute inset-0" style="background-image: radial-gradient(circle at 2px 2px, white 1px, transparent 0); background-size: 40px 40px;"></div>
@@ -441,46 +510,6 @@
         </div>
     </footer>
 
-    <!-- Mobile Bottom Navigation (visible only on mobile) -->
-    <nav class="lg:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-slate-200 safe-bottom z-40 shadow-lg">
-        <div class="flex justify-around items-center h-16">
-            <a href="/" class="flex flex-col items-center justify-center w-full h-full gap-1 {{ request()->is('/') ? 'text-primary-600' : 'text-slate-400' }}">
-                <div class="w-10 h-10 rounded-full flex items-center justify-center {{ request()->is('/') ? 'bg-primary-100' : '' }}">
-                    <i class="fas fa-home text-lg"></i>
-                </div>
-                <span class="text-xs font-medium">Accueil</span>
-            </a>
-            
-            <a href="/cours" class="flex flex-col items-center justify-center w-full h-full gap-1 {{ request()->is('cours*') ? 'text-primary-600' : 'text-slate-400' }}">
-                <div class="w-10 h-10 rounded-full flex items-center justify-center {{ request()->is('cours*') ? 'bg-primary-100' : '' }}">
-                    <i class="fas fa-book text-lg"></i>
-                </div>
-                <span class="text-xs font-medium">Cours</span>
-            </a>
-            
-            <a href="/epreuves" class="flex flex-col items-center justify-center w-full h-full gap-1 {{ request()->is('epreuves*') ? 'text-primary-600' : 'text-slate-400' }}">
-                <div class="w-10 h-10 rounded-full flex items-center justify-center {{ request()->is('epreuves*') ? 'bg-primary-100' : '' }}">
-                    <i class="fas fa-file-alt text-lg"></i>
-                </div>
-                <span class="text-xs font-medium">Épreuves</span>
-            </a>
-            
-            <a href="/assistance" class="flex flex-col items-center justify-center w-full h-full gap-1 {{ request()->is('assistance*') ? 'text-primary-600' : 'text-slate-400' }}">
-                <div class="w-10 h-10 rounded-full flex items-center justify-center {{ request()->is('assistance*') ? 'bg-primary-100' : '' }}">
-                    <i class="fas fa-question-circle text-lg"></i>
-                </div>
-                <span class="text-xs font-medium">Aide</span>
-            </a>
-            
-            <a href="/dashboard" class="flex flex-col items-center justify-center w-full h-full gap-1 {{ request()->is('dashboard') ? 'text-primary-600' : 'text-slate-400' }}">
-                <div class="w-10 h-10 rounded-full flex items-center justify-center {{ request()->is('dashboard') ? 'bg-primary-100' : '' }}">
-                    <i class="fas fa-user text-lg"></i>
-                </div>
-                <span class="text-xs font-medium">Profil</span>
-            </a>
-        </div>
-    </nav>
-
     <!-- Scripts -->
     <script>
         // Initialize AOS Animation
@@ -491,17 +520,19 @@
             offset: 50
         });
 
-        // Navbar scroll effect
+        // Navbar scroll effect (desktop only)
         window.addEventListener('scroll', () => {
             const navbar = document.getElementById('navbar');
-            if (window.scrollY > 50) {
-                navbar.classList.add('shadow-lg');
-            } else {
-                navbar.classList.remove('shadow-lg');
+            if (navbar) {
+                if (window.scrollY > 50) {
+                    navbar.classList.add('shadow-lg');
+                } else {
+                    navbar.classList.remove('shadow-lg');
+                }
             }
         });
 
-        // Toggle functions
+        // Toggle search overlay
         function toggleSearch() {
             const overlay = document.getElementById('searchOverlay');
             const box = document.getElementById('searchBox');
@@ -521,26 +552,36 @@
             }
         }
 
-        function toggleMobileMenu() {
-            const menu = document.getElementById('mobileMenu');
-            if (menu.classList.contains('translate-x-full')) {
-                menu.classList.remove('translate-x-full');
-            } else {
-                menu.classList.add('translate-x-full');
+        // Toggle desktop user menu
+        function toggleUserMenu() {
+            const menu = document.getElementById('userMenu');
+            if (menu) {
+                menu.classList.toggle('hidden');
             }
         }
 
-        function toggleUserMenu() {
-            const menu = document.getElementById('userMenu');
-            menu.classList.toggle('hidden');
+        // Toggle mobile user menu
+        function toggleMobileUserMenu() {
+            const menu = document.getElementById('mobileUserMenu');
+            if (menu) {
+                menu.classList.toggle('hidden');
+            }
         }
 
-        // Close user menu when clicking outside
+        // Close menus when clicking outside
         document.addEventListener('click', (e) => {
-            const menu = document.getElementById('userMenu');
-            const button = e.target.closest('[onclick="toggleUserMenu()"]');
-            if (!button && menu && !menu.classList.contains('hidden')) {
-                menu.classList.add('hidden');
+            // Desktop user menu
+            const desktopMenu = document.getElementById('userMenu');
+            const desktopButton = e.target.closest('[onclick="toggleUserMenu()"]');
+            if (!desktopButton && desktopMenu && !desktopMenu.classList.contains('hidden')) {
+                desktopMenu.classList.add('hidden');
+            }
+
+            // Mobile user menu
+            const mobileMenu = document.getElementById('mobileUserMenu');
+            const mobileButton = e.target.closest('[onclick="toggleMobileUserMenu()"]');
+            if (!mobileButton && mobileMenu && !mobileMenu.classList.contains('hidden')) {
+                mobileMenu.classList.add('hidden');
             }
         });
 
@@ -548,17 +589,17 @@
         document.addEventListener('keydown', (e) => {
             if (e.key === 'Escape') {
                 const overlay = document.getElementById('searchOverlay');
-                if (!overlay.classList.contains('hidden')) {
+                if (overlay && !overlay.classList.contains('hidden')) {
                     toggleSearch();
                 }
             }
         });
     </script>
     <!-- CKEditor 5 -->
-<script src="https://cdn.ckeditor.com/ckeditor5/39.0.1/classic/ckeditor.js"></script>
-<script src="https://cdn.ckeditor.com/ckeditor5/39.0.1/classic/translations/fr.js"></script>
-<!-- MathType pour les formules -->
-<script src="https://cdn.jsdelivr.net/npm/@wiris/mathtype-ckeditor5@8.3.0/dist/mathtype-ckeditor5.js"></script>
+    <script src="https://cdn.ckeditor.com/ckeditor5/39.0.1/classic/ckeditor.js"></script>
+    <script src="https://cdn.ckeditor.com/ckeditor5/39.0.1/classic/translations/fr.js"></script>
+    <!-- MathType pour les formules -->
+    <script src="https://cdn.jsdelivr.net/npm/@wiris/mathtype-ckeditor5@8.3.0/dist/mathtype-ckeditor5.js"></script>
 
     @yield('scripts')
 </body>

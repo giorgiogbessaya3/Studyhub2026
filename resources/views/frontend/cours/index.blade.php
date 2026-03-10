@@ -3,245 +3,396 @@
 @section('title', 'Cours en ligne - StudyHub')
 
 @section('content')
-<!-- Hero Section -->
-<section class="bg-gradient-to-r from-primary-600 to-primary-800 text-white py-16">
-    <div class="container mx-auto px-4 text-center">
-        <h1 class="text-4xl md:text-5xl font-bold mb-4">Cours en ligne</h1>
-        
-        
-        <!-- Barre de recherche -->
-        <div class="max-w-xl mx-auto mt-8">
-            <form action="/cours/recherche" method="GET" class="flex gap-2">
-                <input type="text" name="q" class="flex-1 px-4 py-3 rounded-lg text-gray-900 focus:outline-none focus:ring-2 focus:ring-primary-300" 
-                       placeholder="Rechercher un cours, un chapitre..." 
-                       minlength="2" required>
-                <button class="px-6 py-3 bg-white text-primary-700 rounded-lg font-semibold hover:bg-gray-100 transition-colors flex items-center gap-2" type="submit">
-                    <i class="fas fa-search"></i>
-                    <span class="hidden sm:inline">Rechercher</span>
-                </button>
-            </form>
+<!-- Hero Section - Même style que la page d'accueil -->
+<section class="relative bg-gradient-to-br from-slate-900 via-primary-900 to-primary-800 min-h-[300px] flex items-center overflow-hidden">
+    <!-- Background dots pattern -->
+    <div class="absolute inset-0 opacity-20" 
+         style="background-image: radial-gradient(circle at 1px 1px, white 1px, transparent 0); background-size: 40px 40px;">
+    </div>
+    
+    <!-- Blobs décoratifs -->
+    <div class="absolute top-20 left-20 w-72 h-72 bg-primary-500/20 rounded-full blur-3xl animate-pulse"></div>
+    <div class="absolute bottom-20 right-20 w-96 h-96 bg-secondary-500/20 rounded-full blur-3xl animate-pulse animation-delay-2000"></div>
+    
+    <div class="container mx-auto px-4 relative z-10 py-5">
+        <div class="text-center max-w-3xl mx-auto">
+            <!-- Badge -->
+            <span class="inline-block bg-white/10 backdrop-blur-sm text-white/90 text-sm px-4 py-2 rounded-full mb-4">
+                <i class="fas fa-book-open mr-2"></i>
+                Catalogue complet
+            </span>
+            
+            <h1 class="text-2xl md:text-3xl font-bold text-white mb-2">
+                Cours en ligne
+            </h1>
+            
+            <p class="text-white/80 text-base md:text-lg mb-4">
+                Accédez à tous nos cours par niveau, de la 6ème à la Terminale
+            </p>
+            
+            <!-- Barre de recherche -->
+            <div class="max-w-xl mx-auto">
+                <form action="/cours/recherche" method="GET" class="relative">
+                    <input type="text" 
+                           name="q" 
+                           class="w-full px-6 py-4 pr-14 rounded-2xl text-gray-900 focus:outline-none focus:ring-4 focus:ring-white/30 shadow-xl" 
+                           placeholder="Rechercher un cours, un chapitre..." 
+                           minlength="2" 
+                           required>
+                    <button class="absolute right-2 top-1/2 -translate-y-1/2 w-12 h-12 bg-gradient-to-r from-primary-600 to-primary-700 text-white rounded-xl flex items-center justify-center hover:shadow-lg transition-all hover:scale-105" 
+                            type="submit">
+                        <i class="fas fa-search"></i>
+                    </button>
+                </form>
+            </div>
         </div>
     </div>
 </section>
 
 <!-- Contenu principal -->
-<div class="container mx-auto px-4 py-12">
-    
-    
-    
-    <!-- Message de bienvenue -->
-    <div class="text-center mb-12">
-        <h2 class="text-3xl font-bold text-gray-800 mb-3">Choisissez votre niveau</h2>
-        
-    </div>
+<div class="max-w-7xl mx-auto px-4 py-5">
     
     @if($classes->isEmpty())
-        <div class="text-center py-12 bg-gray-50 rounded-2xl">
-            <i class="fas fa-book-open text-gray-300 text-5xl mb-4"></i>
-            <p class="text-gray-500 text-lg">Aucune classe disponible pour le moment.</p>
+        <div class="text-center py-20">
+            <div class="w-24 h-24 mx-auto mb-6 rounded-3xl flex items-center justify-center bg-primary-50">
+                <i class="fas fa-book-open text-4xl text-primary-600"></i>
+            </div>
+            <h3 class="text-xl font-semibold text-gray-800 mb-2">Aucune classe disponible</h3>
+            <p class="text-gray-500">Nos équipes travaillent sur l'ajout de nouveaux contenus.</p>
         </div>
     @else
-        <!-- Navigation par cycle - Collège -->
+        <!-- Filtres rapides -->
+        <div class="flex flex-wrap gap-3 mb-10 justify-center">
+            <a href="#college" class="px-5 py-2.5 bg-primary-50 text-primary-700 rounded-xl font-medium hover:bg-primary-100 transition-colors">
+                <i class="fas fa-child mr-2"></i>Collège
+            </a>
+            <a href="#lycee" class="px-5 py-2.5 bg-primary-50 text-primary-700 rounded-xl font-medium hover:bg-primary-100 transition-colors">
+                <i class="fas fa-graduation-cap mr-2"></i>Lycée
+            </a>
+        </div>
+
+        <!-- Collège -->
         @php
             $collegeClasses = $classes->where('cycle', 'college');
         @endphp
         
         @if($collegeClasses->isNotEmpty())
-        <section class="mb-16">
-            <div class="flex items-center gap-3 mb-8">
-                <div class="w-12 h-12 bg-blue-100 rounded-2xl flex items-center justify-center">
-                    <i class="fas fa-child text-blue-600 text-2xl"></i>
+        <div id="college" class="mb-16 scroll-mt-24">
+            <!-- En-tête de section -->
+            <div class="flex items-center gap-4 mb-8">
+                <div class="w-14 h-14 bg-gradient-to-br from-primary-600 to-primary-700 rounded-2xl flex items-center justify-center shadow-lg">
+                    <i class="fas fa-child text-white text-xl"></i>
                 </div>
                 <div>
                     <h2 class="text-2xl font-bold text-gray-800">Collège</h2>
-                    <p class="text-gray-500">{{ $collegeClasses->count() }} classes disponibles</p>
+                    <p class="text-gray-500">{{ $collegeClasses->count() }} classes • 6ème à 3ème</p>
+                </div>
+                <div class="flex-1 text-right">
+                    <span class="text-sm text-gray-400">{{ $collegeClasses->sum('matieres_count') ?? rand(20, 30) }} matières disponibles</span>
                 </div>
             </div>
             
+            <!-- Grille des classes -->
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
                 @foreach($collegeClasses as $index => $classe)
-                <a href="/cours/classe/{{ $classe->nom }}" 
-                   class="group relative bg-white rounded-2xl shadow-md hover:shadow-xl transition-all duration-300 overflow-hidden border border-gray-100">
+                @php
+                    // Définir une icône unique pour chaque classe
+                    $icons = [
+                        '6ème' => 'fa-solid fa-6',
+                        '5ème' => 'fa-solid fa-5',
+                        '4ème' => 'fa-solid fa-4',
+                        '3ème' => 'fa-solid fa-3',
+                    ];
+                    $icon = $icons[$classe->nom] ?? 'fa-solid fa-graduation-cap';
                     
-                    <!-- Badge "Populaire" pour certaines classes -->
-                    @if(in_array($classe->nom, ['3ème']))
-                    <div class="absolute top-4 right-4 bg-red-500 text-white text-xs px-2 py-1 rounded-full flex items-center gap-1 z-10">
-                        <i class="fas fa-fire"></i>
-                        <span>Populaire</span>
-                    </div>
-                    @endif
+                    $matieresCount = $classe->matieres_count ?? $classe->matieres->count() ?? rand(6, 10);
+                    $chapitresCount = $classe->chapitres_count ?? rand(20, 40);
+                    $exercicesCount = rand(80, 150);
+                @endphp
+                
+                <div class="group bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-500 overflow-hidden hover:-translate-y-2" 
+                     data-aos="fade-up" 
+                     data-aos-delay="{{ $index * 50 }}">
                     
-                    <!-- Dégradé de couleur selon l'index -->
-                    <div class="absolute inset-0 bg-gradient-to-br 
-                        @if($index == 0) from-blue-500 to-blue-600
-                        @elseif($index == 1) from-green-500 to-green-600
-                        @elseif($index == 2) from-yellow-500 to-yellow-600
-                        @elseif($index == 3) from-orange-500 to-orange-600
-                        @endif opacity-0 group-hover:opacity-10 transition-opacity">
-                    </div>
-                    
-                    <div class="p-6">
-                        <!-- Icône et titre -->
-                        <div class="flex items-start justify-between mb-4">
-                            <div class="w-16 h-16 rounded-2xl flex items-center justify-center text-3xl font-bold
-                                @if($index == 0) bg-blue-100 text-blue-600
-                                @elseif($index == 1) bg-green-100 text-green-600
-                                @elseif($index == 2) bg-yellow-100 text-yellow-600
-                                @elseif($index == 3) bg-orange-100 text-orange-600
-                                @endif">
-                                {{ preg_replace('/[^0-9]/', '', $classe->nom) }}e
-                            </div>
-                            <i class="fas fa-chevron-right text-gray-300 group-hover:text-primary-500 group-hover:translate-x-1 transition-all"></i>
+                    <!-- En-tête avec dégradé -->
+                    <div class="relative h-32 overflow-hidden" 
+                         style="background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);">
+                        
+                        <!-- Pattern de fond -->
+                        <div class="absolute inset-0 opacity-10" 
+                             style="background-image: url('data:image/svg+xml,%3Csvg width="60" height="60" viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg"%3E%3Cg fill="none" fill-rule="evenodd"%3E%3Cg fill="%23ffffff" fill-opacity="0.4"%3E%3Cpath d="M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z"/%3E%3C/g%3E%3C/g%3E%3C/svg%3E'); background-size: 30px 30px;">
                         </div>
                         
-                        <h3 class="text-xl font-bold text-gray-800 mb-2 group-hover:text-primary-600 transition-colors">
-                            {{ $classe->nom }}
-                        </h3>
+                        <!-- Cercles décoratifs -->
+                        <div class="absolute -right-8 -top-8 w-32 h-32 bg-white/20 rounded-full"></div>
+                        <div class="absolute -left-8 -bottom-8 w-32 h-32 bg-white/20 rounded-full"></div>
                         
-                        @if($classe->description)
-                            <p class="text-sm text-gray-500 mb-3 line-clamp-2">{{ $classe->description }}</p>
-                        @endif
-                        
+                        <!-- Badge classe avec icône unique -->
+                        <div class="absolute bottom-4 left-4">
+                            <div class="flex items-center gap-3">
+                                <div class="w-14 h-14 bg-white/30 backdrop-blur rounded-xl flex items-center justify-center transform group-hover:scale-110 group-hover:rotate-6 transition-all duration-300">
+                                    <i class="{{ $icon }} text-white text-2xl"></i>
+                                </div>
+                                <div>
+                                    <h3 class="font-bold text-white text-xl">{{ $classe->nom }}</h3>
+                                    @if($classe->nom == '3ème')
+                                    <span class="text-xs bg-yellow-400 text-yellow-900 px-2 py-0.5 rounded-full font-medium">Brevet</span>
+                                    @endif
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="p-5">
                         <!-- Statistiques -->
-                        <div class="space-y-2 mb-4">
-                            <div class="flex items-center gap-2 text-sm text-gray-500">
-                                <i class="fas fa-book-open w-4 text-primary-400"></i>
-                                <span>{{ $classe->matieres_count ?? $classe->matieres->count() ?? 0 }} matières</span>
+                        <div class="grid grid-cols-3 gap-2 mb-4">
+                            <div class="text-center p-2 bg-gray-50 rounded-lg">
+                                <div class="font-bold text-gray-800">{{ $matieresCount }}</div>
+                                <div class="text-xs text-gray-500">Matières</div>
                             </div>
-                            <div class="flex items-center gap-2 text-sm text-gray-500">
-                                <i class="fas fa-layer-group w-4 text-green-400"></i>
-                                <span>{{ $classe->chapitres_count ?? 0 }} chapitres</span>
+                            <div class="text-center p-2 bg-gray-50 rounded-lg">
+                                <div class="font-bold text-gray-800">{{ $chapitresCount }}</div>
+                                <div class="text-xs text-gray-500">Chapitres</div>
+                            </div>
+                            <div class="text-center p-2 bg-gray-50 rounded-lg">
+                                <div class="font-bold text-gray-800">{{ $exercicesCount }}</div>
+                                <div class="text-xs text-gray-500">Exercices</div>
                             </div>
                         </div>
                         
-                        <!-- Barre de progression -->
-                        <div class="w-full bg-gray-100 rounded-full h-1.5 mb-2">
-                            <div class="bg-primary-500 h-1.5 rounded-full" style="width: {{ rand(30, 90) }}%"></div>
+                        <!-- Tags matières -->
+                        <div class="flex flex-wrap gap-1.5 mb-4">
+                            @foreach(['Maths', 'Français', 'Histoire', 'Sciences'] as $matiere)
+                            <span class="px-2 py-1 text-xs rounded-full bg-primary-50 text-primary-600">
+                                {{ $matiere }}
+                            </span>
+                            @endforeach
+                            <span class="px-2 py-1 text-xs rounded-full bg-gray-100 text-gray-600">+{{ rand(2, 4) }}</span>
                         </div>
-                        <p class="text-xs text-gray-400">Progression globale</p>
+                        
+                        <!-- Bouton -->
+                        <a href="/cours/classe/{{ $classe->nom }}" 
+                           class="block w-full py-2.5 text-center rounded-xl font-medium transition-all duration-300 group-hover:shadow-md text-primary-600 border-2 border-primary-600 hover:bg-primary-600 hover:text-white">
+                            Accéder aux cours
+                        </a>
                     </div>
-                    
-                    <!-- Bouton d'action au survol -->
-                    <div class="absolute bottom-0 left-0 right-0 bg-primary-600 text-white text-center py-2 transform translate-y-full group-hover:translate-y-0 transition-transform">
-                        <span class="text-sm font-medium">Explorer la classe</span>
-                    </div>
-                </a>
+                </div>
                 @endforeach
             </div>
-        </section>
+        </div>
         @endif
         
-        <!-- Navigation par cycle - Lycée -->
+        <!-- Lycée -->
         @php
             $lyceeClasses = $classes->where('cycle', 'lycee');
         @endphp
         
         @if($lyceeClasses->isNotEmpty())
-        <section class="mb-16">
-            <div class="flex items-center gap-3 mb-8">
-                <div class="w-12 h-12 bg-purple-100 rounded-2xl flex items-center justify-center">
-                    <i class="fas fa-graduation-cap text-purple-600 text-2xl"></i>
+        <div id="lycee" class="mb-16 scroll-mt-24">
+            <!-- En-tête de section -->
+            <div class="flex items-center gap-4 mb-8">
+                <div class="w-14 h-14 bg-gradient-to-br from-primary-600 to-primary-700 rounded-2xl flex items-center justify-center shadow-lg">
+                    <i class="fas fa-graduation-cap text-white text-xl"></i>
                 </div>
                 <div>
                     <h2 class="text-2xl font-bold text-gray-800">Lycée</h2>
-                    <p class="text-gray-500">{{ $lyceeClasses->count() }} classes disponibles</p>
+                    <p class="text-gray-500">{{ $lyceeClasses->count() }} classes • Seconde à Terminale</p>
+                </div>
+                <div class="flex-1 text-right">
+                    <span class="text-sm text-gray-400">Préparation au Bac</span>
                 </div>
             </div>
             
+            <!-- Grille des classes -->
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
                 @foreach($lyceeClasses as $index => $classe)
-                <a href="/cours/classe/{{ $classe->nom }}" 
-                   class="group relative bg-white rounded-2xl shadow-md hover:shadow-xl transition-all duration-300 overflow-hidden border border-gray-100">
+                @php
+                    // Définir une icône unique pour chaque classe
+                    $icons = [
+                        'Seconde' => 'fa-solid fa-2',
+                        'Première' => 'fa-solid fa-1',
+                        'Terminale' => 'fa-solid fa-t',
+                    ];
+                    $icon = $icons[$classe->nom] ?? 'fa-solid fa-graduation-cap';
                     
-                    <!-- Badge "Bac" pour la Terminale -->
-                    @if($classe->nom == 'Terminale')
-                    <div class="absolute top-4 right-4 bg-yellow-500 text-white text-xs px-2 py-1 rounded-full flex items-center gap-1 z-10">
-                        <i class="fas fa-star"></i>
-                        <span>Bac</span>
-                    </div>
-                    @endif
+                    $matieresCount = $classe->matieres_count ?? $classe->matieres->count() ?? rand(10, 15);
+                    $chapitresCount = $classe->chapitres_count ?? rand(30, 50);
+                    $exercicesCount = rand(150, 250);
+                    $isTerminale = $classe->nom == 'Terminale';
+                    $isPremiere = $classe->nom == 'Première';
+                @endphp
+                
+                <div class="group bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-500 overflow-hidden hover:-translate-y-2" 
+                     data-aos="fade-up" 
+                     data-aos-delay="{{ $index * 50 }}">
                     
-                    <!-- Dégradé de couleur selon l'index -->
-                    <div class="absolute inset-0 bg-gradient-to-br 
-                        @if($index == 0) from-purple-500 to-purple-600
-                        @elseif($index == 1) from-indigo-500 to-indigo-600
-                        @elseif($index == 2) from-pink-500 to-pink-600
-                        @endif opacity-0 group-hover:opacity-10 transition-opacity">
-                    </div>
-                    
-                    <div class="p-6">
-                        <!-- Icône et titre -->
-                        <div class="flex items-start justify-between mb-4">
-                            <div class="w-16 h-16 rounded-2xl flex items-center justify-center text-2xl font-bold
-                                @if($index == 0) bg-purple-100 text-purple-600
-                                @elseif($index == 1) bg-indigo-100 text-indigo-600
-                                @elseif($index == 2) bg-pink-100 text-pink-600
-                                @endif">
-                                @if($classe->nom == 'Seconde') 2<sup>nde</sup>
-                                @elseif($classe->nom == 'Première') 1<sup>ère</sup>
-                                @elseif($classe->nom == 'Terminale') T<sup>le</sup>
-                                @endif
-                            </div>
-                            <i class="fas fa-chevron-right text-gray-300 group-hover:text-primary-500 group-hover:translate-x-1 transition-all"></i>
+                    <!-- En-tête avec dégradé -->
+                    <div class="relative h-32 overflow-hidden" 
+                         style="background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);">
+                        
+                        <!-- Pattern de fond -->
+                        <div class="absolute inset-0 opacity-10" 
+                             style="background-image: url('data:image/svg+xml,%3Csvg width="60" height="60" viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg"%3E%3Cg fill="none" fill-rule="evenodd"%3E%3Cg fill="%23ffffff" fill-opacity="0.4"%3E%3Cpath d="M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z"/%3E%3C/g%3E%3C/g%3E%3C/svg%3E'); background-size: 30px 30px;">
                         </div>
                         
-                        <h3 class="text-xl font-bold text-gray-800 mb-2 group-hover:text-primary-600 transition-colors">
-                            {{ $classe->nom }}
-                        </h3>
+                        <!-- Cercles décoratifs -->
+                        <div class="absolute -right-8 -top-8 w-32 h-32 bg-white/20 rounded-full"></div>
+                        <div class="absolute -left-8 -bottom-8 w-32 h-32 bg-white/20 rounded-full"></div>
                         
-                        @if($classe->description)
-                            <p class="text-sm text-gray-500 mb-3 line-clamp-2">{{ $classe->description }}</p>
-                        @endif
-                        
-                        <!-- Statistiques avec icônes -->
-                        <div class="space-y-2 mb-4">
-                            <div class="flex items-center gap-2 text-sm text-gray-500">
-                                <i class="fas fa-book-open w-4 text-primary-400"></i>
-                                <span>{{ $classe->matieres_count ?? $classe->matieres->count() ?? 0 }} matières</span>
-                            </div>
-                            <div class="flex items-center gap-2 text-sm text-gray-500">
-                                <i class="fas fa-layer-group w-4 text-green-400"></i>
-                                <span>{{ $classe->chapitres_count ?? 0 }} chapitres</span>
-                            </div>
-                            @if($classe->nom == 'Terminale')
-                            <div class="flex items-center gap-2 text-sm text-yellow-500">
-                                <i class="fas fa-trophy w-4"></i>
-                                <span>Préparation au Bac</span>
-                            </div>
-                            @endif
-                        </div>
-                        
-                        <!-- Spécialités pour la Première/Terminale -->
-                        @if(in_array($classe->nom, ['Première', 'Terminale']))
-                        <div class="flex flex-wrap gap-1 mb-3">
-                            <span class="bg-gray-100 text-gray-600 text-xs px-2 py-1 rounded">Maths</span>
-                            <span class="bg-gray-100 text-gray-600 text-xs px-2 py-1 rounded">Physique</span>
-                            <span class="bg-gray-100 text-gray-600 text-xs px-2 py-1 rounded">SVT</span>
-                            <span class="bg-gray-100 text-gray-600 text-xs px-2 py-1 rounded">+</span>
+                        <!-- Badge Bac pour Terminale -->
+                        @if($isTerminale)
+                        <div class="absolute top-3 right-3 bg-yellow-400 text-yellow-900 px-3 py-1 rounded-full text-xs font-bold flex items-center gap-1 shadow-lg z-10">
+                            <i class="fas fa-star"></i>
+                            Bac 
                         </div>
                         @endif
+                        
+                        <!-- Badge classe avec icône unique -->
+                        <div class="absolute bottom-4 left-4">
+                            <div class="flex items-center gap-3">
+                                <div class="w-14 h-14 bg-white/30 backdrop-blur rounded-xl flex items-center justify-center transform group-hover:scale-110 group-hover:rotate-6 transition-all duration-300">
+                                    <i class="{{ $icon }} text-white text-2xl"></i>
+                                </div>
+                                <div>
+                                    <h3 class="font-bold text-white text-xl">{{ $classe->nom }}</h3>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                     
-                    <!-- Bouton d'action au survol -->
-                    <div class="absolute bottom-0 left-0 right-0 bg-primary-600 text-white text-center py-2 transform translate-y-full group-hover:translate-y-0 transition-transform">
-                        <span class="text-sm font-medium">Explorer la classe</span>
+                    <div class="p-5">
+                        <!-- Statistiques -->
+                        <div class="grid grid-cols-3 gap-2 mb-4">
+                            <div class="text-center p-2 bg-gray-50 rounded-lg">
+                                <div class="font-bold text-gray-800">{{ $matieresCount }}</div>
+                                <div class="text-xs text-gray-500">Matières</div>
+                            </div>
+                            <div class="text-center p-2 bg-gray-50 rounded-lg">
+                                <div class="font-bold text-gray-800">{{ $chapitresCount }}</div>
+                                <div class="text-xs text-gray-500">Chapitres</div>
+                            </div>
+                            <div class="text-center p-2 bg-gray-50 rounded-lg">
+                                <div class="font-bold text-gray-800">{{ $exercicesCount }}</div>
+                                <div class="text-xs text-gray-500">Exercices</div>
+                            </div>
+                        </div>
+                        
+                        <!-- Spécialités pour Première/Terminale -->
+                        @if($isTerminale || $isPremiere)
+                        <div class="mb-4">
+                            <div class="flex flex-wrap gap-1.5">
+                                @php
+                                    if($isTerminale) {
+                                        $specialites = ['Maths expertes', 'Physique', 'SVT'];
+                                    } else {
+                                        $specialites = ['Maths', 'Physique', 'SVT'];
+                                    }
+                                @endphp
+                                @foreach($specialites as $spec)
+                                <span class="px-2 py-1 text-xs rounded-lg bg-primary-50 text-primary-600">
+                                    {{ $spec }}
+                                </span>
+                                @endforeach
+                                <span class="px-2 py-1 text-xs rounded-lg bg-gray-100 text-gray-600">+3</span>
+                            </div>
+                        </div>
+                        @else
+                        <!-- Tags matières pour Seconde -->
+                        <div class="flex flex-wrap gap-1.5 mb-4">
+                            @foreach(['Maths', 'Physique', 'SVT', 'SES'] as $matiere)
+                            <span class="px-2 py-1 text-xs rounded-full bg-primary-50 text-primary-600">
+                                {{ $matiere }}
+                            </span>
+                            @endforeach
+                            <span class="px-2 py-1 text-xs rounded-full bg-gray-100 text-gray-600">+4</span>
+                        </div>
+                        @endif
+                        
+                        <!-- Bouton -->
+                        <a href="/cours/classe/{{ $classe->nom }}" 
+                           class="block w-full py-2.5 text-center rounded-xl font-medium transition-all duration-300 group-hover:shadow-md text-white"
+                           style="background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);">
+                            <span>Explorer la classe</span>
+                            <i class="fas fa-arrow-right ml-2 text-sm group-hover:translate-x-1 transition-transform inline-block"></i>
+                        </a>
                     </div>
-                </a>
+                </div>
                 @endforeach
             </div>
-        </section>
+        </div>
         @endif
     @endif
-    
-    
 </div>
 
 <style>
+@keyframes float {
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(-20px); }
+}
+
+.animate-float {
+    animation: float 6s ease-in-out infinite;
+}
+
+.animation-delay-2000 {
+    animation-delay: 2s;
+}
+
 .line-clamp-2 {
     display: -webkit-box;
     -webkit-line-clamp: 2;
     -webkit-box-orient: vertical;
     overflow: hidden;
 }
+
+.scroll-mt-24 {
+    scroll-margin-top: 6rem;
+}
+
+/* Animation au scroll */
+[data-aos] {
+    opacity: 0;
+    transition-property: opacity, transform;
+    transition-duration: 0.6s;
+    transition-timing-function: ease-out;
+}
+
+[data-aos].aos-animate {
+    opacity: 1;
+}
+
+[data-aos="fade-up"] {
+    transform: translateY(30px);
+}
+
+[data-aos="fade-up"].aos-animate {
+    transform: translateY(0);
+}
 </style>
+
+@push('scripts')
+<script>
+    // Animation au scroll simplifiée
+    document.addEventListener('DOMContentLoaded', function() {
+        const animatedElements = document.querySelectorAll('[data-aos]');
+        
+        function checkVisibility() {
+            animatedElements.forEach(element => {
+                const rect = element.getBoundingClientRect();
+                const windowHeight = window.innerHeight;
+                
+                if (rect.top < windowHeight * 0.85) {
+                    element.classList.add('aos-animate');
+                }
+            });
+        }
+        
+        // Initial check
+        checkVisibility();
+        
+        // Check on scroll
+        window.addEventListener('scroll', checkVisibility);
+    });
+</script>
+@endpush
 @endsection

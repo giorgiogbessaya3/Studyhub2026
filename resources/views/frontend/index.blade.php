@@ -40,7 +40,7 @@
             
             <!-- Image -->
             <div class="hidden lg:block flex-1">
-                <img src="https://illustrations.popsy.co/amber/student-reading.svg" 
+                <img src="img/car1.png" 
                      alt="Student" 
                      class="w-full max-w-md mx-auto">
             </div>

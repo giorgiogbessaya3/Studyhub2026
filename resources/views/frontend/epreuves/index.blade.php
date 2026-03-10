@@ -4,13 +4,10 @@
 
 @section('content')
 <!-- Hero Section -->
-<section class="bg-gradient-to-r from-green-600 to-green-800 text-white py-16">
+<section class="bg-gradient-to-r from-green-600 to-green-800 text-white py-10">
     <div class="container mx-auto px-4 text-center">
         <h1 class="text-4xl md:text-5xl font-bold mb-4">Banque d'épreuves</h1>
-        <p class="text-xl text-green-100 max-w-2xl mx-auto">
-            Accédez à des milliers d'épreuves corrigées du collège au lycée. 
-            Devoirs, interrogations, examens blancs et plus encore.
-        </p>
+        
         
         <!-- Barre de recherche -->
         <div class="max-w-xl mx-auto mt-8">
@@ -32,32 +29,9 @@
 <div class="container mx-auto px-4 py-12">
     
     <!-- Statistiques -->
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-12">
-        <div class="bg-white rounded-xl shadow-sm p-6 text-center border border-gray-100">
-            <div class="text-3xl font-bold text-green-600 mb-1">{{ $stats['total'] }}</div>
-            <div class="text-gray-500 text-sm">Total épreuves</div>
-        </div>
-        <div class="bg-white rounded-xl shadow-sm p-6 text-center border border-gray-100">
-            <div class="text-3xl font-bold text-blue-600 mb-1">{{ $stats['total_college'] }}</div>
-            <div class="text-gray-500 text-sm">Collège</div>
-        </div>
-        <div class="bg-white rounded-xl shadow-sm p-6 text-center border border-gray-100">
-            <div class="text-3xl font-bold text-purple-600 mb-1">{{ $stats['total_lycee'] }}</div>
-            <div class="text-gray-500 text-sm">Lycée</div>
-        </div>
-        <div class="bg-white rounded-xl shadow-sm p-6 text-center border border-gray-100">
-            <div class="text-3xl font-bold text-amber-600 mb-1">{{ $stats['avec_correction'] }}</div>
-            <div class="text-gray-500 text-sm">Avec correction</div>
-        </div>
-    </div>
-    
+   
     <!-- Message de bienvenue -->
-    <div class="text-center mb-12">
-        <h2 class="text-3xl font-bold text-gray-800 mb-3">Choisissez votre niveau</h2>
-        <p class="text-gray-600 max-w-2xl mx-auto">
-            Sélectionnez votre classe pour découvrir toutes les épreuves disponibles.
-        </p>
-    </div>
+    
     
     @if($classes->isEmpty())
         <div class="text-center py-12 bg-gray-50 rounded-2xl">
@@ -93,7 +67,7 @@
                     @if(in_array($classe->nom, ['3ème']))
                     <div class="absolute top-4 right-4 bg-red-500 text-white text-xs px-2 py-1 rounded-full flex items-center gap-1 z-10">
                         <i class="fas fa-fire"></i>
-                        <span>Populaire</span>
+                        <span>BEPC</span>
                     </div>
                     @endif
                     
@@ -160,7 +134,7 @@
         @endphp
         
         @if($lyceeClasses->isNotEmpty())
-        <section class="mb-16">
+        <section class="mb-10">
             <div class="flex items-center gap-3 mb-8">
                 <div class="w-12 h-12 bg-purple-100 rounded-2xl flex items-center justify-center">
                     <i class="fas fa-graduation-cap text-purple-600 text-2xl"></i>
@@ -171,7 +145,7 @@
                 </div>
             </div>
             
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
                 @foreach($lyceeClasses as $index => $classe)
                 <a href="/epreuves/classe/{{ $classe->nom }}/types" 
                    class="group relative bg-white rounded-2xl shadow-md hover:shadow-xl transition-all duration-300 overflow-hidden border border-gray-100">
@@ -242,31 +216,7 @@
     @endif
     
     <!-- Section avantages -->
-    <section class="bg-gray-50 rounded-3xl p-8 md:p-12 mt-12">
-        <div class="grid md:grid-cols-3 gap-8">
-            <div class="text-center">
-                <div class="w-16 h-16 bg-green-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
-                    <i class="fas fa-download text-green-600 text-2xl"></i>
-                </div>
-                <h3 class="font-bold text-gray-800 mb-2">Téléchargement gratuit</h3>
-                <p class="text-gray-500 text-sm">Toutes les épreuves sont téléchargeables en PDF</p>
-            </div>
-            <div class="text-center">
-                <div class="w-16 h-16 bg-blue-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
-                    <i class="fas fa-check-circle text-blue-600 text-2xl"></i>
-                </div>
-                <h3 class="font-bold text-gray-800 mb-2">Corrections détaillées</h3>
-                <p class="text-gray-500 text-sm">La plupart des épreuves incluent leur corrigé</p>
-            </div>
-            <div class="text-center">
-                <div class="w-16 h-16 bg-yellow-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
-                    <i class="fas fa-search text-yellow-600 text-2xl"></i>
-                </div>
-                <h3 class="font-bold text-gray-800 mb-2">Recherche avancée</h3>
-                <p class="text-gray-500 text-sm">Filtrez par année, durée, matière, type d'épreuve</p>
-            </div>
-        </div>
-    </section>
+  
 </div>
 
 <style>

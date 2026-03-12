@@ -11,6 +11,7 @@ use App\Http\Controllers\Frontend\CoursController;
 use App\Http\Controllers\Frontend\UserController;
 use App\Http\Controllers\Frontend\ContactController;
 use App\Http\Controllers\Frontend\EpreuveControllers; // Avec S
+use App\Http\Controllers\Frontend\AssistanceController; // NOUVEAU
 
 // ==========================================
 // CONTROLLERS AUTH
@@ -30,7 +31,7 @@ use App\Http\Controllers\Admin\ContenuController;
 use App\Http\Controllers\Admin\ChapitreController;
 use App\Http\Controllers\Admin\QuizController;
 use App\Http\Controllers\Admin\QuestionController;
-use App\Http\Controllers\Admin\AssistanceController;
+use App\Http\Controllers\Admin\AssistanceController as AdminAssistanceController;
 use App\Http\Controllers\Admin\SettingController;
 use App\Http\Controllers\Admin\NewsletterController;
 
@@ -54,8 +55,6 @@ Route::prefix('cours')->name('cours.')->controller(CoursController::class)->grou
 // ==========================================
 // ROUTES PUBLIQUES - BANQUE D'ÉPREUVES
 // ==========================================
-// SUPPRIMER TOUTES LES ANCIENNES ROUTES D'ÉPREUVES ET GARDER UNIQUEMENT CELLES-CI :
-
 Route::prefix('epreuves')->name('epreuves.')->controller(EpreuveControllers::class)->group(function() {
     // Page d'accueil des épreuves (liste des classes)
     Route::get('/', 'index')->name('index');
@@ -75,6 +74,28 @@ Route::prefix('epreuves')->name('epreuves.')->controller(EpreuveControllers::cla
     // Correction
     Route::get('/{epreuve}/correction', 'correction')->name('correction');
     Route::get('/{epreuve}/correction/download', 'downloadCorrection')->name('correction.download');
+});
+
+// ==========================================
+// ROUTES PUBLIQUES - ASSISTANCE PÉDAGOGIQUE (NOUVELLES)
+// ==========================================
+Route::prefix('assistance')->name('assistance.')->controller(AssistanceController::class)->group(function() {
+    // Pages publiques
+    Route::get('/', 'index')->name('index');
+    Route::get('/questions', 'liste')->name('liste');
+    Route::get('/question/{id}', 'show')->name('show');
+    
+    // Routes protégées par authentification
+    Route::middleware(['auth'])->group(function() {
+        Route::get('/poser', 'create')->name('create');
+        Route::post('/', 'store')->name('store');
+        Route::post('/question/{id}/repondre', 'reply')->name('reply');
+        Route::post('/reponse/{id}/solution', 'markAsSolution')->name('solution');
+        Route::get('/mes-questions', 'mesQuestions')->name('mes-questions');
+        Route::get('/question/{id}/edit', 'edit')->name('edit');
+        Route::put('/question/{id}', 'update')->name('update');
+        Route::delete('/question/{id}', 'destroy')->name('destroy');
+    });
 });
 
 // ==========================================
@@ -104,16 +125,6 @@ Route::get('quiz', [FrontendController::class, 'quizList'])->name('quiz.list');
 Route::get('quiz/{quiz}', [FrontendController::class, 'quizStart'])->name('quiz.start');
 Route::post('quiz/{quiz}/submit', [FrontendController::class, 'quizSubmit'])->name('quiz.submit');
 Route::get('quiz/{quiz}/result', [FrontendController::class, 'quizResult'])->name('quiz.result');
-
-// ==========================================
-// ROUTES PUBLIQUES - ASSISTANCE PÉDAGOGIQUE
-// ==========================================
-Route::get('assistance', [FrontendController::class, 'assistance'])->name('assistance');
-Route::get('assistance/nouvelle', [FrontendController::class, 'createQuestion'])->name('assistance.create');
-Route::post('assistance/question', [FrontendController::class, 'storeQuestion'])->name('assistance.store');
-Route::get('assistance/questions', [FrontendController::class, 'questionsList'])->name('assistance.list');
-Route::get('assistance/question/{question}', [FrontendController::class, 'questionDetail'])->name('assistance.show');
-Route::post('assistance/question/{question}/repondre', [FrontendController::class, 'replyQuestion'])->name('assistance.reply');
 
 // ==========================================
 // ROUTES PUBLIQUES - CONTACT & NEWSLETTER
@@ -285,8 +296,8 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'isAdmin'])->group(f
     Route::post('quiz/{quiz}/toggle-status', [QuizController::class, 'toggleStatus'])->name('quiz.toggle');
     Route::get('quiz/{quiz}/statistiques', [QuizController::class, 'statistiques'])->name('quiz.statistiques');
     
-    // Gestion de l'assistance
-    Route::prefix('assistance')->name('assistance.')->controller(AssistanceController::class)->group(function() {
+    // Gestion de l'assistance ADMIN
+    Route::prefix('assistance')->name('assistance.')->controller(AdminAssistanceController::class)->group(function() {
         Route::get('questions', 'questions')->name('questions');
         Route::get('questions/{question}', 'showQuestion')->name('questions.show');
         Route::post('questions/{question}/reply', 'reply')->name('questions.reply');
@@ -296,6 +307,7 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'isAdmin'])->group(f
         Route::post('reponses/{reponse}/approve', 'approveReponse')->name('reponses.approve');
         Route::post('reponses/{reponse}/reject', 'rejectReponse')->name('reponses.reject');
         Route::delete('reponses/{reponse}', 'destroyReponse')->name('reponses.destroy');
+        Route::post('reponses/{reponse}/solution', 'marquerSolution')->name('reponses.solution');
         Route::get('statistiques', 'statistiques')->name('statistiques');
         Route::get('export', 'export')->name('export');
     });
@@ -397,10 +409,10 @@ Route::prefix('api')->name('api.')->middleware(['auth:api'])->group(function() {
     Route::get('quiz/{quiz}/questions', [QuizController::class, 'apiQuestions'])->name('quiz.questions');
     Route::post('quiz/{quiz}/submit', [QuizController::class, 'apiSubmit'])->name('quiz.submit');
     Route::get('quiz/{quiz}/resultats', [QuizController::class, 'apiResultats'])->name('quiz.resultats');
-    Route::get('assistance/questions', [AssistanceController::class, 'apiQuestions'])->name('assistance.questions');
-    Route::get('assistance/questions/{question}', [AssistanceController::class, 'apiShowQuestion'])->name('assistance.questions.show');
-    Route::post('assistance/questions', [AssistanceController::class, 'apiStoreQuestion'])->name('assistance.store');
-    Route::post('assistance/questions/{question}/repondre', [AssistanceController::class, 'apiReply'])->name('assistance.reply');
+    Route::get('assistance/questions', [AdminAssistanceController::class, 'apiQuestions'])->name('assistance.questions');
+    Route::get('assistance/questions/{question}', [AdminAssistanceController::class, 'apiShowQuestion'])->name('assistance.questions.show');
+    Route::post('assistance/questions', [AdminAssistanceController::class, 'apiStoreQuestion'])->name('assistance.store');
+    Route::post('assistance/questions/{question}/repondre', [AdminAssistanceController::class, 'apiReply'])->name('assistance.reply');
     Route::get('search', [FrontendController::class, 'apiSearch'])->name('search');
     
     Route::middleware('auth:api')->group(function() {

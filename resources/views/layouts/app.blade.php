@@ -7,7 +7,7 @@
     <meta name="theme-color" content="#0642a3">
     <title>@yield('title', 'StudyHub - Plateforme Éducative')</title>
     
-    <!-- Favicon (icône de l'onglet du navigateur) -->
+    <!-- Favicon -->
     <link rel="icon" type="image/png" href="{{ asset('img/logo.png') }}">
     <link rel="shortcut icon" href="{{ asset('img/logo.png') }}">
     <link rel="apple-touch-icon" href="{{ asset('img/logo.png') }}">
@@ -176,8 +176,17 @@
         /* Mobile adjustments */
         @media (max-width: 1023px) {
             main {
-                padding-bottom: 80px; /* Space for bottom nav */
+                padding-bottom: 80px;
             }
+        }
+
+        /* Avatar animations */
+        .avatar-hover {
+            transition: all 0.3s ease;
+        }
+        .avatar-hover:hover {
+            transform: scale(1.05);
+            box-shadow: 0 10px 25px -5px rgba(59, 130, 246, 0.4);
         }
     </style>
     
@@ -191,7 +200,7 @@
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div class="flex justify-between items-center h-20">
                     <!-- Logo -->
-                    <a href="/" class="flex items-center gap-3 group">
+                    <a href="{{ url('/') }}" class="flex items-center gap-3 group">
                         <div class="w-12 h-12 bg-gradient-to-br from-primary-600 to-primary-800 rounded-xl flex items-center justify-center shadow-lg transform group-hover:rotate-12 transition-transform duration-300">
                             <i class="fas fa-graduation-cap text-white text-xl"></i>
                         </div>
@@ -202,21 +211,29 @@
 
                     <!-- Desktop Menu -->
                     <div class="flex items-center space-x-1">
-                        <a href="/" class="px-4 py-2 rounded-lg text-slate-600 hover:text-primary-600 hover:bg-primary-50 transition-all {{ request()->is('/') ? 'text-primary-600 bg-primary-50 font-medium' : '' }}">
+                        <a href="{{ url('/') }}" class="px-4 py-2 rounded-lg text-slate-600 hover:text-primary-600 hover:bg-primary-50 transition-all {{ request()->is('/') ? 'text-primary-600 bg-primary-50 font-medium' : '' }}">
                             Accueil
                         </a>
-                        <a href="/cours" class="px-4 py-2 rounded-lg text-slate-600 hover:text-primary-600 hover:bg-primary-50 transition-all {{ request()->is('cours*') ? 'text-primary-600 bg-primary-50 font-medium' : '' }}">
+                        <a href="{{ url('/cours') }}" class="px-4 py-2 rounded-lg text-slate-600 hover:text-primary-600 hover:bg-primary-50 transition-all {{ request()->is('cours*') ? 'text-primary-600 bg-primary-50 font-medium' : '' }}">
                             Cours
                         </a>
-                        <a href="/epreuves" class="px-4 py-2 rounded-lg text-slate-600 hover:text-primary-600 hover:bg-primary-50 transition-all {{ request()->is('epreuves*') ? 'text-primary-600 bg-primary-50 font-medium' : '' }}">
+                        <a href="{{ url('/epreuves') }}" class="px-4 py-2 rounded-lg text-slate-600 hover:text-primary-600 hover:bg-primary-50 transition-all {{ request()->is('epreuves*') ? 'text-primary-600 bg-primary-50 font-medium' : '' }}">
                             Épreuves
                         </a>
-                        <a href="/quiz" class="px-4 py-2 rounded-lg text-slate-600 hover:text-primary-600 hover:bg-primary-50 transition-all {{ request()->is('quiz*') ? 'text-primary-600 bg-primary-50 font-medium' : '' }}">
+                        <a href="{{ url('/quiz') }}" class="px-4 py-2 rounded-lg text-slate-600 hover:text-primary-600 hover:bg-primary-50 transition-all {{ request()->is('quiz*') ? 'text-primary-600 bg-primary-50 font-medium' : '' }}">
                             Quiz
                         </a>
-                        <a href="/assistance" class="px-4 py-2 rounded-lg text-slate-600 hover:text-primary-600 hover:bg-primary-50 transition-all {{ request()->is('assistance*') ? 'text-primary-600 bg-primary-50 font-medium' : '' }}">
+                        <a href="{{ url('/assistance') }}" class="px-4 py-2 rounded-lg text-slate-600 hover:text-primary-600 hover:bg-primary-50 transition-all {{ request()->is('assistance*') ? 'text-primary-600 bg-primary-50 font-medium' : '' }}">
                             Assistance
                         </a>
+                        
+                        @auth
+                            @if(Auth::user()->isAdmin())
+                                <a href="{{ url('/admin/dashboard') }}" class="px-4 py-2 rounded-lg text-purple-600 hover:text-purple-700 hover:bg-purple-50 transition-all {{ request()->is('admin*') ? 'text-purple-600 bg-purple-50 font-medium' : '' }}">
+                                    <i class="fas fa-cog mr-1"></i>Admin
+                                </a>
+                            @endif
+                        @endauth
                     </div>
 
                     <!-- Right Side Desktop -->
@@ -227,44 +244,114 @@
                         </button>
 
                         @auth
-                            <!-- User Menu Desktop -->
-                            <div class="relative" x-data="{ open: false }">
-                                <button onclick="toggleUserMenu()" class="flex items-center gap-3 pl-2 pr-4 py-2 rounded-full hover:bg-slate-100 transition-colors">
-                                    <img src="https://ui-avatars.com/api/?name={{ urlencode(Auth::user()->name) }}&background=3b82f6&color=fff" alt="Avatar" class="w-10 h-10 rounded-full border-2 border-primary-200">
-                                    <span class="font-medium text-slate-700">{{ explode(' ', Auth::user()->name)[0] }}</span>
+                            <!-- User Menu Desktop avec Avatar dynamique -->
+                            <div class="relative" id="desktopUserMenuContainer">
+                                <button onclick="toggleDesktopUserMenu()" class="flex items-center gap-3 pl-2 pr-4 py-2 rounded-full hover:bg-slate-100 transition-colors border-2 border-transparent hover:border-primary-200 avatar-hover">
+                                    <img src="{{ Auth::user()->avatar_url }}" 
+                                         alt="{{ Auth::user()->name }}" 
+                                         class="w-10 h-10 rounded-full border-2 border-primary-200 object-cover"
+                                         onerror="this.src='https://ui-avatars.com/api/?name={{ urlencode(Auth::user()->name) }}&background=3b82f6&color=fff&size=40'">
+                                    <span class="font-medium text-slate-700 hidden xl:inline">{{ explode(' ', Auth::user()->name)[0] }}</span>
                                     <i class="fas fa-chevron-down text-xs text-slate-400"></i>
                                 </button>
                                 
-                                <!-- Dropdown -->
-                                <div id="userMenu" class="hidden absolute right-0 mt-2 w-56 bg-white rounded-2xl shadow-xl border border-slate-100 overflow-hidden">
-                                    <div class="p-4 border-b border-slate-100">
-                                        <p class="font-semibold text-slate-800">{{ Auth::user()->name }}</p>
-                                        <p class="text-sm text-slate-500">{{ Auth::user()->email }}</p>
+                                <!-- Dropdown Desktop amélioré -->
+                                <div id="desktopUserMenu" class="hidden absolute right-0 mt-2 w-72 bg-white rounded-2xl shadow-xl border border-slate-100 overflow-hidden z-50">
+                                    <!-- En-tête avec avatar plus grand -->
+                                    <div class="p-6 bg-gradient-to-r from-primary-600 to-primary-700 text-white">
+                                        <div class="flex items-center gap-4">
+                                            <img src="{{ Auth::user()->avatar_url }}" 
+                                                 alt="{{ Auth::user()->name }}" 
+                                                 class="w-16 h-16 rounded-full border-4 border-white/30 object-cover"
+                                                 onerror="this.src='https://ui-avatars.com/api/?name={{ urlencode(Auth::user()->name) }}&background=3b82f6&color=fff&size=64'">
+                                            <div>
+                                                <p class="font-bold text-lg">{{ Auth::user()->name }}</p>
+                                                <p class="text-sm text-primary-100">{{ Auth::user()->email }}</p>
+                                                <div class="mt-2">
+                                                    @if(Auth::user()->isAdmin())
+                                                        <span class="inline-flex items-center px-3 py-1 bg-purple-500/30 text-white text-xs rounded-full">
+                                                            <i class="fas fa-crown mr-1"></i> Administrateur
+                                                        </span>
+                                                    @elseif(Auth::user()->isEnseignant())
+                                                        <span class="inline-flex items-center px-3 py-1 bg-green-500/30 text-white text-xs rounded-full">
+                                                            <i class="fas fa-chalkboard-teacher mr-1"></i> Enseignant
+                                                        </span>
+                                                    @else
+                                                        <span class="inline-flex items-center px-3 py-1 bg-blue-500/30 text-white text-xs rounded-full">
+                                                            <i class="fas fa-user-graduate mr-1"></i> Élève
+                                                        </span>
+                                                    @endif
+                                                </div>
+                                            </div>
+                                        </div>
                                     </div>
-                                    <a href="/dashboard" class="block px-4 py-3 hover:bg-slate-50 text-slate-700">
-                                        <i class="fas fa-chart-line mr-2 text-primary-500"></i> Tableau de bord
-                                    </a>
-                                    <a href="/profile" class="block px-4 py-3 hover:bg-slate-50 text-slate-700">
-                                        <i class="fas fa-user mr-2 text-primary-500"></i> Mon profil
-                                    </a>
-                                    <a href="/mes-cours" class="block px-4 py-3 hover:bg-slate-50 text-slate-700">
-                                        <i class="fas fa-book mr-2 text-primary-500"></i> Mes cours
-                                    </a>
-                                    <div class="border-t border-slate-100">
-                                        <form action="/logout" method="POST" class="block">
+                                    
+                                    <!-- Liens du menu -->
+                                    <div class="p-2">
+                                        <a href="{{ url('/dashboard') }}" class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-primary-50 text-slate-700 transition-colors group">
+                                            <div class="w-9 h-9 bg-primary-100 rounded-full flex items-center justify-center group-hover:bg-primary-200 transition-colors">
+                                                <i class="fas fa-chart-line text-primary-600"></i>
+                                            </div>
+                                            <div>
+                                                <p class="font-medium">Tableau de bord</p>
+                                                <p class="text-xs text-slate-500">Votre activité</p>
+                                            </div>
+                                        </a>
+                                        
+                                        <a href="{{ url('/profile') }}" class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-primary-50 text-slate-700 transition-colors group">
+                                            <div class="w-9 h-9 bg-primary-100 rounded-full flex items-center justify-center group-hover:bg-primary-200 transition-colors">
+                                                <i class="fas fa-user text-primary-600"></i>
+                                            </div>
+                                            <div>
+                                                <p class="font-medium">Mon profil</p>
+                                                <p class="text-xs text-slate-500">Gérer vos informations</p>
+                                            </div>
+                                        </a>
+                                        
+                                        
+                                        
+                                        <a href="{{ url('/mes-resultats') }}" class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-primary-50 text-slate-700 transition-colors group">
+                                            <div class="w-9 h-9 bg-primary-100 rounded-full flex items-center justify-center group-hover:bg-primary-200 transition-colors">
+                                                <i class="fas fa-chart-bar text-primary-600"></i>
+                                            </div>
+                                            <div>
+                                                <p class="font-medium">Mes résultats</p>
+                                                <p class="text-xs text-slate-500">Quiz et évaluations</p>
+                                            </div>
+                                        </a>
+                                        
+                                        <a href="{{ url('/mes-questions') }}" class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-primary-50 text-slate-700 transition-colors group">
+                                            <div class="w-9 h-9 bg-primary-100 rounded-full flex items-center justify-center group-hover:bg-primary-200 transition-colors">
+                                                <i class="fas fa-question text-primary-600"></i>
+                                            </div>
+                                            <div>
+                                                <p class="font-medium">Mes questions</p>
+                                                <p class="text-xs text-slate-500">Assistance</p>
+                                            </div>
+                                        </a>
+                                    </div>
+                                    
+                                    <div class="border-t border-slate-100 p-2">
+                                        <form method="POST" action="{{ route('logout') }}" id="logout-form-desktop">
                                             @csrf
-                                            <button type="submit" class="w-full text-left px-4 py-3 hover:bg-red-50 text-red-600">
-                                                <i class="fas fa-sign-out-alt mr-2"></i> Déconnexion
+                                            <button type="submit" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-red-50 text-red-600 transition-colors group">
+                                                <div class="w-9 h-9 bg-red-100 rounded-full flex items-center justify-center group-hover:bg-red-200 transition-colors">
+                                                    <i class="fas fa-sign-out-alt text-red-600"></i>
+                                                </div>
+                                                <div class="text-left">
+                                                    <p class="font-medium">Déconnexion</p>
+                                                    <p class="text-xs text-red-400">Se déconnecter</p>
+                                                </div>
                                             </button>
                                         </form>
                                     </div>
                                 </div>
                             </div>
                         @else
-                            <a href="/login" class="px-6 py-2.5 text-primary-600 font-medium hover:bg-primary-50 rounded-full transition-colors">
+                            <a href="{{ route('login') }}" class="px-6 py-2.5 text-primary-600 font-medium hover:bg-primary-50 rounded-full transition-colors">
                                 Connexion
                             </a>
-                            <a href="/register" class="px-6 py-2.5 bg-primary-600 hover:bg-primary-700 text-white font-medium rounded-full shadow-lg shadow-primary-500/30 transition-all hover:scale-105 btn-shine">
+                            <a href="{{ route('register') }}" class="px-6 py-2.5 bg-primary-600 hover:bg-primary-700 text-white font-medium rounded-full shadow-lg shadow-primary-500/30 transition-all hover:scale-105 btn-shine">
                                 S'inscrire
                             </a>
                         @endauth
@@ -279,7 +366,7 @@
         <div class="glass border-b border-white/20">
             <div class="px-4 h-16 flex items-center justify-between">
                 <!-- Logo and Name -->
-                <a href="/" class="flex items-center gap-2">
+                <a href="{{ url('/') }}" class="flex items-center gap-2">
                     <div class="w-10 h-10 bg-gradient-to-br from-primary-600 to-primary-800 rounded-xl flex items-center justify-center shadow-lg">
                         <i class="fas fa-graduation-cap text-white text-sm"></i>
                     </div>
@@ -287,117 +374,207 @@
                 </a>
 
                 <!-- Right side icons -->
-                <div class="flex items-center gap-3">
+                <div class="flex items-center gap-2">
                     <!-- Search Icon -->
                     <button onclick="toggleSearch()" class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-slate-100 transition-colors">
                         <i class="fas fa-search text-slate-600 text-lg"></i>
                     </button>
 
-                    @auth
-                        <!-- User Avatar (clickable to open menu) -->
-                        <button onclick="toggleMobileUserMenu()" class="relative">
-                            <img src="https://ui-avatars.com/api/?name={{ urlencode(Auth::user()->name) }}&background=3b82f6&color=fff" alt="Avatar" class="w-10 h-10 rounded-full border-2 border-primary-200">
-                        </button>
-
-                        <!-- Mobile User Menu (hidden by default) -->
-                        <div id="mobileUserMenu" class="hidden absolute top-16 right-4 w-64 bg-white rounded-2xl shadow-xl border border-slate-100 overflow-hidden z-50">
-                            <div class="p-4 border-b border-slate-100">
-                                <p class="font-semibold text-slate-800">{{ Auth::user()->name }}</p>
-                                <p class="text-sm text-slate-500 truncate">{{ Auth::user()->email }}</p>
-                            </div>
-                            <a href="/dashboard" class="flex items-center gap-3 px-4 py-3 hover:bg-slate-50 text-slate-700">
-                                <i class="fas fa-chart-line w-5 text-primary-500"></i> Tableau de bord
-                            </a>
-                            <a href="/profile" class="flex items-center gap-3 px-4 py-3 hover:bg-slate-50 text-slate-700">
-                                <i class="fas fa-user w-5 text-primary-500"></i> Mon profil
-                            </a>
-                            <a href="/mes-cours" class="flex items-center gap-3 px-4 py-3 hover:bg-slate-50 text-slate-700">
-                                <i class="fas fa-book w-5 text-primary-500"></i> Mes cours
-                            </a>
-                            <div class="border-t border-slate-100">
-                                <form action="/logout" method="POST">
-                                    @csrf
-                                    <button type="submit" class="w-full flex items-center gap-3 px-4 py-3 hover:bg-red-50 text-red-600">
-                                        <i class="fas fa-sign-out-alt w-5"></i> Déconnexion
-                                    </button>
-                                </form>
-                            </div>
-                        </div>
-                    @else
-                        <!-- Default avatar for non-authenticated users -->
-                        <a href="/login" class="w-10 h-10 rounded-full bg-slate-200 flex items-center justify-center border-2 border-primary-200">
-                            <i class="fas fa-user text-slate-500 text-lg"></i>
-                        </a>
-                    @endauth
+                    <!-- Mobile Menu Button -->
+                    <button onclick="toggleMobileMenu()" class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-slate-100 transition-colors" id="mobileMenuButton">
+                        <i class="fas fa-bars text-slate-600 text-lg" id="menuIcon"></i>
+                    </button>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Search Overlay (same for all devices) -->
-    <div id="searchOverlay" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 hidden opacity-0 transition-opacity duration-300">
-        <div class="max-w-3xl mx-auto mt-32 px-4">
-            <div class="bg-white rounded-2xl shadow-2xl overflow-hidden transform scale-95 transition-transform duration-300" id="searchBox">
-                <div class="flex items-center p-4 border-b border-slate-100">
-                    <i class="fas fa-search text-slate-400 text-xl mr-3"></i>
-                    <input type="text" placeholder="Rechercher un cours, une épreuve, une matière..." class="flex-1 text-lg outline-none text-slate-700 placeholder-slate-400" autofocus>
-                    <button onclick="toggleSearch()" class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-slate-100 text-slate-400">
-                        <i class="fas fa-times"></i>
-                    </button>
-                </div>
-                <div class="p-4 bg-slate-50">
-                    <p class="text-sm text-slate-500 mb-3">Suggestions populaires</p>
-                    <div class="flex flex-wrap gap-2">
-                        <a href="/epreuves?classe=terminale" class="px-3 py-1.5 bg-white rounded-full text-sm text-slate-600 hover:text-primary-600 hover:shadow-sm transition-all">Bac 2024</a>
-                        <a href="/cours/recherche?q=maths" class="px-3 py-1.5 bg-white rounded-full text-sm text-slate-600 hover:text-primary-600 hover:shadow-sm transition-all">Cours de maths</a>
-                        <a href="/epreuves?type=devoir" class="px-3 py-1.5 bg-white rounded-full text-sm text-slate-600 hover:text-primary-600 hover:shadow-sm transition-all">Devoirs surveillés</a>
-                        <a href="/quiz" class="px-3 py-1.5 bg-white rounded-full text-sm text-slate-600 hover:text-primary-600 hover:shadow-sm transition-all">Quiz en ligne</a>
+    <!-- Mobile Menu Panel (slide-down) -->
+    <div id="mobileMenuPanel" class="lg:hidden fixed top-16 left-0 right-0 bg-white shadow-xl z-40 hidden transform transition-all duration-300 ease-in-out max-h-[80vh] overflow-y-auto">
+        <div class="p-4 border-b border-slate-100">
+            @auth
+                <div class="flex items-center gap-3 mb-4 p-3 bg-primary-50 rounded-xl">
+                    <img src="{{ Auth::user()->avatar_url }}" 
+                         alt="{{ Auth::user()->name }}" 
+                         class="w-14 h-14 rounded-full border-3 border-primary-200 object-cover"
+                         onerror="this.src='https://ui-avatars.com/api/?name={{ urlencode(Auth::user()->name) }}&background=3b82f6&color=fff&size=56'">
+                    <div class="flex-1">
+                        <p class="font-semibold text-slate-800">{{ Auth::user()->name }}</p>
+                        <p class="text-xs text-slate-500 truncate">{{ Auth::user()->email }}</p>
+                        <div class="mt-1">
+                            @if(Auth::user()->isAdmin())
+                                <span class="inline-flex items-center px-2 py-0.5 bg-purple-100 text-purple-700 text-xs rounded-full">
+                                    <i class="fas fa-crown mr-1"></i> Administrateur
+                                </span>
+                            @elseif(Auth::user()->isEnseignant())
+                                <span class="inline-flex items-center px-2 py-0.5 bg-green-100 text-green-700 text-xs rounded-full">
+                                    <i class="fas fa-chalkboard-teacher mr-1"></i> Enseignant
+                                </span>
+                            @else
+                                <span class="inline-flex items-center px-2 py-0.5 bg-blue-100 text-blue-700 text-xs rounded-full">
+                                    <i class="fas fa-user-graduate mr-1"></i> Élève
+                                </span>
+                            @endif
+                        </div>
                     </div>
                 </div>
+            @endauth
+
+            <!-- Navigation Links -->
+            <div class="space-y-1">
+                <a href="{{ url('/') }}" class="flex items-center gap-3 px-4 py-3 rounded-xl {{ request()->is('/') ? 'bg-primary-50 text-primary-600' : 'text-slate-700 hover:bg-slate-50' }} transition-colors">
+                    <div class="w-8 h-8 {{ request()->is('/') ? 'bg-primary-100' : 'bg-slate-100' }} rounded-full flex items-center justify-center">
+                        <i class="fas fa-home {{ request()->is('/') ? 'text-primary-600' : 'text-slate-500' }}"></i>
+                    </div>
+                    <span class="font-medium">Accueil</span>
+                </a>
+                
+                <a href="{{ url('/cours') }}" class="flex items-center gap-3 px-4 py-3 rounded-xl {{ request()->is('cours*') ? 'bg-primary-50 text-primary-600' : 'text-slate-700 hover:bg-slate-50' }} transition-colors">
+                    <div class="w-8 h-8 {{ request()->is('cours*') ? 'bg-primary-100' : 'bg-slate-100' }} rounded-full flex items-center justify-center">
+                        <i class="fas fa-book {{ request()->is('cours*') ? 'text-primary-600' : 'text-slate-500' }}"></i>
+                    </div>
+                    <span class="font-medium">Cours</span>
+                </a>
+                
+                <a href="{{ url('/epreuves') }}" class="flex items-center gap-3 px-4 py-3 rounded-xl {{ request()->is('epreuves*') ? 'bg-primary-50 text-primary-600' : 'text-slate-700 hover:bg-slate-50' }} transition-colors">
+                    <div class="w-8 h-8 {{ request()->is('epreuves*') ? 'bg-primary-100' : 'bg-slate-100' }} rounded-full flex items-center justify-center">
+                        <i class="fas fa-file-alt {{ request()->is('epreuves*') ? 'text-primary-600' : 'text-slate-500' }}"></i>
+                    </div>
+                    <span class="font-medium">Épreuves</span>
+                </a>
+                
+                <a href="{{ url('/quiz') }}" class="flex items-center gap-3 px-4 py-3 rounded-xl {{ request()->is('quiz*') ? 'bg-primary-50 text-primary-600' : 'text-slate-700 hover:bg-slate-50' }} transition-colors">
+                    <div class="w-8 h-8 {{ request()->is('quiz*') ? 'bg-primary-100' : 'bg-slate-100' }} rounded-full flex items-center justify-center">
+                        <i class="fas fa-question-circle {{ request()->is('quiz*') ? 'text-primary-600' : 'text-slate-500' }}"></i>
+                    </div>
+                    <span class="font-medium">Quiz</span>
+                </a>
+                
+                <a href="{{ url('/assistance') }}" class="flex items-center gap-3 px-4 py-3 rounded-xl {{ request()->is('assistance*') ? 'bg-primary-50 text-primary-600' : 'text-slate-700 hover:bg-slate-50' }} transition-colors">
+                    <div class="w-8 h-8 {{ request()->is('assistance*') ? 'bg-primary-100' : 'bg-slate-100' }} rounded-full flex items-center justify-center">
+                        <i class="fas fa-headset {{ request()->is('assistance*') ? 'text-primary-600' : 'text-slate-500' }}"></i>
+                    </div>
+                    <span class="font-medium">Assistance</span>
+                </a>
+                
+                @auth
+                    @if(Auth::user()->isAdmin())
+                        <a href="{{ url('/admin/dashboard') }}" class="flex items-center gap-3 px-4 py-3 rounded-xl {{ request()->is('admin*') ? 'bg-purple-50 text-purple-600' : 'text-slate-700 hover:bg-slate-50' }} transition-colors">
+                            <div class="w-8 h-8 {{ request()->is('admin*') ? 'bg-purple-100' : 'bg-slate-100' }} rounded-full flex items-center justify-center">
+                                <i class="fas fa-cog {{ request()->is('admin*') ? 'text-purple-600' : 'text-slate-500' }}"></i>
+                            </div>
+                            <span class="font-medium">Administration</span>
+                        </a>
+                    @endif
+                    
+                    <div class="border-t border-slate-200 my-3"></div>
+                    
+                    <p class="text-xs font-semibold text-slate-400 uppercase tracking-wider px-4 mb-2">Mon espace</p>
+                    
+                    <a href="{{ url('/dashboard') }}" class="flex items-center gap-3 px-4 py-3 rounded-xl {{ request()->is('dashboard') ? 'bg-primary-50 text-primary-600' : 'text-slate-700 hover:bg-slate-50' }} transition-colors">
+                        <div class="w-8 h-8 {{ request()->is('dashboard') ? 'bg-primary-100' : 'bg-slate-100' }} rounded-full flex items-center justify-center">
+                            <i class="fas fa-chart-line {{ request()->is('dashboard') ? 'text-primary-600' : 'text-slate-500' }}"></i>
+                        </div>
+                        <span class="font-medium">Tableau de bord</span>
+                    </a>
+                    
+                    <a href="{{ url('/profile') }}" class="flex items-center gap-3 px-4 py-3 rounded-xl {{ request()->is('profile') ? 'bg-primary-50 text-primary-600' : 'text-slate-700 hover:bg-slate-50' }} transition-colors">
+                        <div class="w-8 h-8 {{ request()->is('profile') ? 'bg-primary-100' : 'bg-slate-100' }} rounded-full flex items-center justify-center">
+                            <i class="fas fa-user {{ request()->is('profile') ? 'text-primary-600' : 'text-slate-500' }}"></i>
+                        </div>
+                        <span class="font-medium">Mon profil</span>
+                    </a>
+                    
+                    <a href="{{ url('/mes-cours') }}" class="flex items-center gap-3 px-4 py-3 rounded-xl {{ request()->is('mes-cours') ? 'bg-primary-50 text-primary-600' : 'text-slate-700 hover:bg-slate-50' }} transition-colors">
+                        <div class="w-8 h-8 {{ request()->is('mes-cours') ? 'bg-primary-100' : 'bg-slate-100' }} rounded-full flex items-center justify-center">
+                            <i class="fas fa-book {{ request()->is('mes-cours') ? 'text-primary-600' : 'text-slate-500' }}"></i>
+                        </div>
+                        <span class="font-medium">Mes cours</span>
+                    </a>
+                    
+                    <a href="{{ url('/mes-resultats') }}" class="flex items-center gap-3 px-4 py-3 rounded-xl {{ request()->is('mes-resultats') ? 'bg-primary-50 text-primary-600' : 'text-slate-700 hover:bg-slate-50' }} transition-colors">
+                        <div class="w-8 h-8 {{ request()->is('mes-resultats') ? 'bg-primary-100' : 'bg-slate-100' }} rounded-full flex items-center justify-center">
+                            <i class="fas fa-chart-bar {{ request()->is('mes-resultats') ? 'text-primary-600' : 'text-slate-500' }}"></i>
+                        </div>
+                        <span class="font-medium">Mes résultats</span>
+                    </a>
+                    
+                    <a href="{{ url('/mes-questions') }}" class="flex items-center gap-3 px-4 py-3 rounded-xl {{ request()->is('mes-questions') ? 'bg-primary-50 text-primary-600' : 'text-slate-700 hover:bg-slate-50' }} transition-colors">
+                        <div class="w-8 h-8 {{ request()->is('mes-questions') ? 'bg-primary-100' : 'bg-slate-100' }} rounded-full flex items-center justify-center">
+                            <i class="fas fa-question {{ request()->is('mes-questions') ? 'text-primary-600' : 'text-slate-500' }}"></i>
+                        </div>
+                        <span class="font-medium">Mes questions</span>
+                    </a>
+                @endauth
             </div>
+            
+            @auth
+                <div class="border-t border-slate-200 mt-4 pt-4">
+                    <form method="POST" action="{{ route('logout') }}" id="logout-form-mobile">
+                        @csrf
+                        <button type="submit" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-red-600 hover:bg-red-50 transition-colors">
+                            <div class="w-8 h-8 bg-red-100 rounded-full flex items-center justify-center">
+                                <i class="fas fa-sign-out-alt text-red-600"></i>
+                            </div>
+                            <span class="font-medium">Déconnexion</span>
+                        </button>
+                    </form>
+                </div>
+            @else
+                <div class="border-t border-slate-200 mt-4 pt-4 flex flex-col gap-2">
+                    <a href="{{ route('login') }}" class="w-full flex items-center justify-center gap-2 px-4 py-3 bg-primary-600 hover:bg-primary-700 text-white font-medium rounded-xl transition-colors">
+                        <i class="fas fa-sign-in-alt"></i>
+                        <span>Se connecter</span>
+                    </a>
+                    <a href="{{ route('register') }}" class="w-full flex items-center justify-center gap-2 px-4 py-3 bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium rounded-xl transition-colors">
+                        <i class="fas fa-user-plus"></i>
+                        <span>S'inscrire</span>
+                    </a>
+                </div>
+            @endauth
         </div>
     </div>
 
     <!-- Mobile Bottom Navigation (visible only on mobile) -->
     <nav class="lg:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-slate-200 safe-bottom z-40 shadow-lg">
         <div class="flex justify-around items-center h-16">
-            <a href="/" class="flex flex-col items-center justify-center w-full h-full gap-1 {{ request()->is('/') ? 'text-primary-600' : 'text-slate-400' }}">
+            <a href="{{ url('/') }}" class="flex flex-col items-center justify-center w-full h-full gap-1 {{ request()->is('/') ? 'text-primary-600' : 'text-slate-400' }}">
                 <div class="w-10 h-10 rounded-full flex items-center justify-center {{ request()->is('/') ? 'bg-primary-100' : '' }}">
                     <i class="fas fa-home text-lg"></i>
                 </div>
                 <span class="text-xs font-medium">Accueil</span>
             </a>
             
-            <a href="/cours" class="flex flex-col items-center justify-center w-full h-full gap-1 {{ request()->is('cours*') ? 'text-primary-600' : 'text-slate-400' }}">
+            <a href="{{ url('/cours') }}" class="flex flex-col items-center justify-center w-full h-full gap-1 {{ request()->is('cours*') ? 'text-primary-600' : 'text-slate-400' }}">
                 <div class="w-10 h-10 rounded-full flex items-center justify-center {{ request()->is('cours*') ? 'bg-primary-100' : '' }}">
                     <i class="fas fa-book text-lg"></i>
                 </div>
                 <span class="text-xs font-medium">Cours</span>
             </a>
             
-            <a href="/epreuves" class="flex flex-col items-center justify-center w-full h-full gap-1 {{ request()->is('epreuves*') ? 'text-primary-600' : 'text-slate-400' }}">
+            <a href="{{ url('/epreuves') }}" class="flex flex-col items-center justify-center w-full h-full gap-1 {{ request()->is('epreuves*') ? 'text-primary-600' : 'text-slate-400' }}">
                 <div class="w-10 h-10 rounded-full flex items-center justify-center {{ request()->is('epreuves*') ? 'bg-primary-100' : '' }}">
                     <i class="fas fa-file-alt text-lg"></i>
                 </div>
                 <span class="text-xs font-medium">Épreuves</span>
             </a>
             
-            <a href="/assistance" class="flex flex-col items-center justify-center w-full h-full gap-1 {{ request()->is('assistance*') ? 'text-primary-600' : 'text-slate-400' }}">
-                <div class="w-10 h-10 rounded-full flex items-center justify-center {{ request()->is('assistance*') ? 'bg-primary-100' : '' }}">
+            <a href="{{ url('/quiz') }}" class="flex flex-col items-center justify-center w-full h-full gap-1 {{ request()->is('quiz*') ? 'text-primary-600' : 'text-slate-400' }}">
+                <div class="w-10 h-10 rounded-full flex items-center justify-center {{ request()->is('quiz*') ? 'bg-primary-100' : '' }}">
                     <i class="fas fa-question-circle text-lg"></i>
                 </div>
-                <span class="text-xs font-medium">Aide</span>
+                <span class="text-xs font-medium">Quiz</span>
             </a>
             
             @auth
-                <a href="/dashboard" class="flex flex-col items-center justify-center w-full h-full gap-1 {{ request()->is('dashboard') ? 'text-primary-600' : 'text-slate-400' }}">
+                <a href="{{ url('/dashboard') }}" class="flex flex-col items-center justify-center w-full h-full gap-1 {{ request()->is('dashboard') ? 'text-primary-600' : 'text-slate-400' }}">
                     <div class="w-10 h-10 rounded-full flex items-center justify-center {{ request()->is('dashboard') ? 'bg-primary-100' : '' }}">
                         <i class="fas fa-user text-lg"></i>
                     </div>
                     <span class="text-xs font-medium">Profil</span>
                 </a>
             @else
-                <a href="/login" class="flex flex-col items-center justify-center w-full h-full gap-1 text-slate-400">
+                <a href="{{ route('login') }}" class="flex flex-col items-center justify-center w-full h-full gap-1 text-slate-400">
                     <div class="w-10 h-10 rounded-full flex items-center justify-center">
                         <i class="fas fa-sign-in-alt text-lg"></i>
                     </div>
@@ -407,12 +584,36 @@
         </div>
     </nav>
 
+    <!-- Search Overlay -->
+    <div id="searchOverlay" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 hidden opacity-0 transition-opacity duration-300">
+        <div class="max-w-3xl mx-auto mt-32 px-4">
+            <div class="bg-white rounded-2xl shadow-2xl overflow-hidden transform scale-95 transition-transform duration-300" id="searchBox">
+                <div class="flex items-center p-4 border-b border-slate-100">
+                    <i class="fas fa-search text-slate-400 text-xl mr-3"></i>
+                    <input type="text" id="searchInput" placeholder="Rechercher un cours, une épreuve, une matière..." class="flex-1 text-lg outline-none text-slate-700 placeholder-slate-400" autofocus>
+                    <button onclick="toggleSearch()" class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-slate-100 text-slate-400">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                <div class="p-4 bg-slate-50">
+                    <p class="text-sm text-slate-500 mb-3">Suggestions populaires</p>
+                    <div class="flex flex-wrap gap-2">
+                        <a href="{{ url('/epreuves?classe=terminale') }}" class="px-3 py-1.5 bg-white rounded-full text-sm text-slate-600 hover:text-primary-600 hover:shadow-sm transition-all">Bac 2024</a>
+                        <a href="{{ url('/cours/recherche?q=maths') }}" class="px-3 py-1.5 bg-white rounded-full text-sm text-slate-600 hover:text-primary-600 hover:shadow-sm transition-all">Cours de maths</a>
+                        <a href="{{ url('/epreuves?type=devoir') }}" class="px-3 py-1.5 bg-white rounded-full text-sm text-slate-600 hover:text-primary-600 hover:shadow-sm transition-all">Devoirs surveillés</a>
+                        <a href="{{ url('/quiz') }}" class="px-3 py-1.5 bg-white rounded-full text-sm text-slate-600 hover:text-primary-600 hover:shadow-sm transition-all">Quiz en ligne</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Main Content -->
     <main class="lg:pt-20 pt-16 min-h-screen">
         @yield('content')
     </main>
 
-    <!-- Footer (visible on lg screens and above, hidden on mobile) -->
+    <!-- Footer -->
     <footer class="hidden lg:block bg-slate-900 text-slate-300 relative overflow-hidden">
         <!-- Background Pattern -->
         <div class="absolute inset-0 opacity-5">
@@ -450,10 +651,10 @@
                 <div>
                     <h4 class="text-white font-semibold mb-6">Ressources</h4>
                     <ul class="space-y-3">
-                        <li><a href="/cours" class="hover:text-primary-400 transition-colors flex items-center gap-2"><i class="fas fa-chevron-right text-xs text-primary-500"></i> Cours par classe</a></li>
-                        <li><a href="/epreuves" class="hover:text-primary-400 transition-colors flex items-center gap-2"><i class="fas fa-chevron-right text-xs text-primary-500"></i> Banque d'épreuves</a></li>
-                        <li><a href="/quiz" class="hover:text-primary-400 transition-colors flex items-center gap-2"><i class="fas fa-chevron-right text-xs text-primary-500"></i> Quiz interactifs</a></li>
-                        <li><a href="/assistance" class="hover:text-primary-400 transition-colors flex items-center gap-2"><i class="fas fa-chevron-right text-xs text-primary-500"></i> Assistance pédagogique</a></li>
+                        <li><a href="{{ url('/cours') }}" class="hover:text-primary-400 transition-colors flex items-center gap-2"><i class="fas fa-chevron-right text-xs text-primary-500"></i> Cours par classe</a></li>
+                        <li><a href="{{ url('/epreuves') }}" class="hover:text-primary-400 transition-colors flex items-center gap-2"><i class="fas fa-chevron-right text-xs text-primary-500"></i> Banque d'épreuves</a></li>
+                        <li><a href="{{ url('/quiz') }}" class="hover:text-primary-400 transition-colors flex items-center gap-2"><i class="fas fa-chevron-right text-xs text-primary-500"></i> Quiz interactifs</a></li>
+                        <li><a href="{{ url('/assistance') }}" class="hover:text-primary-400 transition-colors flex items-center gap-2"><i class="fas fa-chevron-right text-xs text-primary-500"></i> Assistance pédagogique</a></li>
                     </ul>
                 </div>
 
@@ -461,10 +662,10 @@
                 <div>
                     <h4 class="text-white font-semibold mb-6">Classes</h4>
                     <ul class="space-y-3">
-                        <li><a href="/cours/classe/6eme" class="hover:text-primary-400 transition-colors flex items-center gap-2"><i class="fas fa-chevron-right text-xs text-primary-500"></i> Collège (6ème - 3ème)</a></li>
-                        <li><a href="/cours/classe/seconde" class="hover:text-primary-400 transition-colors flex items-center gap-2"><i class="fas fa-chevron-right text-xs text-primary-500"></i> Seconde</a></li>
-                        <li><a href="/cours/classe/premiere" class="hover:text-primary-400 transition-colors flex items-center gap-2"><i class="fas fa-chevron-right text-xs text-primary-500"></i> Première</a></li>
-                        <li><a href="/cours/classe/terminale" class="hover:text-primary-400 transition-colors flex items-center gap-2"><i class="fas fa-chevron-right text-xs text-primary-500"></i> Terminale (Bac)</a></li>
+                        <li><a href="{{ url('/cours/classe/6eme') }}" class="hover:text-primary-400 transition-colors flex items-center gap-2"><i class="fas fa-chevron-right text-xs text-primary-500"></i> Collège (6ème - 3ème)</a></li>
+                        <li><a href="{{ url('/cours/classe/seconde') }}" class="hover:text-primary-400 transition-colors flex items-center gap-2"><i class="fas fa-chevron-right text-xs text-primary-500"></i> Seconde</a></li>
+                        <li><a href="{{ url('/cours/classe/premiere') }}" class="hover:text-primary-400 transition-colors flex items-center gap-2"><i class="fas fa-chevron-right text-xs text-primary-500"></i> Première</a></li>
+                        <li><a href="{{ url('/cours/classe/terminale') }}" class="hover:text-primary-400 transition-colors flex items-center gap-2"><i class="fas fa-chevron-right text-xs text-primary-500"></i> Terminale (Bac)</a></li>
                     </ul>
                 </div>
 
@@ -536,6 +737,7 @@
         function toggleSearch() {
             const overlay = document.getElementById('searchOverlay');
             const box = document.getElementById('searchBox');
+            const input = document.getElementById('searchInput');
             
             if (overlay.classList.contains('hidden')) {
                 overlay.classList.remove('hidden');
@@ -543,6 +745,7 @@
                     overlay.classList.remove('opacity-0');
                     box.classList.remove('scale-95');
                     box.classList.add('scale-100');
+                    if (input) input.focus();
                 }, 10);
             } else {
                 overlay.classList.add('opacity-0');
@@ -553,35 +756,65 @@
         }
 
         // Toggle desktop user menu
-        function toggleUserMenu() {
-            const menu = document.getElementById('userMenu');
+        function toggleDesktopUserMenu() {
+            const menu = document.getElementById('desktopUserMenu');
             if (menu) {
                 menu.classList.toggle('hidden');
             }
         }
 
-        // Toggle mobile user menu
-        function toggleMobileUserMenu() {
-            const menu = document.getElementById('mobileUserMenu');
-            if (menu) {
-                menu.classList.toggle('hidden');
+        // Toggle mobile menu
+        function toggleMobileMenu() {
+            const panel = document.getElementById('mobileMenuPanel');
+            const icon = document.getElementById('menuIcon');
+            
+            if (panel.classList.contains('hidden')) {
+                panel.classList.remove('hidden');
+                icon.classList.remove('fa-bars');
+                icon.classList.add('fa-times');
+                document.body.style.overflow = 'hidden';
+            } else {
+                panel.classList.add('hidden');
+                icon.classList.remove('fa-times');
+                icon.classList.add('fa-bars');
+                document.body.style.overflow = '';
             }
         }
+
+        // Close mobile menu when clicking a link
+        document.querySelectorAll('#mobileMenuPanel a').forEach(link => {
+            link.addEventListener('click', () => {
+                const panel = document.getElementById('mobileMenuPanel');
+                const icon = document.getElementById('menuIcon');
+                panel.classList.add('hidden');
+                icon.classList.remove('fa-times');
+                icon.classList.add('fa-bars');
+                document.body.style.overflow = '';
+            });
+        });
 
         // Close menus when clicking outside
         document.addEventListener('click', (e) => {
             // Desktop user menu
-            const desktopMenu = document.getElementById('userMenu');
-            const desktopButton = e.target.closest('[onclick="toggleUserMenu()"]');
+            const desktopMenu = document.getElementById('desktopUserMenu');
+            const desktopButton = e.target.closest('[onclick="toggleDesktopUserMenu()"]');
             if (!desktopButton && desktopMenu && !desktopMenu.classList.contains('hidden')) {
                 desktopMenu.classList.add('hidden');
             }
 
-            // Mobile user menu
-            const mobileMenu = document.getElementById('mobileUserMenu');
-            const mobileButton = e.target.closest('[onclick="toggleMobileUserMenu()"]');
-            if (!mobileButton && mobileMenu && !mobileMenu.classList.contains('hidden')) {
-                mobileMenu.classList.add('hidden');
+            // Mobile menu
+            const mobilePanel = document.getElementById('mobileMenuPanel');
+            const mobileButton = e.target.closest('#mobileMenuButton');
+            const mobileIcon = e.target.closest('#menuIcon');
+            
+            if (mobilePanel && !mobilePanel.classList.contains('hidden') && 
+                !mobileButton && !mobileIcon && 
+                !mobilePanel.contains(e.target)) {
+                mobilePanel.classList.add('hidden');
+                const icon = document.getElementById('menuIcon');
+                icon.classList.remove('fa-times');
+                icon.classList.add('fa-bars');
+                document.body.style.overflow = '';
             }
         });
 
@@ -592,15 +825,45 @@
                 if (overlay && !overlay.classList.contains('hidden')) {
                     toggleSearch();
                 }
+                
+                const mobilePanel = document.getElementById('mobileMenuPanel');
+                if (mobilePanel && !mobilePanel.classList.contains('hidden')) {
+                    mobilePanel.classList.add('hidden');
+                    const icon = document.getElementById('menuIcon');
+                    icon.classList.remove('fa-times');
+                    icon.classList.add('fa-bars');
+                    document.body.style.overflow = '';
+                }
+                
+                const desktopMenu = document.getElementById('desktopUserMenu');
+                if (desktopMenu && !desktopMenu.classList.contains('hidden')) {
+                    desktopMenu.classList.add('hidden');
+                }
+            }
+        });
+
+        // Handle responsive behavior
+        window.addEventListener('resize', () => {
+            if (window.innerWidth >= 1024) {
+                const mobilePanel = document.getElementById('mobileMenuPanel');
+                if (mobilePanel && !mobilePanel.classList.contains('hidden')) {
+                    mobilePanel.classList.add('hidden');
+                    const icon = document.getElementById('menuIcon');
+                    icon.classList.remove('fa-times');
+                    icon.classList.add('fa-bars');
+                    document.body.style.overflow = '';
+                }
             }
         });
     </script>
+    
     <!-- CKEditor 5 -->
     <script src="https://cdn.ckeditor.com/ckeditor5/39.0.1/classic/ckeditor.js"></script>
     <script src="https://cdn.ckeditor.com/ckeditor5/39.0.1/classic/translations/fr.js"></script>
+    
     <!-- MathType pour les formules -->
     <script src="https://cdn.jsdelivr.net/npm/@wiris/mathtype-ckeditor5@8.3.0/dist/mathtype-ckeditor5.js"></script>
 
     @yield('scripts')
-</body>
-</html>
+</body> 
+</html> 

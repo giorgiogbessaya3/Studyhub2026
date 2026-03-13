@@ -90,7 +90,7 @@
     </div>
 </section>
 
-<!-- SECTION 2 - SERVICES CARDS -->
+<!-- SECTION 2 - SERVICES CARDS (4 SERVICES MAINTENANT) -->
 <section class="py-8 md:py-10 bg-gradient-to-b from-blue-50 to-white">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <!-- En-tête de section -->
@@ -100,7 +100,7 @@
             </span>
         </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6 lg:gap-8 perspective">
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 lg:gap-8 perspective">
             <!-- COURS CARD -->
             <div class="group bg-white rounded-2xl md:rounded-3xl p-5 md:p-8 border border-blue-100 hover:border-blue-300 shadow-lg hover:shadow-2xl hover:shadow-blue-500/20 transition-all duration-500 hover:-translate-y-1 md:hover:-translate-y-2 transform-3d" data-aos="fade-up" data-aos-delay="100">
                 <div class="relative mb-4 md:mb-6">
@@ -133,11 +133,27 @@
                 </a>
             </div>
 
+            <!-- QUIZ CARD (NOUVEAU) -->
+            <div class="group bg-white rounded-2xl md:rounded-3xl p-5 md:p-8 border border-orange-100 hover:border-orange-300 shadow-lg hover:shadow-2xl hover:shadow-orange-500/20 transition-all duration-500 hover:-translate-y-1 md:hover:-translate-y-2 transform-3d" data-aos="fade-up" data-aos-delay="300">
+                <div class="relative mb-4 md:mb-6">
+                    <div class="w-16 h-16 md:w-20 md:h-20 bg-gradient-to-br from-orange-500 to-orange-600 rounded-xl md:rounded-2xl flex items-center justify-center transform group-hover:scale-110 group-hover:rotate-6 transition-all duration-300">
+                        <i class="fas fa-question-circle text-white text-xl md:text-3xl"></i>
+                    </div>
+                    <div class="absolute -top-2 -right-2 w-4 h-4 md:w-6 md:h-6 bg-orange-500 rounded-full animate-ping opacity-50"></div>
+                </div>
+                <h3 class="text-xl md:text-2xl font-bold text-gray-900 mb-2 md:mb-3">Quiz interactifs</h3>
+                <p class="text-sm md:text-base text-gray-600 mb-4 md:mb-6 leading-relaxed">Testez vos connaissances avec des quiz interactifs adaptés à votre niveau et suivez votre progression.</p>
+                <a href="/quiz" class="inline-flex items-center text-orange-600 font-medium text-sm md:text-base group-hover:gap-3 transition-all">
+                    <span>Commencer les quiz</span>
+                    <i class="fas fa-arrow-right text-xs md:text-sm group-hover:translate-x-1 transition-transform"></i>
+                </a>
+            </div>
+
             <!-- ASSISTANCE CARD -->
-            <div class="group bg-white rounded-2xl md:rounded-3xl p-5 md:p-8 border border-purple-100 hover:border-purple-300 shadow-lg hover:shadow-2xl hover:shadow-purple-500/20 transition-all duration-500 hover:-translate-y-1 md:hover:-translate-y-2 transform-3d md:col-span-2 lg:col-span-1" data-aos="fade-up" data-aos-delay="300">
+            <div class="group bg-white rounded-2xl md:rounded-3xl p-5 md:p-8 border border-purple-100 hover:border-purple-300 shadow-lg hover:shadow-2xl hover:shadow-purple-500/20 transition-all duration-500 hover:-translate-y-1 md:hover:-translate-y-2 transform-3d" data-aos="fade-up" data-aos-delay="400">
                 <div class="relative mb-4 md:mb-6">
                     <div class="w-16 h-16 md:w-20 md:h-20 bg-gradient-to-br from-purple-500 to-purple-600 rounded-xl md:rounded-2xl flex items-center justify-center transform group-hover:scale-110 group-hover:rotate-6 transition-all duration-300">
-                        <i class="fas fa-question-circle text-white text-xl md:text-3xl"></i>
+                        <i class="fas fa-headset text-white text-xl md:text-3xl"></i>
                     </div>
                     <div class="absolute -top-2 -right-2 w-4 h-4 md:w-6 md:h-6 bg-purple-500 rounded-full animate-ping opacity-50"></div>
                 </div>
@@ -152,7 +168,7 @@
     </div>
 </section>
 
-<!-- SECTION 3 - CLASSES -->
+<!-- SECTION 3 - CLASSES (4 CLASSES SEULEMENT) -->
 <section class="py-8 md:py-10 bg-white">
     <div class="container mx-auto px-4">
         <!-- En-tête -->
@@ -168,7 +184,7 @@
             </a>
         </div>
         
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6">
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
             @foreach($quickClasses as $index => $classe)
             @php
                 $colors = [
@@ -176,8 +192,6 @@
                     ['from' => '#10b981', 'to' => '#059669', 'light' => '#ecfdf5'],
                     ['from' => '#8b5cf6', 'to' => '#7c3aed', 'light' => '#f5f3ff'],
                     ['from' => '#f59e0b', 'to' => '#d97706', 'light' => '#fffbeb'],
-                    ['from' => '#ef4444', 'to' => '#dc2626', 'light' => '#fef2f2'],
-                    ['from' => '#06b6d4', 'to' => '#0891b2', 'light' => '#cffafe'],
                 ];
                 $color = $colors[$index % count($colors)];
             @endphp
@@ -251,7 +265,7 @@
     </div>
 </section>
 
-<!-- SECTION 4 - STATISTIQUES (optionnelle pour remplir) -->
+<!-- SECTION 4 - STATISTIQUES -->
 <section class="py-8 md:py-10 bg-gradient-to-b from-white to-blue-50">
     <div class="container mx-auto px-4">
         <div class="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
@@ -264,11 +278,11 @@
                 <div class="text-xs md:text-sm text-gray-600">Cours</div>
             </div>
             <div class="text-center p-4 md:p-6 bg-white rounded-xl md:rounded-2xl shadow-lg" data-aos="fade-up" data-aos-delay="300">
-                <div class="text-2xl md:text-3xl font-bold text-purple-600 mb-1 md:mb-2">2000+</div>
-                <div class="text-xs md:text-sm text-gray-600">Exercices</div>
+                <div class="text-2xl md:text-3xl font-bold text-orange-600 mb-1 md:mb-2">500+</div>
+                <div class="text-xs md:text-sm text-gray-600">Quiz</div>
             </div>
             <div class="text-center p-4 md:p-6 bg-white rounded-xl md:rounded-2xl shadow-lg" data-aos="fade-up" data-aos-delay="400">
-                <div class="text-2xl md:text-3xl font-bold text-orange-600 mb-1 md:mb-2">98%</div>
+                <div class="text-2xl md:text-3xl font-bold text-purple-600 mb-1 md:mb-2">98%</div>
                 <div class="text-xs md:text-sm text-gray-600">Satisfaction</div>
             </div>
         </div>
@@ -350,6 +364,17 @@
 img, svg, video {
     max-width: 100%;
     height: auto;
+}
+
+/* Animation ping personnalisée */
+@keyframes ping {
+    75%, 100% {
+        transform: scale(2);
+        opacity: 0;
+    }
+}
+.animate-ping {
+    animation: ping 1s cubic-bezier(0, 0, 0.2, 1) infinite;
 }
 </style>
 

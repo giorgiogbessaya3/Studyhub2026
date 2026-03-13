@@ -141,15 +141,29 @@ Auth::routes();
 // ROUTES UTILISATEUR AUTHENTIFIÉ
 // ==========================================
 Route::middleware(['auth'])->group(function() {
+    // Dashboard
     Route::get('dashboard', [UserController::class, 'dashboard'])->name('user.dashboard');
+    
+    // Profil
     Route::get('profile', [UserController::class, 'profile'])->name('profile');
     Route::post('profile', [UserController::class, 'updateProfile'])->name('profile.update');
+    Route::post('profile/avatar', [UserController::class, 'updateAvatar'])->name('profile.avatar');
+    
+    // Mot de passe
     Route::get('change-password', [UserController::class, 'changePassword'])->name('password.change');
-    Route::post('change-password', [UserController::class, 'updatePassword'])->name('password.update');
+    Route::post('profile/password', [UserController::class, 'updatePassword'])->name('password.update');
+    
+    // Suppression de compte
+    Route::delete('profile/delete', [UserController::class, 'deleteAccount'])->name('profile.delete');
+    
+    // Mes contenus
     Route::get('mes-cours', [UserController::class, 'mesCours'])->name('mes.cours');
     Route::get('mes-epreuves', [UserController::class, 'mesEpreuves'])->name('mes.epreuves');
     Route::get('mes-resultats', [UserController::class, 'mesResultats'])->name('mes.resultats');
+    Route::get('mes-resultats/{id}', [UserController::class, 'detailResultat'])->name('mes.resultats.detail');
     Route::get('mes-questions', [UserController::class, 'mesQuestions'])->name('mes.questions');
+    
+    // Déconnexion
     Route::post('logout', [UserController::class, 'logout'])->name('logout');
 });
 

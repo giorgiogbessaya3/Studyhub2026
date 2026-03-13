@@ -22,10 +22,17 @@
                             <img src="{{ $user->avatar_url }}" 
                                  alt="{{ $user->name }}" 
                                  class="w-32 h-32 rounded-full border-4 border-primary-100 mx-auto object-cover">
-                            <button onclick="document.getElementById('avatarInput').click()" 
-                                    class="absolute bottom-0 right-0 w-10 h-10 bg-primary-600 hover:bg-primary-700 text-white rounded-full flex items-center justify-center shadow-lg cursor-pointer transition-colors">
-                                <i class="fas fa-camera"></i>
-                            </button>
+                            
+                            <!-- Formulaire upload avatar -->
+                            <form action="{{ url('/profile/avatar') }}" method="POST" enctype="multipart/form-data" id="avatarForm">
+                                @csrf
+                                <input type="file" name="avatar" id="avatarInput" accept="image/*" class="hidden" onchange="document.getElementById('avatarForm').submit()">
+                                <button type="button" 
+                                        onclick="document.getElementById('avatarInput').click()" 
+                                        class="absolute bottom-0 right-0 w-10 h-10 bg-primary-600 hover:bg-primary-700 text-white rounded-full flex items-center justify-center shadow-lg cursor-pointer transition-colors">
+                                    <i class="fas fa-camera"></i>
+                                </button>
+                            </form>
                         </div>
                         <h2 class="text-xl font-bold text-slate-800 mt-4">{{ $user->name }}</h2>
                         <p class="text-slate-500">{{ $user->email }}</p>
@@ -99,13 +106,6 @@
 
             <!-- Colonne de droite - Formulaires -->
             <div class="lg:col-span-2 space-y-6">
-                <!-- Formulaire d'avatar caché -->
-                <form id="avatarForm" action="{{ url('/profile/avatar') }}" method="POST" enctype="multipart/form-data" class="hidden">
-                    @csrf
-                    @method('PUT')
-                    <input type="file" name="avatar" id="avatarInput" accept="image/*" onchange="document.getElementById('avatarForm').submit()">
-                </form>
-
                 <!-- Messages de succès/erreur -->
                 @if(session('success'))
                     <div class="bg-green-100 border-l-4 border-green-500 text-green-700 p-4 rounded-lg" role="alert">
@@ -119,13 +119,23 @@
                     </div>
                 @endif
 
+                @if($errors->any())
+                    <div class="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 rounded-lg" role="alert">
+                        <p class="font-medium">Veuillez corriger les erreurs suivantes :</p>
+                        <ul class="list-disc list-inside mt-2">
+                            @foreach($errors->all() as $error)
+                                <li>{{ $error }}</li>
+                            @endforeach
+                        </ul>
+                    </div>
+                @endif
+
                 <!-- Formulaire d'informations personnelles -->
                 <div class="bg-white rounded-2xl shadow-sm p-6">
                     <h2 class="text-xl font-semibold text-slate-800 mb-6">Informations personnelles</h2>
                     
-                    <form action="{{ url('/profile') }}" method="POST" id="profileForm">
+                    <form action="{{ url('/profile') }}" method="POST">
                         @csrf
-                        @method('PUT')
                         
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
                             <!-- Nom -->
@@ -197,7 +207,6 @@
                     
                     <form action="{{ url('/profile/password') }}" method="POST">
                         @csrf
-                        @method('PUT')
                         
                         <!-- Mot de passe actuel -->
                         <div class="mb-6">
@@ -396,54 +405,58 @@
         number: document.getElementById('number')
     };
 
-    passwordInput.addEventListener('input', function() {
-        const password = this.value;
-        
-        // Vérifier la longueur
-        if (password.length >= 8) {
-            requirements.length.innerHTML = '✓ Au moins 8 caractères';
-            requirements.length.classList.add('valid');
-        } else {
-            requirements.length.innerHTML = '✗ Au moins 8 caractères';
-            requirements.length.classList.remove('valid');
-        }
-        
-        // Vérifier la majuscule
-        if (/[A-Z]/.test(password)) {
-            requirements.uppercase.innerHTML = '✓ Au moins une majuscule';
-            requirements.uppercase.classList.add('valid');
-        } else {
-            requirements.uppercase.innerHTML = '✗ Au moins une majuscule';
-            requirements.uppercase.classList.remove('valid');
-        }
-        
-        // Vérifier la minuscule
-        if (/[a-z]/.test(password)) {
-            requirements.lowercase.innerHTML = '✓ Au moins une minuscule';
-            requirements.lowercase.classList.add('valid');
-        } else {
-            requirements.lowercase.innerHTML = '✗ Au moins une minuscule';
-            requirements.lowercase.classList.remove('valid');
-        }
-        
-        // Vérifier le chiffre
-        if (/\d/.test(password)) {
-            requirements.number.innerHTML = '✓ Au moins un chiffre';
-            requirements.number.classList.add('valid');
-        } else {
-            requirements.number.innerHTML = '✗ Au moins un chiffre';
-            requirements.number.classList.remove('valid');
-        }
-        
-        // Vérifier la confirmation
-        checkPasswordMatch();
-    });
+    if (passwordInput) {
+        passwordInput.addEventListener('input', function() {
+            const password = this.value;
+            
+            // Vérifier la longueur
+            if (password.length >= 8) {
+                requirements.length.innerHTML = '✓ Au moins 8 caractères';
+                requirements.length.classList.add('valid');
+            } else {
+                requirements.length.innerHTML = '✗ Au moins 8 caractères';
+                requirements.length.classList.remove('valid');
+            }
+            
+            // Vérifier la majuscule
+            if (/[A-Z]/.test(password)) {
+                requirements.uppercase.innerHTML = '✓ Au moins une majuscule';
+                requirements.uppercase.classList.add('valid');
+            } else {
+                requirements.uppercase.innerHTML = '✗ Au moins une majuscule';
+                requirements.uppercase.classList.remove('valid');
+            }
+            
+            // Vérifier la minuscule
+            if (/[a-z]/.test(password)) {
+                requirements.lowercase.innerHTML = '✓ Au moins une minuscule';
+                requirements.lowercase.classList.add('valid');
+            } else {
+                requirements.lowercase.innerHTML = '✗ Au moins une minuscule';
+                requirements.lowercase.classList.remove('valid');
+            }
+            
+            // Vérifier le chiffre
+            if (/\d/.test(password)) {
+                requirements.number.innerHTML = '✓ Au moins un chiffre';
+                requirements.number.classList.add('valid');
+            } else {
+                requirements.number.innerHTML = '✗ Au moins un chiffre';
+                requirements.number.classList.remove('valid');
+            }
+            
+            // Vérifier la confirmation
+            checkPasswordMatch();
+        });
+    }
 
     // Password match checker
     const confirmInput = document.getElementById('new_password_confirmation');
     const matchDiv = document.getElementById('passwordMatch');
 
     function checkPasswordMatch() {
+        if (!passwordInput || !confirmInput || !matchDiv) return;
+        
         const password = passwordInput.value;
         const confirm = confirmInput.value;
         
@@ -462,25 +475,31 @@
         }
     }
 
-    confirmInput.addEventListener('input', checkPasswordMatch);
+    if (confirmInput) {
+        confirmInput.addEventListener('input', checkPasswordMatch);
+    }
 
     // Delete modal
     function openDeleteModal() {
         const modal = document.getElementById('deleteModal');
-        modal.classList.remove('hidden');
-        setTimeout(() => {
-            modal.classList.remove('opacity-0');
-        }, 10);
-        document.body.style.overflow = 'hidden';
+        if (modal) {
+            modal.classList.remove('hidden');
+            setTimeout(() => {
+                modal.classList.remove('opacity-0');
+            }, 10);
+            document.body.style.overflow = 'hidden';
+        }
     }
 
     function closeDeleteModal() {
         const modal = document.getElementById('deleteModal');
-        modal.classList.add('opacity-0');
-        setTimeout(() => {
-            modal.classList.add('hidden');
-            document.body.style.overflow = '';
-        }, 300);
+        if (modal) {
+            modal.classList.add('opacity-0');
+            setTimeout(() => {
+                modal.classList.add('hidden');
+                document.body.style.overflow = '';
+            }, 300);
+        }
     }
 
     // Close modal on escape key
@@ -491,10 +510,13 @@
     });
 
     // Close modal when clicking outside
-    document.getElementById('deleteModal').addEventListener('click', function(e) {
-        if (e.target === this) {
-            closeDeleteModal();
-        }
-    });
+    const deleteModal = document.getElementById('deleteModal');
+    if (deleteModal) {
+        deleteModal.addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeDeleteModal();
+            }
+        });
+    }
 </script>
 @endpush

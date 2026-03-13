@@ -14,11 +14,11 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
-        'role', // 'admin', 'enseignant', 'eleve'
+        'role',
         'is_active',
         'avatar',
         'bio',
-        'classe_id' // pour les élèves
+        'classe_id'
     ];
 
     protected $hidden = [
@@ -30,6 +30,19 @@ class User extends Authenticatable
         'email_verified_at' => 'datetime',
         'is_active' => 'boolean',
     ];
+
+    /**
+     * Accesseur pour l'URL de l'avatar
+     */
+    public function getAvatarUrlAttribute()
+    {
+        if ($this->avatar && file_exists(storage_path('app/public/' . $this->avatar))) {
+            return asset('storage/' . $this->avatar);
+        }
+        
+        // Avatar par défaut avec les initiales
+        return 'https://ui-avatars.com/api/?name=' . urlencode($this->name) . '&background=3b82f6&color=fff&size=128';
+    }
 
     /**
      * Relations pour l'assistance
@@ -45,7 +58,7 @@ class User extends Authenticatable
     }
 
     /**
-     * Relations existantes (à adapter selon votre base)
+     * Relations existantes
      */
     public function classe()
     {
@@ -59,7 +72,7 @@ class User extends Authenticatable
 
     public function resultatsQuiz()
     {
-        return $this->hasMany(ResultatQuiz::class);
+        return $this->hasMany(QuizResultat::class);
     }
 
     /**
@@ -78,16 +91,5 @@ class User extends Authenticatable
     public function isEleve()
     {
         return $this->role === 'eleve';
-    }
-
-    /**
-     * Accesseurs
-     */
-    public function getAvatarUrlAttribute()
-    {
-        if ($this->avatar) {
-            return asset('storage/avatars/' . $this->avatar);
-        }
-        return 'https://ui-avatars.com/api/?name=' . urlencode($this->name) . '&background=3b82f6&color=fff';
     }
 }

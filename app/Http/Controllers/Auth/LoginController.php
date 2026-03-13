@@ -35,7 +35,7 @@ class LoginController extends Controller
             return redirect('admin/dashboard')->with('status' , 'Bienvenu a la partie administration');
         }
         else{
-            return redirect('/home')->with('status' , 'vous ne pouvez acceeder en tand que utilisateur');
+            return redirect('/')->with('status' , 'vous ne pouvez acceeder en tand que utilisateur');
         }
     }
 

@@ -9,18 +9,21 @@ use App\Models\Chapitre;
 use App\Models\Contenu;
 use App\Models\Epreuve;
 use App\Models\TypeEpreuve;
-use App\Models\Assistance;
+use App\Models\Question; // Modèle pour les questions d'assistance
+use App\Models\Reponse;  // Modèle pour les réponses
 use App\Models\Quiz;
 use App\Models\Resultat;
 use App\Models\Setting;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Auth;
 
 class FrontendController extends Controller
 {
     // ==========================================
-    // PAGE D'ACCUEIL
+    // PAGE D'ACCUEIL - CORRIGÉE POUR 4 CLASSES
     // ==========================================
     
     public function index()
@@ -31,6 +34,8 @@ class FrontendController extends Controller
         $stats = [
             'total_epreuves' => Epreuve::where('statut', true)->count(),
             'total_cours' => Chapitre::where('statut', true)->count(),
+            'total_quiz' => Quiz::where('statut', 'publie')->count(),
+            'total_utilisateurs' => User::count(),
             'total_classes' => Classe::where('statut', true)->count(),
         ];
         
@@ -41,13 +46,68 @@ class FrontendController extends Controller
             ->take(5)
             ->get();
         
-        // Classes populaires
-        $quickClasses = Classe::whereIn('nom', ['6ème', '3ème', 'Terminale'])
-            ->where('statut', true)
-            ->orderBy('ordre')
+        // Derniers quiz
+        $recentQuiz = Quiz::with(['classe', 'matiere'])
+            ->where('statut', 'publie')
+            ->latest()
+            ->take(5)
             ->get();
         
-        return view('frontend.index', compact('settings', 'stats', 'recentEpreuves', 'quickClasses'));
+        // Dernières questions d'assistance - CORRIGÉ avec 'publiee' au lieu de 'publie'
+        $recentQuestions = Question::with(['user', 'matiere', 'classe'])
+            ->where('statut', 'publiee') // Changé de 'publie' à 'publiee'
+            ->latest()
+            ->take(5)
+            ->get();
+        
+        // CLASSES POPULAIRES - 4 classes exactement pour la grille
+        // Liste des classes à afficher dans l'ordre souhaité
+        $classeNames = ['6ème', '5ème', '4ème', '3ème', 'Seconde', 'Première', 'Terminale'];
+        
+        // Prendre les 4 premières classes disponibles dans cet ordre
+        $quickClasses = collect();
+        
+        foreach ($classeNames as $nom) {
+            if ($quickClasses->count() >= 4) {
+                break;
+            }
+            
+            $classe = Classe::where('nom', $nom)
+                ->where('statut', true)
+                ->first();
+            
+            if ($classe) {
+                // Charger le nombre de matières pour chaque classe
+                $classe->matieres_count = $classe->matieres()->count();
+                $quickClasses->push($classe);
+            }
+        }
+        
+        // Si on a moins de 4 classes, compléter avec d'autres classes
+        if ($quickClasses->count() < 4) {
+            $existingIds = $quickClasses->pluck('id')->toArray();
+            $autresClasses = Classe::where('statut', true)
+                ->whereNotIn('id', $existingIds)
+                ->orderBy('ordre')
+                ->take(4 - $quickClasses->count())
+                ->get();
+            
+            // Charger le nombre de matières pour les classes supplémentaires
+            foreach ($autresClasses as $classe) {
+                $classe->matieres_count = $classe->matieres()->count();
+            }
+            
+            $quickClasses = $quickClasses->concat($autresClasses);
+        }
+        
+        return view('frontend.index', compact(
+            'settings', 
+            'stats', 
+            'recentEpreuves', 
+            'recentQuiz',
+            'recentQuestions',
+            'quickClasses'
+        ));
     }
 
     // ==========================================
@@ -62,6 +122,7 @@ class FrontendController extends Controller
         $settings = Setting::first();
         
         $classes = Classe::where('statut', true)
+            ->withCount('matieres')
             ->orderBy('ordre')
             ->get();
         
@@ -122,7 +183,7 @@ class FrontendController extends Controller
         $classe = $this->findClasse($classeId);
         
         if (!$classe) {
-            return redirect()->route('classes');
+            return redirect('/classes');
         }
         
         $chapitres = Chapitre::where('matiere_id', $matiere->id)
@@ -140,7 +201,21 @@ class FrontendController extends Controller
             ->take(10)
             ->get();
         
-        return view('frontend.matiere_detail', compact('settings', 'matiere', 'classe', 'chapitres', 'epreuves'));
+        $quizs = Quiz::where('matiere_id', $matiere->id)
+            ->where('classe_id', $classe->id)
+            ->where('statut', 'publie')
+            ->latest()
+            ->take(5)
+            ->get();
+        
+        return view('frontend.matiere_detail', compact(
+            'settings', 
+            'matiere', 
+            'classe', 
+            'chapitres', 
+            'epreuves',
+            'quizs'
+        ));
     }
 
     /**
@@ -158,7 +233,9 @@ class FrontendController extends Controller
             abort(404, 'Chapitre non trouvé');
         }
         
-        $chapitre->load(['matiere', 'classe', 'contenus']);
+        $chapitre->load(['matiere', 'classe', 'contenus' => function($q) {
+            $q->orderBy('ordre');
+        }]);
 
         $chapitrePrecedent = Chapitre::where('matiere_id', $chapitre->matiere_id)
             ->where('classe_id', $chapitre->classe_id)
@@ -174,9 +251,7 @@ class FrontendController extends Controller
             ->orderBy('ordre', 'asc')
             ->first();
         
-        $contenus = $chapitre->contenus()
-            ->orderBy('ordre')
-            ->get();
+        $contenus = $chapitre->contenus;
 
         return view('frontend.chapitre_detail', compact(
             'settings', 
@@ -193,7 +268,7 @@ class FrontendController extends Controller
     
     public function cours()
     {
-        return redirect()->route('classes');
+        return $this->classes();
     }
     
     public function coursDetail($identifier)
@@ -203,14 +278,14 @@ class FrontendController extends Controller
             : Chapitre::where('slug', $identifier)->first();
         
         if ($chapitre) {
-            return redirect()->route('chapitre.detail', $chapitre->slug);
+            return redirect('/chapitre/' . ($chapitre->slug ?? $chapitre->id));
         }
         
         abort(404);
     }
 
     // ==========================================
-    // BANQUE D'ÉPREUVES - NAVIGATION CASCADE COMPLÈTE
+    // BANQUE D'ÉPREUVES
     // ==========================================
     
     /**
@@ -327,7 +402,7 @@ class FrontendController extends Controller
             abort(404, 'Matière non trouvée');
         }
         
-        $query = Epreuve::with(['typeEpreuve', 'correction'])
+        $query = Epreuve::with(['typeEpreuve', 'correction', 'classe', 'matiere'])
             ->where('classe_id', $classe->id)
             ->where('matiere_id', $matiere->id)
             ->where('type_epreuve_id', $type->id)
@@ -451,8 +526,14 @@ class FrontendController extends Controller
         $settings = Setting::first();
         
         $epreuve = is_numeric($identifier)
-            ? Epreuve::where('id', $identifier)->with(['classe', 'matiere', 'typeEpreuve', 'correction'])->where('statut', true)->first()
-            : Epreuve::where('slug', $identifier)->with(['classe', 'matiere', 'typeEpreuve', 'correction'])->where('statut', true)->first();
+            ? Epreuve::where('id', $identifier)
+                ->with(['classe', 'matiere', 'typeEpreuve', 'correction'])
+                ->where('statut', true)
+                ->first()
+            : Epreuve::where('slug', $identifier)
+                ->with(['classe', 'matiere', 'typeEpreuve', 'correction'])
+                ->where('statut', true)
+                ->first();
         
         if (!$epreuve) {
             abort(404, 'Épreuve non trouvée');
@@ -466,14 +547,16 @@ class FrontendController extends Controller
             ->take(3)
             ->get();
         
-        return view('frontend.epreuves.liste', compact('settings', 'epreuve', 'similaires'));
+        return view('frontend.epreuve_detail', compact('settings', 'epreuve', 'similaires'));
     }
 
     /**
      * Télécharger une épreuve
      */
-    public function downloadEpreuve(Epreuve $epreuve)
+    public function downloadEpreuve($id)
     {
+        $epreuve = Epreuve::findOrFail($id);
+        
         if (!$epreuve->fichier || !Storage::disk('public')->exists($epreuve->fichier)) {
             abort(404, 'Fichier non trouvé');
         }
@@ -489,9 +572,11 @@ class FrontendController extends Controller
     /**
      * Voir la correction d'une épreuve
      */
-    public function correction(Epreuve $epreuve)
+    public function correction($id)
     {
         $settings = Setting::first();
+        
+        $epreuve = Epreuve::with('correction')->findOrFail($id);
         
         if (!$epreuve->correction) {
             return redirect()->back()->with('error', 'La correction n\'est pas encore disponible');
@@ -500,8 +585,29 @@ class FrontendController extends Controller
         return view('frontend.correction', compact('settings', 'epreuve'));
     }
 
+    /**
+     * Télécharger la correction
+     */
+    public function downloadCorrection($id)
+    {
+        $epreuve = Epreuve::with('correction')->findOrFail($id);
+        
+        if (!$epreuve->correction || !$epreuve->correction->fichier) {
+            abort(404, 'Correction non trouvée');
+        }
+        
+        if (!Storage::disk('public')->exists($epreuve->correction->fichier)) {
+            abort(404, 'Fichier non trouvé');
+        }
+        
+        return Storage::disk('public')->download(
+            $epreuve->correction->fichier,
+            $epreuve->correction->nom_fichier_original ?? 'correction_' . $epreuve->id . '.pdf'
+        );
+    }
+
     // ==========================================
-    // ÉVALUATIONS / QUIZ
+    // QUIZ
     // ==========================================
     
     /**
@@ -511,8 +617,9 @@ class FrontendController extends Controller
     {
         $settings = Setting::first();
         
-        $quizs = Quiz::where('statut', true)
-            ->with(['classe', 'matiere', 'questions'])
+        $quizs = Quiz::with(['classe', 'matiere'])
+            ->withCount('questions')
+            ->where('statut', 'publie')
             ->orderBy('created_at', 'desc')
             ->get();
         
@@ -526,7 +633,7 @@ class FrontendController extends Controller
     {
         $settings = Setting::first();
         
-        if (!$quiz->statut) {
+        if ($quiz->statut !== 'publie') {
             abort(404, 'Quiz non disponible');
         }
         
@@ -549,7 +656,7 @@ class FrontendController extends Controller
         
         foreach ($quiz->questions as $question) {
             $reponseDonnee = $reponses[$question->id] ?? null;
-            $estCorrect = $reponseDonnee == $question->reponse_correcte;
+            $estCorrect = $reponseDonnee == $question->bonne_reponse;
             
             if ($estCorrect) {
                 $score++;
@@ -559,7 +666,7 @@ class FrontendController extends Controller
                 'question_id' => $question->id,
                 'question_titre' => $question->titre,
                 'reponse_donnee' => $reponseDonnee,
-                'reponse_correcte' => $question->reponse_correcte,
+                'reponse_correcte' => $question->bonne_reponse,
                 'est_correct' => $estCorrect
             ];
         }
@@ -580,13 +687,8 @@ class FrontendController extends Controller
             $resultatId = $resultat->id;
         }
         
-        return redirect()->route('quiz.result', [
-            'quiz' => $quiz->id,
-            'score' => $score,
-            'total' => $total,
-            'pourcentage' => $pourcentage,
-            'resultat_id' => $resultatId
-        ]);
+        return redirect('/quiz/' . $quiz->id . '/result?score=' . $score . '&total=' . $total . '&pourcentage=' . $pourcentage . '&resultat_id=' . $resultatId)
+            ->with('success', 'Quiz terminé !');
     }
 
     /**
@@ -616,25 +718,47 @@ class FrontendController extends Controller
     }
 
     // ==========================================
-    // ASSISTANCE PÉDAGOGIQUE
+    // ASSISTANCE PÉDAGOGIQUE - CORRIGÉ AVEC LE BON CHAMP 'statut'
     // ==========================================
     
     /**
      * Liste des questions d'assistance
      */
-    public function assistance()
+    public function assistance(Request $request)
     {
         $settings = Setting::first();
         
-        $questions = Assistance::with(['user', 'matiere', 'classe', 'reponses' => function($q) {
-                $q->where('approuve', true);
+        $query = Question::with(['user', 'matiere', 'classe'])
+            ->withCount(['reponses' => function($q) {
+                $q->where('statut', 'approuvee'); // Les réponses approuvées
             }])
-            ->where('statut', true)
-            ->where('publie', true)
-            ->latest()
-            ->paginate(20);
+            ->where('statut', 'publiee'); // CORRIGÉ: 'publiee' au lieu de 'publie'
         
-        return view('frontend.assistance', compact('settings', 'questions'));
+        // Filtre par classe
+        if ($request->filled('classe_id')) {
+            $query->where('classe_id', $request->classe_id);
+        }
+        
+        // Filtre par matière
+        if ($request->filled('matiere_id')) {
+            $query->where('matiere_id', $request->matiere_id);
+        }
+        
+        // Recherche
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where(function($q) use ($search) {
+                $q->where('titre', 'like', "%{$search}%")
+                  ->orWhere('contenu', 'like', "%{$search}%"); // CORRIGÉ: 'contenu' au lieu de 'description'
+            });
+        }
+        
+        $questions = $query->latest()->paginate(15);
+        
+        $classes = Classe::where('statut', true)->orderBy('nom')->get();
+        $matieres = Matiere::where('statut', true)->orderBy('nom')->get();
+        
+        return view('frontend.assistance', compact('settings', 'questions', 'classes', 'matieres'));
     }
 
     /**
@@ -647,7 +771,7 @@ class FrontendController extends Controller
         $classes = Classe::where('statut', true)->orderBy('ordre')->get();
         $matieres = Matiere::where('statut', true)->orderBy('nom')->get();
         
-        return view('frontend.assistance_create', compact('settings', 'classes', 'matieres'));
+        return view('frontend.assistance.create', compact('settings', 'classes', 'matieres'));
     }
 
     /**
@@ -655,77 +779,186 @@ class FrontendController extends Controller
      */
     public function storeQuestion(Request $request)
     {
-        $validated = $request->validate([
+        $request->validate([
             'titre' => 'required|string|max:255',
-            'description' => 'required|string',
+            'contenu' => 'required|string', // CORRIGÉ: 'contenu' au lieu de 'description'
             'classe_id' => 'required|exists:classes,id',
             'matiere_id' => 'required|exists:matieres,id',
             'image' => 'nullable|image|max:2048'
         ]);
         
         $data = [
-            'user_id' => auth()->id(),
-            'titre' => $validated['titre'],
-            'description' => $validated['description'],
-            'classe_id' => $validated['classe_id'],
-            'matiere_id' => $validated['matiere_id'],
-            'statut' => true,
-            'publie' => false
+            'user_id' => Auth::id(),
+            'titre' => $request->titre,
+            'contenu' => $request->contenu, // CORRIGÉ: 'contenu' au lieu de 'description'
+            'classe_id' => $request->classe_id,
+            'matiere_id' => $request->matiere_id,
+            'statut' => 'en_attente', // CORRIGÉ: 'en_attente' au lieu de false
+            'views' => 0,
+            'reponses_count' => 0
         ];
         
         if ($request->hasFile('image')) {
             $data['image'] = $request->file('image')->store('assistance', 'public');
         }
         
-        $question = Assistance::create($data);
+        $question = Question::create($data);
         
-        return redirect()->route('assistance')
+        return redirect('/assistance/question/' . $question->id)
             ->with('success', 'Votre question a été envoyée et sera publiée après modération');
-    }
-
-    /**
-     * Liste des questions (alias)
-     */
-    public function questionsList()
-    {
-        return $this->assistance();
     }
 
     /**
      * Détail d'une question
      */
-    public function questionDetail(Assistance $question)
+    public function questionDetail($id)
     {
         $settings = Setting::first();
         
-        if (!$question->publie && auth()->id() != $question->user_id) {
+        $question = Question::with(['user', 'matiere', 'classe', 'reponses' => function($q) {
+                $q->where('statut', 'approuvee') // CORRIGÉ: 'approuvee' au lieu de true
+                  ->with('user')
+                  ->latest();
+            }])
+            ->findOrFail($id);
+        
+        // Incrémenter le nombre de vues
+        $question->increment('views');
+        
+        // Vérifier l'accès
+        if ($question->statut != 'publiee' && Auth::id() != $question->user_id && !Auth::user()?->isAdmin()) {
             abort(404);
         }
         
-        $question->load(['user', 'matiere', 'classe', 'reponses' => function($q) {
-            $q->where('approuve', true)->with('user');
-        }]);
-        
-        return view('frontend.assistance_detail', compact('settings', 'question'));
+        return view('frontend.assistance.detail', compact('settings', 'question'));
     }
 
     /**
      * Répondre à une question
      */
-    public function replyQuestion(Request $request, Assistance $question)
+    public function replyQuestion(Request $request, $id)
     {
-        $validated = $request->validate([
+        $request->validate([
             'contenu' => 'required|string'
         ]);
         
-        $question->reponses()->create([
-            'user_id' => auth()->id(),
-            'contenu' => $validated['contenu'],
-            'approuve' => false
+        $question = Question::findOrFail($id);
+        
+        // Vérifier que la question est publiée ou que l'utilisateur est le propriétaire
+        if ($question->statut != 'publiee' && Auth::id() != $question->user_id && !Auth::user()?->isAdmin()) {
+            return redirect()->back()->with('error', 'Vous ne pouvez pas répondre à cette question');
+        }
+        
+        $reponse = Reponse::create([
+            'user_id' => Auth::id(),
+            'question_id' => $question->id,
+            'contenu' => $request->contenu,
+            'statut' => 'en_attente' // CORRIGÉ: 'en_attente' au lieu de false
         ]);
+        
+        // Mettre à jour le compteur de réponses
+        $question->updateReponsesCount();
         
         return redirect()->back()
             ->with('success', 'Votre réponse a été envoyée et sera publiée après modération');
+    }
+
+    /**
+     * Marquer une réponse comme solution
+     */
+    public function markAsSolution($id, $reponseId)
+    {
+        $question = Question::findOrFail($id);
+        
+        if (Auth::id() != $question->user_id && !Auth::user()?->isAdmin()) {
+            return redirect()->back()->with('error', 'Action non autorisée');
+        }
+        
+        // Enlever le statut solution des autres réponses
+        Reponse::where('question_id', $id)->update(['est_solution' => false]);
+        
+        // Marquer la réponse comme solution
+        Reponse::where('id', $reponseId)
+            ->where('question_id', $id)
+            ->update(['est_solution' => true]);
+        
+        // Changer le statut de la question en 'resolue'
+        $question->update(['statut' => 'resolue']);
+        
+        return redirect()->back()->with('success', 'Réponse marquée comme solution');
+    }
+
+    /**
+     * Modifier une question
+     */
+    public function editQuestion($id)
+    {
+        $settings = Setting::first();
+        
+        $question = Question::where('id', $id)
+            ->where('user_id', Auth::id())
+            ->firstOrFail();
+        
+        $classes = Classe::where('statut', true)->orderBy('ordre')->get();
+        $matieres = Matiere::where('statut', true)->orderBy('nom')->get();
+        
+        return view('frontend.assistance.edit', compact('settings', 'question', 'classes', 'matieres'));
+    }
+
+    /**
+     * Mettre à jour une question
+     */
+    public function updateQuestion(Request $request, $id)
+    {
+        $question = Question::where('id', $id)
+            ->where('user_id', Auth::id())
+            ->firstOrFail();
+        
+        $request->validate([
+            'titre' => 'required|string|max:255',
+            'contenu' => 'required|string', // CORRIGÉ: 'contenu' au lieu de 'description'
+            'classe_id' => 'required|exists:classes,id',
+            'matiere_id' => 'required|exists:matieres,id',
+            'image' => 'nullable|image|max:2048'
+        ]);
+        
+        $data = [
+            'titre' => $request->titre,
+            'contenu' => $request->contenu, // CORRIGÉ: 'contenu' au lieu de 'description'
+            'classe_id' => $request->classe_id,
+            'matiere_id' => $request->matiere_id,
+        ];
+        
+        if ($request->hasFile('image')) {
+            // Supprimer l'ancienne image
+            if ($question->image) {
+                Storage::disk('public')->delete($question->image);
+            }
+            $data['image'] = $request->file('image')->store('assistance', 'public');
+        }
+        
+        $question->update($data);
+        
+        return redirect('/assistance/question/' . $question->id)
+            ->with('success', 'Question mise à jour avec succès');
+    }
+
+    /**
+     * Supprimer une question
+     */
+    public function destroyQuestion($id)
+    {
+        $question = Question::where('id', $id)
+            ->where('user_id', Auth::id())
+            ->firstOrFail();
+        
+        if ($question->image) {
+            Storage::disk('public')->delete($question->image);
+        }
+        
+        $question->delete();
+        
+        return redirect('/mes-questions')->with('success', 'Question supprimée avec succès');
     }
 
     // ==========================================
@@ -742,7 +975,7 @@ class FrontendController extends Controller
     }
 
     // ==========================================
-    // RECHERCHE GLOBALE
+    // RECHERCHE GLOBALE - CORRIGÉE AVEC BONS CHAMPS
     // ==========================================
     
     /**
@@ -758,40 +991,77 @@ class FrontendController extends Controller
             return view('frontend.search', compact('settings', 'q'));
         }
         
-        $chapitres = Chapitre::where('titre', 'like', "%$q%")
-            ->orWhere('description', 'like', "%$q%")
-            ->orWhere('contenu', 'like', "%$q%")
-            ->where('statut', true)
+        // Recherche dans les chapitres
+        $chapitres = Chapitre::where('statut', true)
+            ->where(function($query) use ($q) {
+                $query->where('titre', 'like', "%{$q}%")
+                      ->orWhere('description', 'like', "%{$q}%")
+                      ->orWhereHas('matiere', function($qry) use ($q) {
+                          $qry->where('nom', 'like', "%{$q}%");
+                      });
+            })
             ->with(['matiere', 'classe'])
-            ->take(10)
-            ->get();
+            ->paginate(5, ['*'], 'chapitres_page');
         
-        $epreuves = Epreuve::where('titre', 'like', "%$q%")
-            ->orWhere('description', 'like', "%$q%")
-            ->where('statut', true)
+        // Recherche dans les épreuves
+        $epreuves = Epreuve::where('statut', true)
+            ->where(function($query) use ($q) {
+                $query->where('titre', 'like', "%{$q}%")
+                      ->orWhere('description', 'like', "%{$q}%")
+                      ->orWhereHas('matiere', function($qry) use ($q) {
+                          $qry->where('nom', 'like', "%{$q}%");
+                      })
+                      ->orWhereHas('typeEpreuve', function($qry) use ($q) {
+                          $qry->where('nom', 'like', "%{$q}%");
+                      });
+            })
             ->with(['matiere', 'classe', 'typeEpreuve'])
-            ->take(10)
-            ->get();
+            ->paginate(5, ['*'], 'epreuves_page');
         
-        $matieres = Matiere::where('nom', 'like', "%$q%")
-            ->where('statut', true)
-            ->take(5)
-            ->get();
+        // Recherche dans les quiz
+        $quizs = Quiz::where('statut', 'publie')
+            ->where(function($query) use ($q) {
+                $query->where('titre', 'like', "%{$q}%")
+                      ->orWhere('description', 'like', "%{$q}%")
+                      ->orWhereHas('matiere', function($qry) use ($q) {
+                          $qry->where('nom', 'like', "%{$q}%");
+                      });
+            })
+            ->with(['matiere', 'classe'])
+            ->withCount('questions')
+            ->paginate(5, ['*'], 'quizs_page');
         
-        $classes = Classe::where('nom', 'like', "%$q%")
-            ->where('statut', true)
-            ->take(5)
-            ->get();
+        // Recherche dans les questions d'assistance - CORRIGÉ
+        $questions = Question::where('statut', 'publiee') // CORRIGÉ: 'publiee'
+            ->where(function($query) use ($q) {
+                $query->where('titre', 'like', "%{$q}%")
+                      ->orWhere('contenu', 'like', "%{$q}%") // CORRIGÉ: 'contenu' au lieu de 'description'
+                      ->orWhereHas('matiere', function($qry) use ($q) {
+                          $qry->where('nom', 'like', "%{$q}%");
+                      });
+            })
+            ->with(['user', 'matiere', 'classe'])
+            ->withCount('reponses')
+            ->paginate(5, ['*'], 'questions_page');
         
-        $results = [
-            'chapitres' => $chapitres,
-            'epreuves' => $epreuves,
-            'matieres' => $matieres,
-            'classes' => $classes,
-            'total' => $chapitres->count() + $epreuves->count() + $matieres->count() + $classes->count()
+        // Statistiques des résultats
+        $stats = [
+            'total_chapitres' => $chapitres->total(),
+            'total_epreuves' => $epreuves->total(),
+            'total_quizs' => $quizs->total(),
+            'total_questions' => $questions->total(),
+            'total_global' => $chapitres->total() + $epreuves->total() + $quizs->total() + $questions->total()
         ];
         
-        return view('frontend.search', compact('settings', 'q', 'results'));
+        return view('frontend.search', compact(
+            'settings',
+            'q',
+            'chapitres',
+            'epreuves',
+            'quizs',
+            'questions',
+            'stats'
+        ));
     }
 
     // ==========================================
@@ -820,11 +1090,32 @@ class FrontendController extends Controller
                     ->select('id', 'titre', 'slug', 'matiere_id', 'classe_id', 'type_epreuve_id')
                     ->with(['matiere:nom', 'classe:nom', 'typeEpreuve:nom'])
                     ->take(5)
+                    ->get(),
+                'quizs' => Quiz::where('titre', 'like', "%$q%")
+                    ->where('statut', 'publie')
+                    ->select('id', 'titre', 'matiere_id', 'classe_id')
+                    ->with(['matiere:nom', 'classe:nom'])
+                    ->take(5)
                     ->get()
             ];
         }
         
         return response()->json($results);
+    }
+
+    /**
+     * API Stats
+     */
+    public function apiStats()
+    {
+        $stats = [
+            'total_epreuves' => Epreuve::where('statut', true)->count(),
+            'total_cours' => Chapitre::where('statut', true)->count(),
+            'total_quiz' => Quiz::where('statut', 'publie')->count(),
+            'total_utilisateurs' => User::count(),
+        ];
+        
+        return response()->json($stats);
     }
 
     // ==========================================
@@ -896,5 +1187,15 @@ class FrontendController extends Controller
         }
         
         return Matiere::where('nom', $identifier)->where('statut', true)->first();
+    }
+
+    /**
+     * Formater le temps en minutes:secondes
+     */
+    private function formatTemps($secondes)
+    {
+        $minutes = floor($secondes / 60);
+        $secondesRestantes = $secondes % 60;
+        return $minutes . ':' . str_pad($secondesRestantes, 2, '0', STR_PAD_LEFT);
     }
 }

@@ -29,18 +29,19 @@
                 </p>
                 
                 <!-- Search bar -->
-                <form action="/search" method="GET" 
+                <form action="{{ route('search') }}" method="GET" 
                       class="flex flex-col sm:flex-row items-stretch sm:items-center bg-white rounded-xl shadow-2xl p-1 max-w-lg mx-auto lg:mx-0 hover:shadow-2xl transition-shadow gap-2 sm:gap-0">
                     <div class="flex items-center flex-1 bg-white rounded-xl sm:rounded-none">
                         <i class="fas fa-search text-primary-400 ml-3"></i>
                         <input type="text" 
                                name="q" 
+                               value="{{ request('q') }}"
                                placeholder="Rechercher une matière, un cours..." 
                                class="w-full px-3 py-3 sm:py-2.5 text-slate-700 focus:outline-none text-sm rounded-xl sm:rounded-none"
                                minlength="2"
                                required>
                     </div>
-                    <button class="bg-gradient-to-r from-primary-600 to-primary-700 text-white px-5 py-3 sm:py-2.5 rounded-xl text-sm font-medium hover:from-primary-700 hover:to-primary-800 transition-all shadow-lg shadow-primary-500/30 w-full sm:w-auto">
+                    <button type="submit" class="bg-gradient-to-r from-primary-600 to-primary-700 text-white px-5 py-3 sm:py-2.5 rounded-xl text-sm font-medium hover:from-primary-700 hover:to-primary-800 transition-all shadow-lg shadow-primary-500/30 w-full sm:w-auto">
                         Rechercher
                     </button>
                 </form>
@@ -49,9 +50,10 @@
             <!-- Image (cachée sur mobile) -->
             <div class="hidden lg:block flex-1">
                 <div class="relative">
-                    <img src="/img/car1.png" 
+                    <img src="{{ asset('img/car1.png') }}" 
                          alt="Student" 
-                         class="w-full max-w-md mx-auto animate-float">
+                         class="w-full max-w-md mx-auto animate-float"
+                         onerror="this.src='https://placehold.co/600x400/3b82f6/white?text=StudyHub'">
                     
                     <!-- Floating cards -->
                     <div class="absolute -top-10 -left-10 bg-white rounded-2xl p-3 shadow-2xl animate-float">
@@ -82,7 +84,7 @@
         </div>
     </div>
     
-    <!-- Wave separator (optionnel pour une transition plus douce) -->
+    <!-- Wave separator -->
     <div class="absolute bottom-0 left-0 right-0">
         <svg viewBox="0 0 1440 120" fill="none" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none" class="w-full h-12 md:h-20">
             <path d="M0 120L60 105C120 90 240 60 360 45C480 30 600 30 720 37.5C840 45 960 60 1080 67.5C1200 75 1320 75 1380 75L1440 75V120H1380C1320 120 1200 120 1080 120C960 120 840 120 720 120C600 120 480 120 360 120C240 120 120 120 60 120H0Z" fill="white" fill-opacity="0.1"/>
@@ -90,7 +92,7 @@
     </div>
 </section>
 
-<!-- SECTION 2 - SERVICES CARDS (4 SERVICES MAINTENANT) -->
+<!-- SECTION 2 - SERVICES CARDS -->
 <section class="py-8 md:py-10 bg-gradient-to-b from-blue-50 to-white">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <!-- En-tête de section -->
@@ -111,7 +113,7 @@
                 </div>
                 <h3 class="text-xl md:text-2xl font-bold text-gray-900 mb-2 md:mb-3">Cours en ligne</h3>
                 <p class="text-sm md:text-base text-gray-600 mb-4 md:mb-6 leading-relaxed">Des cours complets et structurés par chapitre avec résumés, illustrations et exercices corrigés.</p>
-                <a href="/cours" class="inline-flex items-center text-blue-600 font-medium text-sm md:text-base group-hover:gap-3 transition-all">
+                <a href="{{ url('/cours') }}" class="inline-flex items-center text-blue-600 font-medium text-sm md:text-base group-hover:gap-3 transition-all">
                     <span>Explorer les cours</span>
                     <i class="fas fa-arrow-right text-xs md:text-sm group-hover:translate-x-1 transition-transform"></i>
                 </a>
@@ -127,13 +129,13 @@
                 </div>
                 <h3 class="text-xl md:text-2xl font-bold text-gray-900 mb-2 md:mb-3">Banque d'épreuves</h3>
                 <p class="text-sm md:text-base text-gray-600 mb-4 md:mb-6 leading-relaxed">Des milliers de devoirs, interrogations et examens blancs avec leurs corrigés détaillés.</p>
-                <a href="/epreuves" class="inline-flex items-center text-green-600 font-medium text-sm md:text-base group-hover:gap-3 transition-all">
+                <a href="{{ url('/epreuves') }}" class="inline-flex items-center text-green-600 font-medium text-sm md:text-base group-hover:gap-3 transition-all">
                     <span>Explorer les épreuves</span>
                     <i class="fas fa-arrow-right text-xs md:text-sm group-hover:translate-x-1 transition-transform"></i>
                 </a>
             </div>
 
-            <!-- QUIZ CARD (NOUVEAU) -->
+            <!-- QUIZ CARD -->
             <div class="group bg-white rounded-2xl md:rounded-3xl p-5 md:p-8 border border-orange-100 hover:border-orange-300 shadow-lg hover:shadow-2xl hover:shadow-orange-500/20 transition-all duration-500 hover:-translate-y-1 md:hover:-translate-y-2 transform-3d" data-aos="fade-up" data-aos-delay="300">
                 <div class="relative mb-4 md:mb-6">
                     <div class="w-16 h-16 md:w-20 md:h-20 bg-gradient-to-br from-orange-500 to-orange-600 rounded-xl md:rounded-2xl flex items-center justify-center transform group-hover:scale-110 group-hover:rotate-6 transition-all duration-300">
@@ -143,7 +145,7 @@
                 </div>
                 <h3 class="text-xl md:text-2xl font-bold text-gray-900 mb-2 md:mb-3">Quiz interactifs</h3>
                 <p class="text-sm md:text-base text-gray-600 mb-4 md:mb-6 leading-relaxed">Testez vos connaissances avec des quiz interactifs adaptés à votre niveau et suivez votre progression.</p>
-                <a href="/quiz" class="inline-flex items-center text-orange-600 font-medium text-sm md:text-base group-hover:gap-3 transition-all">
+                <a href="{{ url('/quiz') }}" class="inline-flex items-center text-orange-600 font-medium text-sm md:text-base group-hover:gap-3 transition-all">
                     <span>Commencer les quiz</span>
                     <i class="fas fa-arrow-right text-xs md:text-sm group-hover:translate-x-1 transition-transform"></i>
                 </a>
@@ -159,7 +161,7 @@
                 </div>
                 <h3 class="text-xl md:text-2xl font-bold text-gray-900 mb-2 md:mb-3">Assistance</h3>
                 <p class="text-sm md:text-base text-gray-600 mb-4 md:mb-6 leading-relaxed">Bloqué sur un exercice ? Posez vos questions et recevez de l'aide de professeurs et d'autres élèves.</p>
-                <a href="/assistance" class="inline-flex items-center text-purple-600 font-medium text-sm md:text-base group-hover:gap-3 transition-all">
+                <a href="{{ url('/assistance') }}" class="inline-flex items-center text-purple-600 font-medium text-sm md:text-base group-hover:gap-3 transition-all">
                     <span>Poser une question</span>
                     <i class="fas fa-arrow-right text-xs md:text-sm group-hover:translate-x-1 transition-transform"></i>
                 </a>
@@ -168,7 +170,7 @@
     </div>
 </section>
 
-<!-- SECTION 3 - CLASSES (4 CLASSES SEULEMENT) -->
+<!-- SECTION 3 - CLASSES (4 CLASSES EXACTEMENT) -->
 <section class="py-8 md:py-10 bg-white">
     <div class="container mx-auto px-4">
         <!-- En-tête -->
@@ -178,22 +180,28 @@
                     Parcours adaptés
                 </span>
             </div>
-            <a href="/cours" class="group flex items-center gap-2 text-primary-600 font-medium hover:text-primary-700 text-sm md:text-base">
+            <a href="{{ url('/cours') }}" class="group flex items-center gap-2 text-primary-600 font-medium hover:text-primary-700 text-sm md:text-base">
                 <span>Voir toutes les classes</span>
                 <i class="fas fa-arrow-right text-xs md:text-sm group-hover:translate-x-1 transition-transform"></i>
             </a>
         </div>
         
+        @if(isset($quickClasses) && $quickClasses->count() > 0)
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
             @foreach($quickClasses as $index => $classe)
             @php
                 $colors = [
-                    ['from' => '#3b82f6', 'to' => '#2563eb', 'light' => '#eff6ff'],
-                    ['from' => '#10b981', 'to' => '#059669', 'light' => '#ecfdf5'],
-                    ['from' => '#8b5cf6', 'to' => '#7c3aed', 'light' => '#f5f3ff'],
-                    ['from' => '#f59e0b', 'to' => '#d97706', 'light' => '#fffbeb'],
+                    ['from' => '#3b82f6', 'to' => '#2563eb', 'light' => '#eff6ff'], // Bleu
+                    ['from' => '#10b981', 'to' => '#059669', 'light' => '#ecfdf5'], // Vert
+                    ['from' => '#8b5cf6', 'to' => '#7c3aed', 'light' => '#f5f3ff'], // Violet
+                    ['from' => '#f59e0b', 'to' => '#d97706', 'light' => '#fffbeb'], // Orange
                 ];
                 $color = $colors[$index % count($colors)];
+                
+                // Statistiques simulées (à remplacer par des vraies données si disponibles)
+                $matieresCount = $classe->matieres_count ?? $classe->matieres->count() ?? rand(6, 10);
+                $chapitresCount = $classe->chapitres_count ?? rand(20, 40);
+                $exercicesCount = rand(80, 150);
             @endphp
             <div class="group bg-white rounded-xl md:rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-500 overflow-hidden hover:-translate-y-1 md:hover:-translate-y-2" 
                  data-aos="fade-up" 
@@ -201,6 +209,7 @@
                 <!-- En-tête avec dégradé -->
                 <div class="relative h-28 md:h-40 overflow-hidden" 
                      style="background: linear-gradient(135deg, {{ $color['from'] }} 0%, {{ $color['to'] }} 100%);">
+                    
                     <!-- Pattern de fond -->
                     <div class="absolute inset-0 opacity-10" 
                          style="background-image: url('data:image/svg+xml,%3Csvg width="60" height="60" viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg"%3E%3Cg fill="none" fill-rule="evenodd"%3E%3Cg fill="%23ffffff" fill-opacity="0.4"%3E%3Cpath d="M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z"/%3E%3C/g%3E%3C/g%3E%3C/svg%3E'); background-size: 30px 30px;">
@@ -218,40 +227,53 @@
                             </div>
                             <div>
                                 <h3 class="font-bold text-white text-lg md:text-2xl">{{ $classe->nom }}</h3>
-                                <p class="text-xs text-white/80">{{ $classe->matieres_count ?? rand(8, 12) }} matières</p>
+                                @if(in_array($classe->nom, ['3ème', 'Terminale']))
+                                    <span class="text-xs bg-yellow-400 text-yellow-900 px-2 py-0.5 rounded-full font-medium">
+                                        {{ $classe->nom == '3ème' ? 'Brevet' : 'Bac' }}
+                                    </span>
+                                @else
+                                    <p class="text-xs text-white/80">{{ $matieresCount }} matières</p>
+                                @endif
                             </div>
                         </div>
                     </div>
                 </div>
                 
                 <div class="p-4 md:p-6">
-                    <!-- Statistiques détaillées -->
+                    <!-- Statistiques -->
                     <div class="grid grid-cols-2 gap-2 md:gap-4 mb-4 md:mb-6">
                         <div class="text-center p-2 md:p-3 bg-gray-50 rounded-lg md:rounded-xl">
-                            <div class="text-base md:text-lg font-bold text-gray-800">{{ rand(40, 80) }}</div>
+                            <div class="text-base md:text-lg font-bold text-gray-800">{{ $chapitresCount }}</div>
                             <div class="text-xs text-gray-500">Chapitres</div>
                         </div>
                         <div class="text-center p-2 md:p-3 bg-gray-50 rounded-lg md:rounded-xl">
-                            <div class="text-base md:text-lg font-bold text-gray-800">{{ rand(100, 200) }}</div>
+                            <div class="text-base md:text-lg font-bold text-gray-800">{{ $exercicesCount }}</div>
                             <div class="text-xs text-gray-500">Exercices</div>
                         </div>
                     </div>
                     
-                    <!-- Description (cachée sur très petits écrans) -->
-                    <p class="hidden sm:block text-xs md:text-sm text-gray-600 mb-4 md:mb-6 line-clamp-2">
-                        Programme complet de {{ $classe->nom }} : cours, exercices, devoirs et examens corrigés.
-                    </p>
-                    
                     <!-- Tags matières -->
                     <div class="flex flex-wrap gap-1 md:gap-2 mb-4 md:mb-6">
-                        <span class="px-2 md:px-3 py-1 text-xs rounded-full" style="background-color: {{ $color['light'] }}; color: {{ $color['from'] }};">Maths</span>
-                        <span class="px-2 md:px-3 py-1 text-xs rounded-full" style="background-color: {{ $color['light'] }}; color: {{ $color['from'] }};">Physique</span>
-                        <span class="px-2 md:px-3 py-1 text-xs rounded-full" style="background-color: {{ $color['light'] }}; color: {{ $color['from'] }};">Français</span>
-                        <span class="px-2 md:px-3 py-1 text-xs rounded-full" style="background-color: {{ $color['light'] }}; color: {{ $color['from'] }};">+{{ rand(3, 6) }}</span>
+                        @php
+                            $matieresList = ['Maths', 'Français', 'Physique', 'Histoire'];
+                            if($classe->nom == 'Terminale') {
+                                $matieresList = ['Maths', 'Physique', 'SVT', 'Philo'];
+                            } elseif($classe->nom == 'Première') {
+                                $matieresList = ['Maths', 'Physique', 'SVT', 'SES'];
+                            } elseif($classe->nom == 'Seconde') {
+                                $matieresList = ['Maths', 'Physique', 'SVT', 'SES'];
+                            }
+                        @endphp
+                        @foreach(array_slice($matieresList, 0, 3) as $matiere)
+                        <span class="px-2 md:px-3 py-1 text-xs rounded-full" style="background-color: {{ $color['light'] }}; color: {{ $color['from'] }};">
+                            {{ $matiere }}
+                        </span>
+                        @endforeach
+                        <span class="px-2 md:px-3 py-1 text-xs rounded-full bg-gray-100 text-gray-600">+{{ rand(2, 4) }}</span>
                     </div>
                     
                     <!-- Bouton d'action -->
-                    <a href="/cours/classe/{{ $classe->nom }}" 
+                    <a href="{{ url('/cours/classe/' . $classe->nom) }}" 
                        class="block w-full py-2 md:py-3 text-center rounded-lg md:rounded-xl text-sm md:text-base font-medium transition-all duration-300"
                        style="color: {{ $color['from'] }}; border: 1px solid {{ $color['from'] }};"
                        onmouseover="this.style.backgroundColor='{{ $color['from'] }}'; this.style.color='white';"
@@ -262,6 +284,11 @@
             </div>
             @endforeach
         </div>
+        @else
+        <div class="text-center py-12">
+            <p class="text-gray-500">Aucune classe disponible pour le moment.</p>
+        </div>
+        @endif
     </div>
 </section>
 
@@ -270,15 +297,15 @@
     <div class="container mx-auto px-4">
         <div class="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
             <div class="text-center p-4 md:p-6 bg-white rounded-xl md:rounded-2xl shadow-lg" data-aos="fade-up" data-aos-delay="100">
-                <div class="text-2xl md:text-3xl font-bold text-primary-600 mb-1 md:mb-2">5000+</div>
+                <div class="text-2xl md:text-3xl font-bold text-primary-600 mb-1 md:mb-2">{{ number_format($stats['total_utilisateurs'] ?? 5000) }}+</div>
                 <div class="text-xs md:text-sm text-gray-600">Élèves</div>
             </div>
             <div class="text-center p-4 md:p-6 bg-white rounded-xl md:rounded-2xl shadow-lg" data-aos="fade-up" data-aos-delay="200">
-                <div class="text-2xl md:text-3xl font-bold text-green-600 mb-1 md:mb-2">1000+</div>
+                <div class="text-2xl md:text-3xl font-bold text-green-600 mb-1 md:mb-2">{{ number_format($stats['total_cours'] ?? 1000) }}+</div>
                 <div class="text-xs md:text-sm text-gray-600">Cours</div>
             </div>
             <div class="text-center p-4 md:p-6 bg-white rounded-xl md:rounded-2xl shadow-lg" data-aos="fade-up" data-aos-delay="300">
-                <div class="text-2xl md:text-3xl font-bold text-orange-600 mb-1 md:mb-2">500+</div>
+                <div class="text-2xl md:text-3xl font-bold text-orange-600 mb-1 md:mb-2">{{ number_format($stats['total_quiz'] ?? 500) }}+</div>
                 <div class="text-xs md:text-sm text-gray-600">Quiz</div>
             </div>
             <div class="text-center p-4 md:p-6 bg-white rounded-xl md:rounded-2xl shadow-lg" data-aos="fade-up" data-aos-delay="400">
@@ -289,8 +316,54 @@
     </div>
 </section>
 
-@endsection
+<!-- SECTION 5 - DERNIÈRES ÉPREUVES (optionnel) -->
+@if(isset($recentEpreuves) && $recentEpreuves->count() > 0)
+<section class="py-8 md:py-10 bg-white">
+    <div class="container mx-auto px-4">
+        <div class="flex flex-col sm:flex-row justify-between items-center mb-6 md:mb-8" data-aos="fade-up">
+            <div>
+                <span class="text-primary-600 text-xs md:text-sm uppercase tracking-wider font-semibold bg-primary-50 px-4 py-2 rounded-full inline-block mb-2">
+                    Nouveautés
+                </span>
+                <h2 class="text-2xl md:text-3xl font-bold text-gray-900">Dernières épreuves</h2>
+            </div>
+            <a href="{{ url('/epreuves') }}" class="group flex items-center gap-2 text-primary-600 font-medium hover:text-primary-700 text-sm md:text-base mt-2 sm:mt-0">
+                <span>Voir toutes</span>
+                <i class="fas fa-arrow-right text-xs md:text-sm group-hover:translate-x-1 transition-transform"></i>
+            </a>
+        </div>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            @foreach($recentEpreuves as $epreuve)
+            <div class="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-shadow" data-aos="fade-up" data-aos-delay="{{ $loop->index * 50 }}">
+                <div class="p-6">
+                    <div class="flex items-center gap-2 text-sm text-gray-500 mb-3">
+                        <span class="bg-green-100 text-green-700 px-2 py-0.5 rounded-full">{{ $epreuve->classe->nom ?? 'N/A' }}</span>
+                        <span>•</span>
+                        <span>{{ $epreuve->matiere->nom ?? 'N/A' }}</span>
+                    </div>
+                    <h3 class="text-lg font-semibold text-gray-800 mb-2 line-clamp-2">
+                        <a href="{{ url('/epreuve/' . ($epreuve->slug ?? $epreuve->id)) }}" class="hover:text-primary-600 transition-colors">
+                            {{ $epreuve->titre }}
+                        </a>
+                    </h3>
+                    <div class="flex items-center justify-between mt-4">
+                        <span class="text-xs text-gray-500">
+                            <i class="far fa-calendar mr-1"></i> {{ $epreuve->created_at->format('d/m/Y') }}
+                        </span>
+                        <a href="{{ url('/epreuve/' . ($epreuve->slug ?? $epreuve->id)) }}" class="text-primary-600 hover:text-primary-700 text-sm font-medium">
+                            Voir <i class="fas fa-arrow-right ml-1 text-xs"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            @endforeach
+        </div>
+    </div>
+</section>
+@endif
 
+<!-- Styles -->
 <style>
 @keyframes float {
     0%, 100% { transform: translateY(0px); }
@@ -366,7 +439,7 @@ img, svg, video {
     height: auto;
 }
 
-/* Animation ping personnalisée */
+/* Animation ping */
 @keyframes ping {
     75%, 100% {
         transform: scale(2);
@@ -380,7 +453,7 @@ img, svg, video {
 
 @push('scripts')
 <script>
-    // Simple AOS-like animation
+    // Animation au scroll
     document.addEventListener('DOMContentLoaded', function() {
         const animatedElements = document.querySelectorAll('[data-aos]');
         
@@ -388,7 +461,7 @@ img, svg, video {
             animatedElements.forEach(element => {
                 const rect = element.getBoundingClientRect();
                 const windowHeight = window.innerHeight;
-                const threshold = window.innerWidth < 640 ? 0.9 : 0.85; // Plus tolérant sur mobile
+                const threshold = window.innerWidth < 640 ? 0.9 : 0.85;
                 
                 if (rect.top < windowHeight * threshold) {
                     element.classList.add('aos-animate');
@@ -396,10 +469,8 @@ img, svg, video {
             });
         }
         
-        // Initial check
         checkVisibility();
         
-        // Check on scroll avec throttling pour les performances
         let ticking = false;
         window.addEventListener('scroll', function() {
             if (!ticking) {
@@ -411,10 +482,8 @@ img, svg, video {
             }
         });
         
-        // Recheck au redimensionnement
-        window.addEventListener('resize', function() {
-            checkVisibility();
-        });
+        window.addEventListener('resize', checkVisibility);
     });
 </script>
 @endpush
+@endsection

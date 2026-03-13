@@ -482,12 +482,7 @@
                         <span class="font-medium">Mon profil</span>
                     </a>
                     
-                    <a href="{{ url('/mes-cours') }}" class="flex items-center gap-3 px-4 py-3 rounded-xl {{ request()->is('mes-cours') ? 'bg-primary-50 text-primary-600' : 'text-slate-700 hover:bg-slate-50' }} transition-colors">
-                        <div class="w-8 h-8 {{ request()->is('mes-cours') ? 'bg-primary-100' : 'bg-slate-100' }} rounded-full flex items-center justify-center">
-                            <i class="fas fa-book {{ request()->is('mes-cours') ? 'text-primary-600' : 'text-slate-500' }}"></i>
-                        </div>
-                        <span class="font-medium">Mes cours</span>
-                    </a>
+                    
                     
                     <a href="{{ url('/mes-resultats') }}" class="flex items-center gap-3 px-4 py-3 rounded-xl {{ request()->is('mes-resultats') ? 'bg-primary-50 text-primary-600' : 'text-slate-700 hover:bg-slate-50' }} transition-colors">
                         <div class="w-8 h-8 {{ request()->is('mes-resultats') ? 'bg-primary-100' : 'bg-slate-100' }} rounded-full flex items-center justify-center">

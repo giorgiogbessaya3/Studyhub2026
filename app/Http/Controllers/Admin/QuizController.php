@@ -79,7 +79,7 @@ class QuizController extends Controller
     }
 
     /**
-     * Enregistre un nouveau quiz
+     * Enregistre un nouveau quiz - CORRIGÉ : redirection vers admin.quiz.index
      */
     public function store(Request $request)
     {
@@ -120,8 +120,9 @@ class QuizController extends Controller
 
             DB::commit();
 
-            return redirect('admin/quiz/' . $quiz->id . '/questions')
-                ->with('success', 'Quiz créé avec succès. Ajoutez maintenant les questions.');
+            // CORRECTION : Rediriger vers la liste des quiz au lieu de la page des questions
+            return redirect('admin/quiz')
+                ->with('success', 'Quiz créé avec succès. Vous pouvez maintenant ajouter des questions.');
 
         } catch (\Exception $e) {
             DB::rollBack();
@@ -304,7 +305,7 @@ class QuizController extends Controller
     }
 
     /**
-     * Affiche les questions d'un quiz
+     * Affiche les questions d'un quiz - À créer si nécessaire
      */
     public function questions(Quiz $quiz)
     {
@@ -312,6 +313,8 @@ class QuizController extends Controller
             $q->orderBy('ordre');
         }]);
         
+        // Si cette vue n'existe pas, on peut rediriger vers l'édition ou la liste
+        // Pour l'instant, on garde la vue mais il faudra la créer
         return view('admin.quiz.questions.index', compact('quiz'));
     }
 
@@ -710,7 +713,6 @@ class QuizController extends Controller
     public function apiSubmit(Request $request, Quiz $quiz)
     {
         // Logique de soumission de quiz pour API
-        // À implémenter selon vos besoins
         return response()->json(['message' => 'API submit - À implémenter']);
     }
 

@@ -307,9 +307,6 @@
                                                 <p class="text-xs text-slate-500">Gérer vos informations</p>
                                             </div>
                                         </a>
-                                        
-                                        
-                                        
                                         <a href="{{ url('/mes-resultats') }}" class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-primary-50 text-slate-700 transition-colors group">
                                             <div class="w-9 h-9 bg-primary-100 rounded-full flex items-center justify-center group-hover:bg-primary-200 transition-colors">
                                                 <i class="fas fa-chart-bar text-primary-600"></i>

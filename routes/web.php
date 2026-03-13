@@ -130,6 +130,7 @@ Route::post('newsletter/subscribe', [ContactController::class, 'newsletter'])->n
 // ROUTES PUBLIQUES - RECHERCHE
 // ==========================================
 Route::get('search', [FrontendController::class, 'search'])->name('search');
+Route::get('recherche', [FrontendController::class, 'search'])->name('recherche'); // AJOUT: Alias pour recherche en français
 
 // ==========================================
 // AUTHENTIFICATION

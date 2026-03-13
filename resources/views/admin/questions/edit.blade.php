@@ -12,7 +12,7 @@
                 <h5 class="mb-0">Modifier la question</h5>
             </div>
             <div class="card-body">
-                <form action="{{ url('admin/questions/' . $question->id) }}" method="POST" enctype="multipart/form-data">
+                <form action="{{ route('admin.questions.update', $question->id) }}" method="POST" enctype="multipart/form-data" id="questionForm">
                     @csrf
                     @method('PUT')
                     
@@ -23,7 +23,7 @@
                             <option value="">Sélectionner un quiz</option>
                             @foreach($quizs as $quiz)
                                 <option value="{{ $quiz->id }}" {{ old('quiz_id', $question->quiz_id) == $quiz->id ? 'selected' : '' }}>
-                                    {{ $quiz->titre }} ({{ $quiz->classe->nom }} - {{ $quiz->matiere->nom }})
+                                    {{ $quiz->titre }} ({{ $quiz->classe->nom ?? 'N/A' }} - {{ $quiz->matiere->nom ?? 'N/A' }})
                                 </option>
                             @endforeach
                         </select>
@@ -47,7 +47,7 @@
                         </div>
                         <div class="col-md-4">
                             <label class="form-label">Filtrer par matière</label>
-                            <select id="filter_matiere" class="form-select">
+                            <select id="filter_matiere" class="form-select" {{ $question->quiz->classe_id ? '' : 'disabled' }}>
                                 <option value="">Toutes les matières</option>
                                 @foreach($matieres as $matiere)
                                     <option value="{{ $matiere->id }}" {{ $matiere->id == $question->quiz->matiere_id ? 'selected' : '' }}>
@@ -58,7 +58,7 @@
                         </div>
                         <div class="col-md-4">
                             <label class="form-label">Filtrer par chapitre</label>
-                            <select id="filter_chapitre" class="form-select">
+                            <select id="filter_chapitre" class="form-select" {{ $question->quiz->matiere_id ? '' : 'disabled' }}>
                                 <option value="">Tous les chapitres</option>
                                 @foreach($chapitres as $chapitre)
                                     <option value="{{ $chapitre->id }}" {{ $chapitre->id == $question->quiz->chapitre_id ? 'selected' : '' }}>
@@ -137,6 +137,9 @@
                         <div id="options-container">
                             @php
                                 $options = old('options', $question->options ?? ['', '', '', '']);
+                                if (!is_array($options)) {
+                                    $options = ['', '', '', ''];
+                                }
                             @endphp
                             @foreach($options as $index => $option)
                             <div class="input-group mb-2 option-row">
@@ -153,39 +156,52 @@
                         </button>
                     </div>
 
-                    <!-- Bonne réponse -->
+                    <!-- Bonne réponse - CHAMP UNIQUE avec gestion dynamique -->
                     <div class="mb-3">
                         <label class="form-label">Bonne réponse <span class="text-danger">*</span></label>
-                        <div id="reponse-container">
-                            <div id="reponse-qcm" style="{{ old('type', $question->type) == 'qcm' ? '' : 'display: none;' }}">
-                                <select name="bonne_reponse" class="form-select @error('bonne_reponse') is-invalid @enderror">
-                                    <option value="">Sélectionner la bonne réponse</option>
-                                    @if($question->type == 'qcm' && $question->options)
-                                        @foreach($question->options as $index => $option)
-                                            <option value="{{ chr(65 + $index) }}" 
-                                                {{ old('bonne_reponse', $question->bonne_reponse) == chr(65 + $index) ? 'selected' : '' }}>
-                                                Option {{ chr(65 + $index) }}
-                                            </option>
-                                        @endforeach
-                                    @endif
-                                </select>
-                            </div>
-                            
-                            <div id="reponse-vrai-faux" style="{{ old('type', $question->type) == 'vrai_faux' ? '' : 'display: none;' }}">
-                                <select name="bonne_reponse" class="form-select @error('bonne_reponse') is-invalid @enderror">
-                                    <option value="">Sélectionner</option>
-                                    <option value="vrai" {{ old('bonne_reponse', $question->bonne_reponse) == 'vrai' ? 'selected' : '' }}>Vrai</option>
-                                    <option value="faux" {{ old('bonne_reponse', $question->bonne_reponse) == 'faux' ? 'selected' : '' }}>Faux</option>
-                                </select>
-                            </div>
-                            
-                            <div id="reponse-texte" style="{{ old('type', $question->type) == 'texte' ? '' : 'display: none;' }}">
-                                <input type="text" name="bonne_reponse" class="form-control @error('bonne_reponse') is-invalid @enderror" 
-                                       placeholder="Entrez la réponse attendue" value="{{ old('bonne_reponse', $question->bonne_reponse) }}">
-                            </div>
+                        
+                        <!-- Champ caché qui contiendra la valeur réelle -->
+                        <input type="hidden" name="bonne_reponse" id="bonne_reponse_value" value="{{ old('bonne_reponse', $question->bonne_reponse) }}">
+                        
+                        <!-- Interface QCM -->
+                        <div id="reponse-qcm" style="{{ old('type', $question->type) == 'qcm' ? '' : 'display: none;' }}">
+                            <select id="bonne_reponse_qcm" class="form-select @error('bonne_reponse') is-invalid @enderror" onchange="document.getElementById('bonne_reponse_value').value = this.value">
+                                <option value="">Sélectionner la bonne réponse</option>
+                                @if($question->type == 'qcm' && $question->options)
+                                    @foreach($question->options as $index => $option)
+                                        <option value="{{ chr(65 + $index) }}" 
+                                            {{ old('bonne_reponse', $question->bonne_reponse) == chr(65 + $index) ? 'selected' : '' }}>
+                                            Option {{ chr(65 + $index) }}
+                                        </option>
+                                    @endforeach
+                                @else
+                                    @foreach(old('options', ['', '', '', '']) as $index => $option)
+                                        @if(!empty($option))
+                                            <option value="{{ chr(65 + $index) }}">Option {{ chr(65 + $index) }}</option>
+                                        @endif
+                                    @endforeach
+                                @endif
+                            </select>
                         </div>
+                        
+                        <!-- Interface Vrai/Faux -->
+                        <div id="reponse-vrai-faux" style="{{ old('type', $question->type) == 'vrai_faux' ? '' : 'display: none;' }}">
+                            <select id="bonne_reponse_vf" class="form-select @error('bonne_reponse') is-invalid @enderror" onchange="document.getElementById('bonne_reponse_value').value = this.value">
+                                <option value="">Sélectionner</option>
+                                <option value="vrai" {{ old('bonne_reponse', $question->bonne_reponse) == 'vrai' ? 'selected' : '' }}>Vrai</option>
+                                <option value="faux" {{ old('bonne_reponse', $question->bonne_reponse) == 'faux' ? 'selected' : '' }}>Faux</option>
+                            </select>
+                        </div>
+                        
+                        <!-- Interface Texte -->
+                        <div id="reponse-texte" style="{{ old('type', $question->type) == 'texte' ? '' : 'display: none;' }}">
+                            <input type="text" id="bonne_reponse_text" class="form-control @error('bonne_reponse') is-invalid @enderror" 
+                                   placeholder="Entrez la réponse attendue" value="{{ old('bonne_reponse', $question->bonne_reponse) }}"
+                                   oninput="document.getElementById('bonne_reponse_value').value = this.value">
+                        </div>
+                        
                         @error('bonne_reponse')
-                            <div class="invalid-feedback">{{ $message }}</div>
+                            <div class="invalid-feedback d-block">{{ $message }}</div>
                         @enderror
                     </div>
 
@@ -203,7 +219,7 @@
                             <label class="form-label">Image</label>
                             @if($question->image)
                                 <div class="mb-2">
-                                    <img src="{{ $question->image_url }}" alt="" class="img-fluid rounded" style="max-height: 80px;">
+                                    <img src="{{ Storage::url($question->image) }}" alt="" class="img-fluid rounded" style="max-height: 80px;">
                                     <small class="text-muted d-block">Image actuelle</small>
                                 </div>
                             @endif
@@ -229,7 +245,7 @@
                     </div>
 
                     <div class="d-flex justify-content-end gap-2">
-                        <a href="{{ url('admin/questions') }}" class="btn btn-light">Annuler</a>
+                        <a href="{{ route('admin.questions.index') }}" class="btn btn-light">Annuler</a>
                         <button type="submit" class="btn btn-primary">
                             <i class="ti ti-device-floppy me-1"></i> Mettre à jour
                         </button>
@@ -264,6 +280,29 @@
 
 @push('scripts')
 <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Initialiser le type de question
+        const checkedType = document.querySelector('input[name="type"]:checked');
+        if (checkedType) {
+            updateQuestionType(checkedType.value);
+        }
+        
+        // Initialiser les filtres
+        const filterClasse = document.getElementById('filter_classe');
+        if (filterClasse.value) {
+            loadMatieres(false);
+        }
+        
+        const filterMatiere = document.getElementById('filter_matiere');
+        if (filterMatiere.value && filterMatiere.value !== '') {
+            loadChapitres(false);
+        }
+
+        // Synchroniser les valeurs initiales
+        syncBonneReponse();
+    });
+
+    // Gestion du changement de type de question
     document.querySelectorAll('input[name="type"]').forEach(radio => {
         radio.addEventListener('change', function() {
             updateQuestionType(this.value);
@@ -271,37 +310,66 @@
     });
 
     function updateQuestionType(type) {
+        // Mettre à jour les styles des cartes
         document.querySelectorAll('.card-radio .card').forEach(card => {
             card.classList.remove('border-primary');
         });
         document.querySelector(`input[name="type"][value="${type}"]`).closest('.card-radio').querySelector('.card').classList.add('border-primary');
 
+        // Afficher/masquer les sections appropriées
         document.getElementById('qcm-options').style.display = type === 'qcm' ? 'block' : 'none';
         document.getElementById('reponse-qcm').style.display = type === 'qcm' ? 'block' : 'none';
         document.getElementById('reponse-vrai-faux').style.display = type === 'vrai_faux' ? 'block' : 'none';
         document.getElementById('reponse-texte').style.display = type === 'texte' ? 'block' : 'none';
         
+        // Mettre à jour le champ caché avec la valeur appropriée
+        syncBonneReponse();
+        
+        // Mettre à jour le select QCM si nécessaire
         if (type === 'qcm') {
             updateQcmSelect();
+        }
+    }
+
+    function syncBonneReponse() {
+        const type = document.querySelector('input[name="type"]:checked')?.value;
+        const hiddenField = document.getElementById('bonne_reponse_value');
+        
+        if (type === 'qcm') {
+            const select = document.getElementById('bonne_reponse_qcm');
+            if (select.value) hiddenField.value = select.value;
+        } else if (type === 'vrai_faux') {
+            const select = document.getElementById('bonne_reponse_vf');
+            if (select.value) hiddenField.value = select.value;
+        } else if (type === 'texte') {
+            const input = document.getElementById('bonne_reponse_text');
+            if (input.value) hiddenField.value = input.value;
         }
     }
 
     function addOption() {
         const container = document.getElementById('options-container');
         const optionCount = container.children.length;
+        
+        if (optionCount >= 6) {
+            alert('Vous ne pouvez pas ajouter plus de 6 options');
+            return;
+        }
+        
         const letter = String.fromCharCode(65 + optionCount);
         
         const div = document.createElement('div');
         div.className = 'input-group mb-2 option-row';
         div.innerHTML = `
             <span class="input-group-text">${letter}</span>
-            <input type="text" name="options[]" class="form-control" placeholder="Option ${letter}">
+            <input type="text" name="options[]" class="form-control" placeholder="Option ${letter}" value="">
             <button type="button" class="btn btn-outline-danger remove-option" onclick="removeOption(this)">
                 <i class="ti ti-trash"></i>
             </button>
         `;
         container.appendChild(div);
         
+        updateOptionLetters();
         updateQcmSelect();
     }
 
@@ -324,7 +392,7 @@
     }
 
     function updateQcmSelect() {
-        const select = document.querySelector('#reponse-qcm select');
+        const select = document.getElementById('bonne_reponse_qcm');
         const options = document.querySelectorAll('.option-row');
         
         select.innerHTML = '<option value="">Sélectionner la bonne réponse</option>';
@@ -333,7 +401,11 @@
             select.innerHTML += `<option value="${letter}">Option ${letter}</option>`;
         });
         
-        select.value = '{{ old("bonne_reponse", $question->bonne_reponse) }}';
+        // Restaurer la valeur sélectionnée si elle existe
+        const hiddenValue = document.getElementById('bonne_reponse_value').value;
+        if (hiddenValue && hiddenValue.match(/^[A-F]$/)) {
+            select.value = hiddenValue;
+        }
     }
 
     function previewImage(input) {
@@ -353,20 +425,25 @@
         }
     }
 
-    document.addEventListener('DOMContentLoaded', function() {
-        @if($question->type == 'qcm' && $question->options)
-            updateQcmSelect();
-        @endif
-    });
-
     // Filtres pour les quiz
-    document.getElementById('filter_classe').addEventListener('change', loadMatieres);
-    document.getElementById('filter_matiere').addEventListener('change', loadChapitres);
+    document.getElementById('filter_classe').addEventListener('change', function() {
+        loadMatieres(true);
+    });
+    
+    document.getElementById('filter_matiere').addEventListener('change', function() {
+        loadChapitres(true);
+    });
+    
     document.getElementById('filter_chapitre').addEventListener('change', filterQuizs);
 
-    function loadMatieres() {
+    function loadMatieres(resetQuiz = true) {
         const classeId = document.getElementById('filter_classe').value;
         const matiereSelect = document.getElementById('filter_matiere');
+        
+        matiereSelect.innerHTML = '<option value="">Chargement...</option>';
+        matiereSelect.disabled = true;
+        document.getElementById('filter_chapitre').innerHTML = '<option value="">Sélectionnez d\'abord une matière</option>';
+        document.getElementById('filter_chapitre').disabled = true;
         
         if (classeId) {
             fetch(`/admin/api/matieres?classe_id=${classeId}`)
@@ -374,26 +451,53 @@
                 .then(data => {
                     matiereSelect.innerHTML = '<option value="">Toutes les matières</option>';
                     data.forEach(matiere => {
-                        matiereSelect.innerHTML += `<option value="${matiere.id}">${matiere.nom}</option>`;
+                        const selected = (matiere.id == '{{ $question->quiz->matiere_id }}') ? 'selected' : '';
+                        matiereSelect.innerHTML += `<option value="${matiere.id}" ${selected}>${matiere.nom}</option>`;
                     });
+                    matiereSelect.disabled = false;
+                    
+                    if (resetQuiz) {
+                        document.getElementById('quiz_id').innerHTML = '<option value="">Sélectionner un quiz</option>';
+                    }
+                })
+                .catch(() => {
+                    matiereSelect.innerHTML = '<option value="">Erreur de chargement</option>';
                 });
+        } else {
+            matiereSelect.innerHTML = '<option value="">Sélectionnez d\'abord une classe</option>';
+            matiereSelect.disabled = true;
         }
     }
 
-    function loadChapitres() {
+    function loadChapitres(resetQuiz = true) {
         const classeId = document.getElementById('filter_classe').value;
         const matiereId = document.getElementById('filter_matiere').value;
         const chapitreSelect = document.getElementById('filter_chapitre');
         
-        if (classeId && matiereId) {
+        chapitreSelect.innerHTML = '<option value="">Chargement...</option>';
+        chapitreSelect.disabled = true;
+        
+        if (classeId && matiereId && matiereId !== '') {
             fetch(`/admin/api/chapitres?classe_id=${classeId}&matiere_id=${matiereId}`)
                 .then(response => response.json())
                 .then(data => {
                     chapitreSelect.innerHTML = '<option value="">Tous les chapitres</option>';
                     data.forEach(chapitre => {
-                        chapitreSelect.innerHTML += `<option value="${chapitre.id}">${chapitre.nom}</option>`;
+                        const selected = (chapitre.id == '{{ $question->quiz->chapitre_id }}') ? 'selected' : '';
+                        chapitreSelect.innerHTML += `<option value="${chapitre.id}" ${selected}>${chapitre.nom}</option>`;
                     });
+                    chapitreSelect.disabled = false;
+                    
+                    if (resetQuiz) {
+                        document.getElementById('quiz_id').innerHTML = '<option value="">Sélectionner un quiz</option>';
+                    }
+                })
+                .catch(() => {
+                    chapitreSelect.innerHTML = '<option value="">Erreur de chargement</option>';
                 });
+        } else {
+            chapitreSelect.innerHTML = '<option value="">Sélectionnez d\'abord une matière</option>';
+            chapitreSelect.disabled = true;
         }
     }
 
@@ -403,9 +507,9 @@
         const chapitreId = document.getElementById('filter_chapitre').value;
         const quizSelect = document.getElementById('quiz_id');
         
-        if (classeId && matiereId) {
+        if (classeId && matiereId && matiereId !== '') {
             let url = `/admin/api/quizs?classe_id=${classeId}&matiere_id=${matiereId}`;
-            if (chapitreId) {
+            if (chapitreId && chapitreId !== '') {
                 url += `&chapitre_id=${chapitreId}`;
             }
             
@@ -414,7 +518,8 @@
                 .then(data => {
                     quizSelect.innerHTML = '<option value="">Sélectionner un quiz</option>';
                     data.forEach(quiz => {
-                        quizSelect.innerHTML += `<option value="${quiz.id}">${quiz.titre}</option>`;
+                        const selected = (quiz.id == '{{ $question->quiz_id }}') ? 'selected' : '';
+                        quizSelect.innerHTML += `<option value="${quiz.id}" ${selected}>${quiz.titre}</option>`;
                     });
                 });
         }

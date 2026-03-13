@@ -9,6 +9,7 @@ use App\Models\QuizResultat;
 use App\Models\Classe;
 use App\Models\Matiere;
 use App\Models\Chapitre;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
@@ -16,6 +17,9 @@ use Illuminate\Support\Str;
 
 class QuizController extends Controller
 {
+    /**
+     * Affiche la liste des quiz
+     */
     public function index(Request $request)
     {
         $query = Quiz::with(['classe', 'matiere', 'chapitre', 'createur'])
@@ -62,6 +66,9 @@ class QuizController extends Controller
         return view('admin.quiz.index', compact('quizzes', 'classes', 'matieres', 'stats'));
     }
 
+    /**
+     * Formulaire de création d'un quiz
+     */
     public function create()
     {
         $classes = Classe::orderBy('nom')->get();
@@ -71,6 +78,9 @@ class QuizController extends Controller
         return view('admin.quiz.create', compact('classes', 'matieres', 'chapitres'));
     }
 
+    /**
+     * Enregistre un nouveau quiz
+     */
     public function store(Request $request)
     {
         $request->validate([
@@ -119,6 +129,9 @@ class QuizController extends Controller
         }
     }
 
+    /**
+     * Affiche les détails d'un quiz
+     */
     public function show(Quiz $quiz)
     {
         $quiz->load(['classe', 'matiere', 'chapitre', 'createur', 'questions']);
@@ -144,6 +157,9 @@ class QuizController extends Controller
         return view('admin.quiz.show', compact('quiz', 'stats', 'meilleursScores'));
     }
 
+    /**
+     * Formulaire d'édition d'un quiz
+     */
     public function edit(Quiz $quiz)
     {
         $classes = Classe::orderBy('nom')->get();
@@ -157,6 +173,9 @@ class QuizController extends Controller
         return view('admin.quiz.edit', compact('quiz', 'classes', 'matieres', 'chapitres'));
     }
 
+    /**
+     * Met à jour un quiz
+     */
     public function update(Request $request, Quiz $quiz)
     {
         $request->validate([
@@ -199,6 +218,9 @@ class QuizController extends Controller
         }
     }
 
+    /**
+     * Supprime un quiz
+     */
     public function destroy(Quiz $quiz)
     {
         try {
@@ -227,6 +249,9 @@ class QuizController extends Controller
         }
     }
 
+    /**
+     * Change le statut d'un quiz
+     */
     public function toggleStatus(Quiz $quiz)
     {
         $nouveauStatut = match($quiz->statut) {
@@ -247,6 +272,9 @@ class QuizController extends Controller
         return redirect()->back()->with('success', "Quiz $message avec succès.");
     }
 
+    /**
+     * Duplique un quiz
+     */
     public function duplicate(Quiz $quiz)
     {
         try {
@@ -275,6 +303,9 @@ class QuizController extends Controller
         }
     }
 
+    /**
+     * Affiche les questions d'un quiz
+     */
     public function questions(Quiz $quiz)
     {
         $quiz->load(['questions' => function($q) {
@@ -284,6 +315,9 @@ class QuizController extends Controller
         return view('admin.quiz.questions.index', compact('quiz'));
     }
 
+    /**
+     * Affiche les statistiques d'un quiz
+     */
     public function statistiques(Quiz $quiz)
     {
         $resultats = $quiz->resultats()
@@ -314,6 +348,9 @@ class QuizController extends Controller
         return view('admin.quiz.statistiques', compact('quiz', 'resultats', 'stats', 'distribution'));
     }
 
+    /**
+     * Exporte les résultats d'un quiz en CSV
+     */
     public function exportResultats(Quiz $quiz)
     {
         $resultats = $quiz->resultats()
@@ -326,7 +363,7 @@ class QuizController extends Controller
         $handle = fopen('php://temp', 'w+');
 
         fputcsv($handle, [
-            'Élève',
+            'Utilisateur',
             'Email',
             'Score',
             'Pourcentage',
@@ -358,6 +395,9 @@ class QuizController extends Controller
             ->header('Content-Disposition', 'attachment; filename="' . $filename . '"');
     }
 
+    /**
+     * Récupère les chapitres pour AJAX
+     */
     public function getChapitres(Request $request)
     {
         $chapitres = Chapitre::where('classe_id', $request->classe_id)
@@ -369,30 +409,235 @@ class QuizController extends Controller
         return response()->json($chapitres);
     }
 
-    public function resultats()
+    /**
+     * Affiche la liste de tous les résultats
+     */
+    public function resultats(Request $request)
     {
-        $resultats = QuizResultat::with(['quiz', 'user'])
-            ->orderBy('created_at', 'desc')
-            ->paginate(20);
+        $query = QuizResultat::with(['quiz', 'quiz.classe', 'quiz.matiere', 'user']);
 
-        return view('admin.quiz.resultats', compact('resultats'));
+        // Filtre par quiz
+        if ($request->filled('quiz_id')) {
+            $query->where('quiz_id', $request->quiz_id);
+        }
+
+        // Filtre par utilisateur
+        if ($request->filled('user_id')) {
+            $query->where('user_id', $request->user_id);
+        }
+
+        // Filtre par date
+        if ($request->filled('date_debut')) {
+            $query->whereDate('created_at', '>=', $request->date_debut);
+        }
+
+        if ($request->filled('date_fin')) {
+            $query->whereDate('created_at', '<=', $request->date_fin);
+        }
+
+        // Filtre par statut (réussi/échoué)
+        if ($request->filled('statut')) {
+            $resultatsTemp = $query->get();
+            $filteredIds = [];
+            
+            foreach ($resultatsTemp as $resultat) {
+                $totalQuestions = $resultat->quiz->questions->count();
+                $pourcentage = $totalQuestions > 0 ? ($resultat->score / $totalQuestions) * 100 : 0;
+                $seuilReussite = $resultat->quiz->score_passer ?? 50;
+                $estReussi = $pourcentage >= $seuilReussite;
+                
+                if (($request->statut == 'reussi' && $estReussi) || 
+                    ($request->statut == 'echoue' && !$estReussi)) {
+                    $filteredIds[] = $resultat->id;
+                }
+            }
+            
+            $query->whereIn('id', $filteredIds);
+        }
+
+        $resultats = $query->orderBy('created_at', 'desc')->paginate(15);
+
+        // Calcul des statistiques globales
+        $tousResultats = QuizResultat::all();
+        $reussites = 0;
+        $echecs = 0;
+
+        foreach ($tousResultats as $r) {
+            $totalQ = $r->quiz->questions->count();
+            $pourc = $totalQ > 0 ? ($r->score / $totalQ) * 100 : 0;
+            $seuil = $r->quiz->score_passer ?? 50;
+            
+            if ($pourc >= $seuil) {
+                $reussites++;
+            } else {
+                $echecs++;
+            }
+        }
+
+        $stats = [
+            'reussites' => $reussites,
+            'echecs' => $echecs,
+            'participants_uniques' => QuizResultat::distinct('user_id')->count('user_id')
+        ];
+
+        // Données pour les filtres
+        $quizs = Quiz::orderBy('titre')->get();
+        $users = User::orderBy('name')->get();
+
+        return view('admin.quiz.resultats', compact('resultats', 'stats', 'quizs', 'users'));
     }
 
-    public function showResultat(QuizResultat $resultat)
+    /**
+     * Affiche le détail d'un résultat
+     */
+    public function showResultat($id)
     {
-        $resultat->load(['quiz', 'user', 'quiz.questions']);
+        $resultat = QuizResultat::with(['quiz', 'user', 'quiz.questions', 'quiz.classe', 'quiz.matiere'])->findOrFail($id);
         
-        return view('admin.quiz.show-resultat', compact('resultat'));
+        // Calcul des résultats précédent et suivant pour la navigation
+        $tousResultats = QuizResultat::where('quiz_id', $resultat->quiz_id)
+            ->orderBy('id')
+            ->pluck('id')
+            ->toArray();
+        
+        $currentIndex = array_search($resultat->id, $tousResultats);
+        $resultatPrecedent = $currentIndex > 0 ? QuizResultat::find($tousResultats[$currentIndex - 1]) : null;
+        $resultatSuivant = $currentIndex < count($tousResultats) - 1 ? QuizResultat::find($tousResultats[$currentIndex + 1]) : null;
+
+        // Statistiques pour ce résultat
+        $stats = [];
+        if ($resultat->quiz->questions->count() > 0) {
+            $bonnesReponses = 0;
+            foreach ($resultat->quiz->questions as $index => $question) {
+                if (isset($resultat->reponses[$index]) && $resultat->reponses[$index] == $question->bonne_reponse) {
+                    $bonnesReponses++;
+                }
+            }
+            $stats['total_reponses'] = $resultat->quiz->questions->count();
+            $stats['bonnes_reponses'] = $bonnesReponses;
+            $stats['mauvaises_reponses'] = $stats['total_reponses'] - $bonnesReponses;
+            $stats['taux_reussite'] = $stats['total_reponses'] > 0 ? round(($bonnesReponses / $stats['total_reponses']) * 100, 1) : 0;
+        }
+
+        return view('admin.quiz.show-resultat', compact('resultat', 'stats', 'resultatPrecedent', 'resultatSuivant'));
     }
 
-    public function destroyResultat(QuizResultat $resultat)
+    /**
+     * Supprime un résultat
+     */
+    public function destroyResultat($id)
     {
+        $resultat = QuizResultat::findOrFail($id);
         $resultat->delete();
 
-        return redirect('admin/quiz/resultats')
+        return redirect('admin/resultats')
             ->with('success', 'Résultat supprimé avec succès.');
     }
 
+    /**
+     * Suppression groupée de résultats
+     */
+    public function bulkDeleteResultats(Request $request)
+    {
+        $request->validate([
+            'ids' => 'required|string'
+        ]);
+
+        $ids = explode(',', $request->ids);
+        
+        try {
+            DB::beginTransaction();
+            
+            QuizResultat::whereIn('id', $ids)->delete();
+            
+            DB::commit();
+            
+            return redirect('admin/resultats')
+                ->with('success', count($ids) . ' résultat(s) supprimé(s) avec succès.');
+                
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return redirect()->back()
+                ->with('error', 'Erreur lors de la suppression : ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * Exporte tous les résultats en CSV
+     */
+    public function exportAllResultats(Request $request)
+    {
+        $query = QuizResultat::with(['quiz', 'quiz.classe', 'quiz.matiere', 'user']);
+
+        if ($request->filled('quiz_id')) {
+            $query->where('quiz_id', $request->quiz_id);
+        }
+
+        if ($request->filled('user_id')) {
+            $query->where('user_id', $request->user_id);
+        }
+
+        if ($request->filled('date_debut')) {
+            $query->whereDate('created_at', '>=', $request->date_debut);
+        }
+
+        if ($request->filled('date_fin')) {
+            $query->whereDate('created_at', '<=', $request->date_fin);
+        }
+
+        $resultats = $query->orderBy('created_at', 'desc')->get();
+
+        $filename = 'tous-les-resultats-' . date('Y-m-d') . '.csv';
+        $handle = fopen('php://temp', 'w+');
+
+        fputcsv($handle, [
+            'ID',
+            'Utilisateur',
+            'Email',
+            'Quiz',
+            'Classe',
+            'Matière',
+            'Score',
+            'Total Questions',
+            'Pourcentage',
+            'Réussite',
+            'Temps',
+            'Date'
+        ]);
+
+        foreach ($resultats as $resultat) {
+            $totalQuestions = $resultat->quiz->questions->count();
+            $pourcentage = $totalQuestions > 0 ? round(($resultat->score / $totalQuestions) * 100, 1) : 0;
+            $seuilReussite = $resultat->quiz->score_passer ?? 50;
+            
+            fputcsv($handle, [
+                $resultat->id,
+                $resultat->user->name,
+                $resultat->user->email,
+                $resultat->quiz->titre,
+                $resultat->quiz->classe->nom ?? 'N/A',
+                $resultat->quiz->matiere->nom ?? 'N/A',
+                $resultat->score,
+                $totalQuestions,
+                $pourcentage . '%',
+                $pourcentage >= $seuilReussite ? 'Oui' : 'Non',
+                $this->formatTemps($resultat->temps_ecoule),
+                $resultat->created_at->format('d/m/Y H:i')
+            ]);
+        }
+
+        rewind($handle);
+        $content = stream_get_contents($handle);
+        fclose($handle);
+
+        return response($content)
+            ->header('Content-Type', 'text/csv')
+            ->header('Content-Disposition', 'attachment; filename="' . $filename . '"');
+    }
+
+    /**
+     * Calcule le taux de réussite d'un quiz
+     */
     private function calculerTauxReussite(Quiz $quiz)
     {
         $resultats = $quiz->resultats;
@@ -411,6 +656,9 @@ class QuizController extends Controller
         return round(($reussites / $total) * 100);
     }
 
+    /**
+     * Calcule le temps moyen d'un quiz
+     */
     private function calculerTempsMoyen(Quiz $quiz)
     {
         $tempsMoyen = $quiz->resultats()->avg('temps_ecoule');
@@ -419,10 +667,86 @@ class QuizController extends Controller
         return $this->formatTemps($tempsMoyen);
     }
 
+    /**
+     * Formate le temps en minutes:secondes
+     */
     private function formatTemps($secondes)
     {
         $minutes = floor($secondes / 60);
         $secondesRestantes = $secondes % 60;
         return $minutes . ':' . str_pad($secondesRestantes, 2, '0', STR_PAD_LEFT);
+    }
+
+    /**
+     * API: Liste des quiz
+     */
+    public function apiIndex()
+    {
+        $quizs = Quiz::with(['classe', 'matiere'])->where('statut', 'publie')->get();
+        return response()->json($quizs);
+    }
+
+    /**
+     * API: Détail d'un quiz
+     */
+    public function apiShow(Quiz $quiz)
+    {
+        $quiz->load(['classe', 'matiere', 'questions']);
+        return response()->json($quiz);
+    }
+
+    /**
+     * API: Questions d'un quiz
+     */
+    public function apiQuestions(Quiz $quiz)
+    {
+        $questions = $quiz->questions()->orderBy('ordre')->get();
+        return response()->json($questions);
+    }
+
+    /**
+     * API: Soumettre un quiz
+     */
+    public function apiSubmit(Request $request, Quiz $quiz)
+    {
+        // Logique de soumission de quiz pour API
+        // À implémenter selon vos besoins
+        return response()->json(['message' => 'API submit - À implémenter']);
+    }
+
+    /**
+     * API: Résultats d'un quiz
+     */
+    public function apiResultats(Quiz $quiz)
+    {
+        $resultats = $quiz->resultats()->with('user')->get();
+        return response()->json($resultats);
+    }
+
+    /**
+     * API: Afficher un résultat
+     */
+    public function apiShowResultat($id)
+    {
+        $resultat = QuizResultat::with(['quiz', 'user'])->findOrFail($id);
+        return response()->json($resultat);
+    }
+
+    /**
+     * API: Résultats par quiz
+     */
+    public function apiResultatsByQuiz(Quiz $quiz)
+    {
+        $resultats = $quiz->resultats()->with('user')->get();
+        return response()->json($resultats);
+    }
+
+    /**
+     * API: Résultats par utilisateur
+     */
+    public function apiResultatsByUser(User $user)
+    {
+        $resultats = QuizResultat::with('quiz')->where('user_id', $user->id)->get();
+        return response()->json($resultats);
     }
 }

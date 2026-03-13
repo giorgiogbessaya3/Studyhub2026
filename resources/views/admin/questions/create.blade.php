@@ -12,7 +12,7 @@
                 <h5 class="mb-0">Nouvelle question</h5>
             </div>
             <div class="card-body">
-                <form action="{{ url('admin/questions') }}" method="POST" enctype="multipart/form-data">
+                <form action="{{ route('admin.questions.store') }}" method="POST" enctype="multipart/form-data" id="questionForm">
                     @csrf
                     
                     <!-- Sélection du quiz -->
@@ -22,7 +22,7 @@
                             <option value="">Sélectionner un quiz</option>
                             @foreach($quizs as $quiz)
                                 <option value="{{ $quiz->id }}" {{ old('quiz_id', $selectedQuiz->id ?? '') == $quiz->id ? 'selected' : '' }}>
-                                    {{ $quiz->titre }} ({{ $quiz->classe->nom }} - {{ $quiz->matiere->nom }})
+                                    {{ $quiz->titre }} ({{ $quiz->classe->nom ?? 'N/A' }} - {{ $quiz->matiere->nom ?? 'N/A' }})
                                 </option>
                             @endforeach
                         </select>
@@ -140,36 +140,48 @@
                         </button>
                     </div>
 
-                    <!-- Bonne réponse -->
+                    <!-- Bonne réponse - CHAMP UNIQUE avec gestion dynamique -->
                     <div class="mb-3">
                         <label class="form-label">Bonne réponse <span class="text-danger">*</span></label>
-                        <div id="reponse-container">
-                            <div id="reponse-qcm" style="{{ old('type', 'qcm') == 'qcm' ? '' : 'display: none;' }}">
-                                <select name="bonne_reponse" class="form-select @error('bonne_reponse') is-invalid @enderror">
-                                    <option value="">Sélectionner la bonne réponse</option>
-                                    @foreach(old('options', ['A', 'B', 'C', 'D']) as $index => $option)
+                        
+                        <!-- Champ caché qui contiendra la valeur réelle -->
+                        <input type="hidden" name="bonne_reponse" id="bonne_reponse_value" value="{{ old('bonne_reponse') }}">
+                        
+                        <!-- Interface QCM -->
+                        <div id="reponse-qcm" style="{{ old('type', 'qcm') == 'qcm' ? '' : 'display: none;' }}">
+                            <select id="bonne_reponse_qcm" class="form-select" onchange="document.getElementById('bonne_reponse_value').value = this.value">
+                                <option value="">Sélectionner la bonne réponse</option>
+                                @php
+                                    $options = old('options', ['A', 'B', 'C', 'D']);
+                                @endphp
+                                @foreach($options as $index => $option)
+                                    @if(!empty($option) || $loop->index < 4)
                                         <option value="{{ chr(65 + $index) }}" {{ old('bonne_reponse') == chr(65 + $index) ? 'selected' : '' }}>
                                             Option {{ chr(65 + $index) }}
                                         </option>
-                                    @endforeach
-                                </select>
-                            </div>
-                            
-                            <div id="reponse-vrai-faux" style="{{ old('type') == 'vrai_faux' ? '' : 'display: none;' }}">
-                                <select name="bonne_reponse" class="form-select @error('bonne_reponse') is-invalid @enderror">
-                                    <option value="">Sélectionner</option>
-                                    <option value="vrai" {{ old('bonne_reponse') == 'vrai' ? 'selected' : '' }}>Vrai</option>
-                                    <option value="faux" {{ old('bonne_reponse') == 'faux' ? 'selected' : '' }}>Faux</option>
-                                </select>
-                            </div>
-                            
-                            <div id="reponse-texte" style="{{ old('type') == 'texte' ? '' : 'display: none;' }}">
-                                <input type="text" name="bonne_reponse" class="form-control @error('bonne_reponse') is-invalid @enderror" 
-                                       placeholder="Entrez la réponse attendue" value="{{ old('bonne_reponse') }}">
-                            </div>
+                                    @endif
+                                @endforeach
+                            </select>
                         </div>
+                        
+                        <!-- Interface Vrai/Faux -->
+                        <div id="reponse-vrai-faux" style="{{ old('type') == 'vrai_faux' ? '' : 'display: none;' }}">
+                            <select id="bonne_reponse_vf" class="form-select" onchange="document.getElementById('bonne_reponse_value').value = this.value">
+                                <option value="">Sélectionner</option>
+                                <option value="vrai" {{ old('bonne_reponse') == 'vrai' ? 'selected' : '' }}>Vrai</option>
+                                <option value="faux" {{ old('bonne_reponse') == 'faux' ? 'selected' : '' }}>Faux</option>
+                            </select>
+                        </div>
+                        
+                        <!-- Interface Texte -->
+                        <div id="reponse-texte" style="{{ old('type') == 'texte' ? '' : 'display: none;' }}">
+                            <input type="text" id="bonne_reponse_text" class="form-control @error('bonne_reponse') is-invalid @enderror" 
+                                   placeholder="Entrez la réponse attendue" value="{{ old('bonne_reponse') }}"
+                                   oninput="document.getElementById('bonne_reponse_value').value = this.value">
+                        </div>
+                        
                         @error('bonne_reponse')
-                            <div class="invalid-feedback">{{ $message }}</div>
+                            <div class="invalid-feedback d-block">{{ $message }}</div>
                         @enderror
                     </div>
 
@@ -207,7 +219,7 @@
                     </div>
 
                     <div class="d-flex justify-content-end gap-2">
-                        <a href="{{ url('admin/questions') }}" class="btn btn-light">Annuler</a>
+                        <a href="{{ route('admin.questions.index') }}" class="btn btn-light">Annuler</a>
                         <button type="submit" class="btn btn-primary">
                             <i class="ti ti-device-floppy me-1"></i> Enregistrer la question
                         </button>
@@ -242,6 +254,24 @@
 
 @push('scripts')
 <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Initialiser le type de question
+        const checkedType = document.querySelector('input[name="type"]:checked');
+        if (checkedType) {
+            updateQuestionType(checkedType.value);
+        }
+        
+        // Initialiser les filtres si des valeurs sont sélectionnées
+        const filterClasse = document.getElementById('filter_classe');
+        if (filterClasse.value) {
+            loadMatieres();
+        }
+
+        // Synchroniser les valeurs initiales
+        syncBonneReponse();
+    });
+
+    // Gestion du changement de type de question
     document.querySelectorAll('input[name="type"]').forEach(radio => {
         radio.addEventListener('change', function() {
             updateQuestionType(this.value);
@@ -249,37 +279,65 @@
     });
 
     function updateQuestionType(type) {
+        // Mettre à jour les styles des cartes
         document.querySelectorAll('.card-radio .card').forEach(card => {
             card.classList.remove('border-primary');
         });
         document.querySelector(`input[name="type"][value="${type}"]`).closest('.card-radio').querySelector('.card').classList.add('border-primary');
 
+        // Afficher/masquer les sections appropriées
         document.getElementById('qcm-options').style.display = type === 'qcm' ? 'block' : 'none';
         document.getElementById('reponse-qcm').style.display = type === 'qcm' ? 'block' : 'none';
         document.getElementById('reponse-vrai-faux').style.display = type === 'vrai_faux' ? 'block' : 'none';
         document.getElementById('reponse-texte').style.display = type === 'texte' ? 'block' : 'none';
         
+        // Mettre à jour le champ caché avec la valeur appropriée
+        syncBonneReponse();
+        
+        // Mettre à jour le select QCM si nécessaire
         if (type === 'qcm') {
             updateQcmSelect();
+        }
+    }
+
+    function syncBonneReponse() {
+        const type = document.querySelector('input[name="type"]:checked')?.value;
+        const hiddenField = document.getElementById('bonne_reponse_value');
+        
+        if (type === 'qcm') {
+            const select = document.getElementById('bonne_reponse_qcm');
+            if (select.value) hiddenField.value = select.value;
+        } else if (type === 'vrai_faux') {
+            const select = document.getElementById('bonne_reponse_vf');
+            if (select.value) hiddenField.value = select.value;
+        } else if (type === 'texte') {
+            const input = document.getElementById('bonne_reponse_text');
+            if (input.value) hiddenField.value = input.value;
         }
     }
 
     function addOption() {
         const container = document.getElementById('options-container');
         const optionCount = container.children.length;
+        if (optionCount >= 6) {
+            alert('Vous ne pouvez pas ajouter plus de 6 options');
+            return;
+        }
+        
         const letter = String.fromCharCode(65 + optionCount);
         
         const div = document.createElement('div');
         div.className = 'input-group mb-2 option-row';
         div.innerHTML = `
             <span class="input-group-text">${letter}</span>
-            <input type="text" name="options[]" class="form-control" placeholder="Option ${letter}">
+            <input type="text" name="options[]" class="form-control" placeholder="Option ${letter}" value="">
             <button type="button" class="btn btn-outline-danger remove-option" onclick="removeOption(this)">
                 <i class="ti ti-trash"></i>
             </button>
         `;
         container.appendChild(div);
         
+        updateOptionLetters();
         updateQcmSelect();
     }
 
@@ -302,7 +360,7 @@
     }
 
     function updateQcmSelect() {
-        const select = document.querySelector('#reponse-qcm select');
+        const select = document.getElementById('bonne_reponse_qcm');
         const options = document.querySelectorAll('.option-row');
         
         select.innerHTML = '<option value="">Sélectionner la bonne réponse</option>';
@@ -310,6 +368,12 @@
             const letter = String.fromCharCode(65 + index);
             select.innerHTML += `<option value="${letter}">Option ${letter}</option>`;
         });
+        
+        // Restaurer la valeur sélectionnée si elle existe
+        const hiddenValue = document.getElementById('bonne_reponse_value').value;
+        if (hiddenValue && hiddenValue.match(/^[A-F]$/)) {
+            select.value = hiddenValue;
+        }
     }
 
     function previewImage(input) {
@@ -340,6 +404,8 @@
         
         matiereSelect.innerHTML = '<option value="">Chargement...</option>';
         matiereSelect.disabled = true;
+        document.getElementById('filter_chapitre').innerHTML = '<option value="">Sélectionnez d\'abord une matière</option>';
+        document.getElementById('filter_chapitre').disabled = true;
         
         if (classeId) {
             fetch(`/admin/api/matieres?classe_id=${classeId}`)
@@ -357,8 +423,6 @@
         } else {
             matiereSelect.innerHTML = '<option value="">Sélectionnez d\'abord une classe</option>';
             matiereSelect.disabled = true;
-            document.getElementById('filter_chapitre').innerHTML = '<option value="">Sélectionnez d\'abord une matière</option>';
-            document.getElementById('filter_chapitre').disabled = true;
         }
     }
 
@@ -370,7 +434,7 @@
         chapitreSelect.innerHTML = '<option value="">Chargement...</option>';
         chapitreSelect.disabled = true;
         
-        if (classeId && matiereId) {
+        if (classeId && matiereId && matiereId !== '') {
             fetch(`/admin/api/chapitres?classe_id=${classeId}&matiere_id=${matiereId}`)
                 .then(response => response.json())
                 .then(data => {
@@ -395,9 +459,9 @@
         const chapitreId = document.getElementById('filter_chapitre').value;
         const quizSelect = document.getElementById('quiz_id');
         
-        if (classeId && matiereId) {
+        if (classeId && matiereId && matiereId !== '') {
             let url = `/admin/api/quizs?classe_id=${classeId}&matiere_id=${matiereId}`;
-            if (chapitreId) {
+            if (chapitreId && chapitreId !== '') {
                 url += `&chapitre_id=${chapitreId}`;
             }
             

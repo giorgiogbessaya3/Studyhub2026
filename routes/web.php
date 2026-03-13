@@ -12,6 +12,7 @@ use App\Http\Controllers\Frontend\UserController;
 use App\Http\Controllers\Frontend\ContactController;
 use App\Http\Controllers\Frontend\EpreuveControllers;
 use App\Http\Controllers\Frontend\AssistanceController;
+use App\Http\Controllers\Frontend\QuizController as FrontendQuizController; // ALIAS: FrontendQuizController
 
 // ==========================================
 // CONTROLLERS AUTH
@@ -29,9 +30,8 @@ use App\Http\Controllers\Admin\EpreuveController as AdminEpreuveController;
 use App\Http\Controllers\Admin\TypeEpreuveController;
 use App\Http\Controllers\Admin\ContenuController;
 use App\Http\Controllers\Admin\ChapitreController;
-use App\Http\Controllers\Admin\QuizController;
+use App\Http\Controllers\Admin\QuizController; // Garde celui-ci sans alias
 use App\Http\Controllers\Admin\QuestionController;
-use App\Http\Controllers\Admin\QuizQuestionController;
 use App\Http\Controllers\Admin\AssistanceController as AdminAssistanceController;
 use App\Http\Controllers\Admin\SettingController;
 use App\Http\Controllers\Admin\NewsletterController;
@@ -109,13 +109,14 @@ Route::get('/matiere/{matiere}', function($matiere) {
 })->name('matiere.detail.old');
 
 // ==========================================
-// ROUTES PUBLIQUES - ÉVALUATIONS/QUIZ
+// ROUTES PUBLIQUES - QUIZ (AVEC FRONTENDQUIZCONTROLLER)
 // ==========================================
-Route::prefix('quiz')->name('quiz.')->controller(FrontendController::class)->group(function() {
-    Route::get('/', 'quizList')->name('list');
-    Route::get('/{quiz}', 'quizStart')->name('start');
-    Route::post('/{quiz}/submit', 'quizSubmit')->name('submit');
-    Route::get('/{quiz}/result', 'quizResult')->name('result');
+Route::prefix('quiz')->name('quiz.')->controller(FrontendQuizController::class)->group(function() {
+    Route::get('/', 'index')->name('index');                          // /quiz - Liste des quiz
+    Route::get('/{quiz}', 'show')->name('show');                      // /quiz/1 - Détail d'un quiz
+    Route::get('/{quiz}/start', 'start')->name('start');              // /quiz/1/start - Commencer un quiz
+    Route::post('/{quiz}/submit', 'submit')->name('submit');          // POST /quiz/1/submit - Soumettre les réponses
+    Route::get('/{quiz}/result/{resultat}', 'result')->name('result'); // /quiz/1/result/1 - Voir le résultat
 });
 
 // ==========================================
@@ -269,7 +270,7 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'isAdmin'])->group(f
     Route::get('epreuves/export', [AdminEpreuveController::class, 'export'])->name('epreuves.export');
     
     // ==========================================
-    // GESTION DES QUIZ (COMPLET)
+    // GESTION DES QUIZ (ADMIN)
     // ==========================================
     
     // Routes principales des quiz
@@ -285,10 +286,9 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'isAdmin'])->group(f
     });
     
     // ==========================================
-    // GESTION DES QUESTIONS DE QUIZ (admin/questions)
+    // GESTION DES QUESTIONS (admin/questions) - UN SEUL GROUPE
     // ==========================================
     Route::prefix('questions')->name('questions.')->controller(QuestionController::class)->group(function() {
-        // Routes de base
         Route::get('/', 'index')->name('index');
         Route::get('/create', 'create')->name('create');
         Route::post('/', 'store')->name('store');
@@ -296,17 +296,14 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'isAdmin'])->group(f
         Route::get('/{question}/edit', 'edit')->name('edit');
         Route::put('/{question}', 'update')->name('update');
         Route::delete('/{question}', 'destroy')->name('destroy');
-        
-        // Routes supplémentaires
         Route::post('/{question}/duplicate', 'duplicate')->name('duplicate');
-        Route::get('/import/form', 'importForm')->name('import.form');
+        Route::get('/import', 'importForm')->name('import.form');
         Route::post('/import', 'import')->name('import');
         Route::get('/export', 'export')->name('export');
-        Route::post('/reorder', 'reorder')->name('reorder');
     });
     
     // ==========================================
-    // GESTION DES RÉSULTATS
+    // GESTION DES RÉSULTATS (ADMIN)
     // ==========================================
     Route::prefix('resultats')->name('resultats.')->controller(QuizController::class)->group(function() {
         Route::get('/', 'resultats')->name('index');
@@ -317,9 +314,17 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'isAdmin'])->group(f
     });
     
     // Routes AJAX pour les filtres
-    Route::get('/api/chapitres', [QuizController::class, 'getChapitres'])->name('api.chapitres');
     Route::get('/api/matieres', [QuestionController::class, 'getMatieres'])->name('api.matieres');
+    Route::get('/api/chapitres', [QuestionController::class, 'getChapitres'])->name('api.chapitres');
     Route::get('/api/quizs', [QuestionController::class, 'getQuizs'])->name('api.quizs');
+    
+    // Routes existantes pour les résultats (via QuizController)
+    Route::get('resultats', [QuizController::class, 'resultats'])->name('resultats');
+    Route::get('resultats/{resultat}', [QuizController::class, 'showResultat'])->name('resultats.show');
+    Route::delete('resultats/{resultat}', [QuizController::class, 'destroyResultat'])->name('resultats.destroy');
+    Route::get('resultats/export/{quiz}', [QuizController::class, 'exportResultats'])->name('resultats.export');
+    Route::post('quiz/{quiz}/toggle-status', [QuizController::class, 'toggleStatus'])->name('quiz.toggle');
+    Route::get('quiz/{quiz}/statistiques', [QuizController::class, 'statistiques'])->name('quiz.statistiques');
     
     // ==========================================
     // GESTION DE L'ASSISTANCE ADMIN
@@ -432,34 +437,31 @@ Route::prefix('api')->name('api.')->middleware(['auth:api'])->group(function() {
     Route::get('epreuves/{epreuve}/download', [AdminEpreuveController::class, 'apiDownload'])->name('epreuves.download');
     Route::get('types-epreuves', [TypeEpreuveController::class, 'apiIndex'])->name('types-epreuves');
     
-    // API Quiz
-    Route::get('quiz', [QuizController::class, 'apiIndex'])->name('quiz');
-    Route::get('quiz/{quiz}', [QuizController::class, 'apiShow'])->name('quiz.show');
-    Route::get('quiz/{quiz}/questions', [QuizController::class, 'apiQuestions'])->name('quiz.questions');
-    Route::post('quiz/{quiz}/submit', [QuizController::class, 'apiSubmit'])->name('quiz.submit');
-    Route::get('quiz/{quiz}/resultats', [QuizController::class, 'apiResultats'])->name('quiz.resultats');
+    // API Quiz (Frontend)
+    Route::get('quiz', [FrontendQuizController::class, 'apiIndex'])->name('quiz');
+    Route::get('quiz/{quiz}', [FrontendQuizController::class, 'apiShow'])->name('quiz.show');
     
     // API Questions
     Route::get('questions', [QuestionController::class, 'apiIndex'])->name('questions');
     Route::get('questions/{question}', [QuestionController::class, 'apiShow'])->name('questions.show');
     Route::get('questions/quiz/{quiz}', [QuestionController::class, 'apiByQuiz'])->name('questions.by-quiz');
     
-    // API Résultats
+    // API Résultats (Admin)
     Route::get('resultats', [QuizController::class, 'apiResultats'])->name('resultats');
     Route::get('resultats/{resultat}', [QuizController::class, 'apiShowResultat'])->name('resultats.show');
     Route::get('resultats/quiz/{quiz}', [QuizController::class, 'apiResultatsByQuiz'])->name('resultats.by-quiz');
     Route::get('resultats/user/{user}', [QuizController::class, 'apiResultatsByUser'])->name('resultats.by-user');
     
-    // API Assistance
+    // API Résultats utilisateur
+    Route::get('user/resultats', [UserController::class, 'apiMesResultats'])->name('user.resultats');
+    Route::get('user/resultats/{resultat}', [UserController::class, 'apiDetailResultat'])->name('user.resultats.show');
+    
     Route::get('assistance/questions', [AdminAssistanceController::class, 'apiQuestions'])->name('assistance.questions');
     Route::get('assistance/questions/{question}', [AdminAssistanceController::class, 'apiShowQuestion'])->name('assistance.questions.show');
     Route::post('assistance/questions', [AdminAssistanceController::class, 'apiStoreQuestion'])->name('assistance.store');
     Route::post('assistance/questions/{question}/repondre', [AdminAssistanceController::class, 'apiReply'])->name('assistance.reply');
-    
-    // API Search
     Route::get('search', [FrontendController::class, 'apiSearch'])->name('search');
     
-    // API User (authentifié)
     Route::middleware('auth:api')->group(function() {
         Route::get('user/profile', [UserController::class, 'apiProfile'])->name('user.profile');
         Route::put('user/profile', [UserController::class, 'apiUpdateProfile'])->name('user.update');
@@ -480,6 +482,7 @@ Route::prefix('api/public')->name('api.public.')->group(function() {
     Route::get('matieres', [MatiereController::class, 'apiPublicIndex'])->name('matieres');
     Route::post('newsletter/subscribe', [ContactController::class, 'apiNewsletterSubscribe'])->name('newsletter.subscribe');
     Route::post('contact', [ContactController::class, 'apiStore'])->name('contact');
+    Route::get('quiz', [FrontendQuizController::class, 'apiIndex'])->name('quiz.public');
 });
 
 // ==========================================

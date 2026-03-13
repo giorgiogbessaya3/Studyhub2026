@@ -59,7 +59,7 @@ class QuestionController extends Controller
      */
     public function create(Request $request)
     {
-        $quizs = Quiz::orderBy('titre')->get();
+        $quizs = Quiz::with(['classe', 'matiere'])->orderBy('titre')->get();
         $classes = Classe::orderBy('nom')->get();
         $matieres = collect();
         $chapitres = collect();
@@ -71,6 +71,7 @@ class QuestionController extends Controller
                 $matieres = Matiere::where('id', $selectedQuiz->matiere_id)->get();
                 $chapitres = Chapitre::where('classe_id', $selectedQuiz->classe_id)
                     ->where('matiere_id', $selectedQuiz->matiere_id)
+                    ->where('statut', true)
                     ->orderBy('titre')
                     ->get(['id', 'titre as nom']);
             }
@@ -80,7 +81,7 @@ class QuestionController extends Controller
     }
 
     /**
-     * Enregistre une nouvelle question
+     * Enregistre une nouvelle question - VERSION CORRIGÉE
      */
     public function store(Request $request)
     {
@@ -88,8 +89,8 @@ class QuestionController extends Controller
             'quiz_id' => 'required|exists:quizzes,id',
             'titre' => 'required|string',
             'type' => 'required|in:qcm,texte,vrai_faux',
-            'options' => 'required_if:type,qcm|array',
-            'options.*' => 'required_if:type,qcm|string',
+            'options' => 'nullable|array',
+            'options.*' => 'nullable|string',
             'bonne_reponse' => 'required|string',
             'points' => 'required|integer|min:1|max:10',
             'explication' => 'nullable|string',
@@ -118,11 +119,14 @@ class QuestionController extends Controller
 
             // Déterminer le prochain ordre
             $ordre = $quiz->questions()->max('ordre') + 1;
+            if (!$ordre) $ordre = 1;
 
             // Préparer les options pour les QCM
             $options = null;
-            if ($request->type == 'qcm') {
-                $options = array_values(array_filter($request->options));
+            if ($request->type == 'qcm' && $request->has('options')) {
+                $options = array_values(array_filter($request->options, function($value) {
+                    return !is_null($value) && trim($value) !== '';
+                }));
             }
 
             // Créer la question
@@ -144,7 +148,7 @@ class QuestionController extends Controller
 
             DB::commit();
 
-            return redirect('admin/questions?quiz_id=' . $request->quiz_id)
+            return redirect()->route('admin.questions.index', ['quiz_id' => $request->quiz_id])
                 ->with('success', 'Question ajoutée avec succès.');
 
         } catch (\Exception $e) {
@@ -174,15 +178,16 @@ class QuestionController extends Controller
         
         // Vérifier que le quiz est modifiable
         if ($question->quiz->statut === 'publie') {
-            return redirect('admin/questions')
+            return redirect()->route('admin.questions.index')
                 ->with('error', 'Impossible de modifier les questions d\'un quiz publié.');
         }
 
-        $quizs = Quiz::orderBy('titre')->get();
+        $quizs = Quiz::with(['classe', 'matiere'])->orderBy('titre')->get();
         $classes = Classe::orderBy('nom')->get();
         $matieres = Matiere::where('id', $question->quiz->matiere_id)->get();
         $chapitres = Chapitre::where('classe_id', $question->quiz->classe_id)
             ->where('matiere_id', $question->quiz->matiere_id)
+            ->where('statut', true)
             ->orderBy('titre')
             ->get(['id', 'titre as nom']);
 
@@ -190,7 +195,7 @@ class QuestionController extends Controller
     }
 
     /**
-     * Met à jour une question
+     * Met à jour une question - VERSION CORRIGÉE
      */
     public function update(Request $request, QuizQuestion $question)
     {
@@ -198,7 +203,7 @@ class QuestionController extends Controller
 
         // Vérifier que le quiz est modifiable
         if ($question->quiz->statut === 'publie') {
-            return redirect('admin/questions')
+            return redirect()->route('admin.questions.index')
                 ->with('error', 'Impossible de modifier les questions d\'un quiz publié.');
         }
 
@@ -206,8 +211,8 @@ class QuestionController extends Controller
             'quiz_id' => 'required|exists:quizzes,id',
             'titre' => 'required|string',
             'type' => 'required|in:qcm,texte,vrai_faux',
-            'options' => 'required_if:type,qcm|array',
-            'options.*' => 'required_if:type,qcm|string',
+            'options' => 'nullable|array',
+            'options.*' => 'nullable|string',
             'bonne_reponse' => 'required|string',
             'points' => 'required|integer|min:1|max:10',
             'explication' => 'nullable|string',
@@ -227,14 +232,17 @@ class QuestionController extends Controller
             ];
 
             // Gestion des options pour QCM
-            if ($request->type == 'qcm') {
-                $data['options'] = array_values(array_filter($request->options));
+            if ($request->type == 'qcm' && $request->has('options')) {
+                $data['options'] = array_values(array_filter($request->options, function($value) {
+                    return !is_null($value) && trim($value) !== '';
+                }));
             } else {
                 $data['options'] = null;
             }
 
             // Gestion de l'image
             if ($request->hasFile('image')) {
+                // Supprimer l'ancienne image
                 if ($question->image) {
                     Storage::disk('public')->delete($question->image);
                 }
@@ -244,22 +252,27 @@ class QuestionController extends Controller
                 $data['image'] = $image->storeAs('quiz-questions', $filename, 'public');
             }
 
+            $ancienQuizId = $question->quiz_id;
             $question->update($data);
 
-            // Mettre à jour le nombre de questions dans l'ancien et nouveau quiz si différent
-            if ($question->quiz_id != $request->quiz_id) {
-                $ancienQuiz = Quiz::find($question->quiz_id);
+            // Mettre à jour le nombre de questions dans l'ancien quiz
+            if ($ancienQuizId != $request->quiz_id) {
+                $ancienQuiz = Quiz::find($ancienQuizId);
                 $ancienQuiz->nombre_questions = $ancienQuiz->questions()->count();
                 $ancienQuiz->save();
 
                 $nouveauQuiz = Quiz::find($request->quiz_id);
                 $nouveauQuiz->nombre_questions = $nouveauQuiz->questions()->count();
                 $nouveauQuiz->save();
+            } else {
+                $quiz = Quiz::find($request->quiz_id);
+                $quiz->nombre_questions = $quiz->questions()->count();
+                $quiz->save();
             }
 
             DB::commit();
 
-            return redirect('admin/questions/' . $question->id)
+            return redirect()->route('admin.questions.show', $question->id)
                 ->with('success', 'Question mise à jour avec succès.');
 
         } catch (\Exception $e) {
@@ -279,7 +292,7 @@ class QuestionController extends Controller
 
         // Vérifier que le quiz est modifiable
         if ($question->quiz->statut === 'publie') {
-            return redirect('admin/questions')
+            return redirect()->route('admin.questions.index')
                 ->with('error', 'Impossible de supprimer les questions d\'un quiz publié.');
         }
 
@@ -307,7 +320,7 @@ class QuestionController extends Controller
 
             DB::commit();
 
-            return redirect('admin/questions')
+            return redirect()->route('admin.questions.index')
                 ->with('success', 'Question supprimée avec succès.');
 
         } catch (\Exception $e) {
@@ -326,7 +339,7 @@ class QuestionController extends Controller
 
         // Vérifier que le quiz est modifiable
         if ($question->quiz->statut === 'publie') {
-            return redirect('admin/questions')
+            return redirect()->route('admin.questions.index')
                 ->with('error', 'Impossible de dupliquer les questions d\'un quiz publié.');
         }
 
@@ -354,7 +367,7 @@ class QuestionController extends Controller
 
             DB::commit();
 
-            return redirect('admin/questions?quiz_id=' . $question->quiz_id)
+            return redirect()->route('admin.questions.index', ['quiz_id' => $question->quiz_id])
                 ->with('success', 'Question dupliquée avec succès.');
 
         } catch (\Exception $e) {
@@ -393,10 +406,62 @@ class QuestionController extends Controller
         }
 
         // Logique d'import CSV
-        // À implémenter selon vos besoins
+        try {
+            DB::beginTransaction();
 
-        return redirect('admin/questions?quiz_id=' . $request->quiz_id)
-            ->with('success', 'Questions importées avec succès.');
+            $file = $request->file('fichier');
+            $handle = fopen($file->getPathname(), 'r');
+            
+            // Lire l'en-tête
+            $header = fgetcsv($handle);
+            
+            $ordre = $quiz->questions()->max('ordre') + 1;
+            $imported = 0;
+            
+            while (($row = fgetcsv($handle)) !== false) {
+                $data = array_combine($header, $row);
+                
+                // Validation basique
+                if (empty($data['titre']) || empty($data['type']) || empty($data['bonne_reponse'])) {
+                    continue;
+                }
+                
+                // Préparer les options pour QCM
+                $options = null;
+                if ($data['type'] == 'qcm' && !empty($data['options'])) {
+                    $options = explode('|', $data['options']);
+                }
+                
+                QuizQuestion::create([
+                    'quiz_id' => $request->quiz_id,
+                    'titre' => $data['titre'],
+                    'type' => $data['type'],
+                    'options' => $options,
+                    'bonne_reponse' => $data['bonne_reponse'],
+                    'points' => $data['points'] ?? 1,
+                    'explication' => $data['explication'] ?? null,
+                    'ordre' => $ordre++
+                ]);
+                
+                $imported++;
+            }
+            
+            fclose($handle);
+            
+            // Mettre à jour le nombre de questions
+            $quiz->nombre_questions = $quiz->questions()->count();
+            $quiz->save();
+            
+            DB::commit();
+
+            return redirect()->route('admin.questions.index', ['quiz_id' => $request->quiz_id])
+                ->with('success', "$imported questions importées avec succès.");
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return redirect()->back()
+                ->with('error', 'Erreur lors de l\'import : ' . $e->getMessage());
+        }
     }
 
     /**
@@ -485,9 +550,307 @@ class QuestionController extends Controller
     {
         $quizs = Quiz::where('classe_id', $request->classe_id)
             ->where('matiere_id', $request->matiere_id)
+            ->where('statut', '!=', 'archive')
             ->orderBy('titre')
             ->get(['id', 'titre']);
 
         return response()->json($quizs);
+    }
+
+    /**
+     * API: Liste des questions
+     */
+    public function apiIndex(Request $request)
+    {
+        $query = QuizQuestion::with(['quiz']);
+
+        if ($request->filled('quiz_id')) {
+            $query->where('quiz_id', $request->quiz_id);
+        }
+
+        if ($request->filled('type')) {
+            $query->where('type', $request->type);
+        }
+
+        $questions = $query->orderBy('created_at', 'desc')->paginate(20);
+
+        return response()->json([
+            'success' => true,
+            'data' => $questions
+        ]);
+    }
+
+    /**
+     * API: Détail d'une question
+     */
+    public function apiShow(QuizQuestion $question)
+    {
+        $question->load(['quiz']);
+        
+        return response()->json([
+            'success' => true,
+            'data' => $question
+        ]);
+    }
+
+    /**
+     * API: Questions par quiz
+     */
+    public function apiByQuiz(Quiz $quiz)
+    {
+        $questions = $quiz->questions()->orderBy('ordre')->get();
+        
+        return response()->json([
+            'success' => true,
+            'data' => $questions
+        ]);
+    }
+
+    /**
+     * API: Créer une question
+     */
+    public function apiStore(Request $request)
+    {
+        $request->validate([
+            'quiz_id' => 'required|exists:quizzes,id',
+            'titre' => 'required|string',
+            'type' => 'required|in:qcm,texte,vrai_faux',
+            'options' => 'nullable|array',
+            'options.*' => 'nullable|string',
+            'bonne_reponse' => 'required|string',
+            'points' => 'required|integer|min:1|max:10',
+            'explication' => 'nullable|string'
+        ]);
+
+        try {
+            DB::beginTransaction();
+
+            $quiz = Quiz::find($request->quiz_id);
+
+            if ($quiz->statut === 'publie') {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Impossible d\'ajouter des questions à un quiz publié.'
+                ], 422);
+            }
+
+            $ordre = $quiz->questions()->max('ordre') + 1;
+            if (!$ordre) $ordre = 1;
+
+            $options = null;
+            if ($request->type == 'qcm' && $request->has('options')) {
+                $options = array_values(array_filter($request->options, function($value) {
+                    return !is_null($value) && trim($value) !== '';
+                }));
+            }
+
+            $question = QuizQuestion::create([
+                'quiz_id' => $request->quiz_id,
+                'titre' => $request->titre,
+                'type' => $request->type,
+                'options' => $options,
+                'bonne_reponse' => $request->bonne_reponse,
+                'points' => $request->points,
+                'explication' => $request->explication,
+                'ordre' => $ordre
+            ]);
+
+            $quiz->nombre_questions = $quiz->questions()->count();
+            $quiz->save();
+
+            DB::commit();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Question créée avec succès.',
+                'data' => $question
+            ], 201);
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json([
+                'success' => false,
+                'message' => 'Erreur lors de la création : ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * API: Mettre à jour une question
+     */
+    public function apiUpdate(Request $request, QuizQuestion $question)
+    {
+        $question->load('quiz');
+
+        if ($question->quiz->statut === 'publie') {
+            return response()->json([
+                'success' => false,
+                'message' => 'Impossible de modifier les questions d\'un quiz publié.'
+            ], 422);
+        }
+
+        $request->validate([
+            'quiz_id' => 'required|exists:quizzes,id',
+            'titre' => 'required|string',
+            'type' => 'required|in:qcm,texte,vrai_faux',
+            'options' => 'nullable|array',
+            'options.*' => 'nullable|string',
+            'bonne_reponse' => 'required|string',
+            'points' => 'required|integer|min:1|max:10',
+            'explication' => 'nullable|string'
+        ]);
+
+        try {
+            DB::beginTransaction();
+
+            $data = [
+                'quiz_id' => $request->quiz_id,
+                'titre' => $request->titre,
+                'type' => $request->type,
+                'bonne_reponse' => $request->bonne_reponse,
+                'points' => $request->points,
+                'explication' => $request->explication,
+            ];
+
+            if ($request->type == 'qcm' && $request->has('options')) {
+                $data['options'] = array_values(array_filter($request->options, function($value) {
+                    return !is_null($value) && trim($value) !== '';
+                }));
+            } else {
+                $data['options'] = null;
+            }
+
+            $ancienQuizId = $question->quiz_id;
+            $question->update($data);
+
+            if ($ancienQuizId != $request->quiz_id) {
+                $ancienQuiz = Quiz::find($ancienQuizId);
+                $ancienQuiz->nombre_questions = $ancienQuiz->questions()->count();
+                $ancienQuiz->save();
+
+                $nouveauQuiz = Quiz::find($request->quiz_id);
+                $nouveauQuiz->nombre_questions = $nouveauQuiz->questions()->count();
+                $nouveauQuiz->save();
+            } else {
+                $quiz = Quiz::find($request->quiz_id);
+                $quiz->nombre_questions = $quiz->questions()->count();
+                $quiz->save();
+            }
+
+            DB::commit();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Question mise à jour avec succès.',
+                'data' => $question
+            ]);
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json([
+                'success' => false,
+                'message' => 'Erreur lors de la mise à jour : ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * API: Supprimer une question
+     */
+    public function apiDestroy(QuizQuestion $question)
+    {
+        $question->load('quiz');
+
+        if ($question->quiz->statut === 'publie') {
+            return response()->json([
+                'success' => false,
+                'message' => 'Impossible de supprimer les questions d\'un quiz publié.'
+            ], 422);
+        }
+
+        try {
+            DB::beginTransaction();
+
+            $quiz = $question->quiz;
+
+            if ($question->image) {
+                Storage::disk('public')->delete($question->image);
+            }
+
+            $question->delete();
+
+            $questions = $quiz->questions()->orderBy('ordre')->get();
+            foreach ($questions as $index => $q) {
+                $q->update(['ordre' => $index + 1]);
+            }
+
+            $quiz->nombre_questions = $quiz->questions()->count();
+            $quiz->save();
+
+            DB::commit();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Question supprimée avec succès.'
+            ]);
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json([
+                'success' => false,
+                'message' => 'Erreur lors de la suppression : ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * API: Dupliquer une question
+     */
+    public function apiDuplicate(QuizQuestion $question)
+    {
+        $question->load('quiz');
+
+        if ($question->quiz->statut === 'publie') {
+            return response()->json([
+                'success' => false,
+                'message' => 'Impossible de dupliquer les questions d\'un quiz publié.'
+            ], 422);
+        }
+
+        try {
+            DB::beginTransaction();
+
+            $nouvelleQuestion = $question->replicate();
+            $nouvelleQuestion->titre = $question->titre . ' (copie)';
+            $nouvelleQuestion->ordre = $question->quiz->questions()->max('ordre') + 1;
+            
+            if ($question->image) {
+                $extension = pathinfo($question->image, PATHINFO_EXTENSION);
+                $nouveauNom = 'copie_' . time() . '_' . Str::slug($question->titre) . '.' . $extension;
+                
+                Storage::disk('public')->copy($question->image, 'quiz-questions/' . $nouveauNom);
+                $nouvelleQuestion->image = 'quiz-questions/' . $nouveauNom;
+            }
+            
+            $nouvelleQuestion->save();
+
+            $question->quiz->nombre_questions = $question->quiz->questions()->count();
+            $question->quiz->save();
+
+            DB::commit();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Question dupliquée avec succès.',
+                'data' => $nouvelleQuestion
+            ]);
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json([
+                'success' => false,
+                'message' => 'Erreur lors de la duplication : ' . $e->getMessage()
+            ], 500);
+        }
     }
 }

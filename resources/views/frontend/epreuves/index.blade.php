@@ -80,12 +80,7 @@
             <a href="#lycee" class="px-5 py-2.5 bg-primary-50 text-primary-700 rounded-xl font-medium hover:bg-primary-100 transition-colors">
                 <i class="fas fa-graduation-cap mr-2"></i>Lycée
             </a>
-            <a href="#bac" class="px-5 py-2.5 bg-primary-50 text-primary-700 rounded-xl font-medium hover:bg-primary-100 transition-colors">
-                <i class="fas fa-star mr-2"></i>Bac
-            </a>
-            <a href="#brevet" class="px-5 py-2.5 bg-primary-50 text-primary-700 rounded-xl font-medium hover:bg-primary-100 transition-colors">
-                <i class="fas fa-fire mr-2"></i>Brevet
-            </a>
+           
         </div>
 
         <!-- Collège -->

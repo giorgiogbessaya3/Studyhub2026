@@ -12,7 +12,7 @@ use App\Http\Controllers\Frontend\UserController;
 use App\Http\Controllers\Frontend\ContactController;
 use App\Http\Controllers\Frontend\EpreuveControllers;
 use App\Http\Controllers\Frontend\AssistanceController;
-use App\Http\Controllers\Frontend\QuizController as FrontendQuizController; // ALIAS: FrontendQuizController
+use App\Http\Controllers\Frontend\QuizController as FrontendQuizController;
 
 // ==========================================
 // CONTROLLERS AUTH
@@ -30,11 +30,12 @@ use App\Http\Controllers\Admin\EpreuveController as AdminEpreuveController;
 use App\Http\Controllers\Admin\TypeEpreuveController;
 use App\Http\Controllers\Admin\ContenuController;
 use App\Http\Controllers\Admin\ChapitreController;
-use App\Http\Controllers\Admin\QuizController; // Garde celui-ci sans alias
+use App\Http\Controllers\Admin\QuizController;
 use App\Http\Controllers\Admin\QuestionController;
 use App\Http\Controllers\Admin\AssistanceController as AdminAssistanceController;
 use App\Http\Controllers\Admin\SettingController;
 use App\Http\Controllers\Admin\NewsletterController;
+use App\Http\Controllers\Admin\ContactController as AdminContactController; // IMPORTANT: Alias pour le contrôleur admin
 
 // ==========================================
 // ROUTES PUBLIQUES - PAGE D'ACCUEIL STUDYHUB
@@ -109,14 +110,14 @@ Route::get('/matiere/{matiere}', function($matiere) {
 })->name('matiere.detail.old');
 
 // ==========================================
-// ROUTES PUBLIQUES - QUIZ (AVEC FRONTENDQUIZCONTROLLER)
+// ROUTES PUBLIQUES - QUIZ
 // ==========================================
 Route::prefix('quiz')->name('quiz.')->controller(FrontendQuizController::class)->group(function() {
-    Route::get('/', 'index')->name('index');                          // /quiz - Liste des quiz
-    Route::get('/{quiz}', 'show')->name('show');                      // /quiz/1 - Détail d'un quiz
-    Route::get('/{quiz}/start', 'start')->name('start');              // /quiz/1/start - Commencer un quiz
-    Route::post('/{quiz}/submit', 'submit')->name('submit');          // POST /quiz/1/submit - Soumettre les réponses
-    Route::get('/{quiz}/result/{resultat}', 'result')->name('result'); // /quiz/1/result/1 - Voir le résultat
+    Route::get('/', 'index')->name('index');
+    Route::get('/{quiz}', 'show')->name('show');
+    Route::get('/{quiz}/start', 'start')->name('start');
+    Route::post('/{quiz}/submit', 'submit')->name('submit');
+    Route::get('/{quiz}/result/{resultat}', 'result')->name('result');
 });
 
 // ==========================================
@@ -130,7 +131,7 @@ Route::post('newsletter/subscribe', [ContactController::class, 'newsletter'])->n
 // ROUTES PUBLIQUES - RECHERCHE
 // ==========================================
 Route::get('search', [FrontendController::class, 'search'])->name('search');
-Route::get('recherche', [FrontendController::class, 'search'])->name('recherche'); // AJOUT: Alias pour recherche en français
+Route::get('recherche', [FrontendController::class, 'search'])->name('recherche');
 
 // ==========================================
 // AUTHENTIFICATION
@@ -141,29 +142,18 @@ Auth::routes();
 // ROUTES UTILISATEUR AUTHENTIFIÉ
 // ==========================================
 Route::middleware(['auth'])->group(function() {
-    // Dashboard
     Route::get('dashboard', [UserController::class, 'dashboard'])->name('user.dashboard');
-    
-    // Profil
     Route::get('profile', [UserController::class, 'profile'])->name('profile');
     Route::post('profile', [UserController::class, 'updateProfile'])->name('profile.update');
     Route::post('profile/avatar', [UserController::class, 'updateAvatar'])->name('profile.avatar');
-    
-    // Mot de passe
     Route::get('change-password', [UserController::class, 'changePassword'])->name('password.change');
     Route::post('profile/password', [UserController::class, 'updatePassword'])->name('password.update');
-    
-    // Suppression de compte
     Route::delete('profile/delete', [UserController::class, 'deleteAccount'])->name('profile.delete');
-    
-    // Mes contenus
     Route::get('mes-cours', [UserController::class, 'mesCours'])->name('mes.cours');
     Route::get('mes-epreuves', [UserController::class, 'mesEpreuves'])->name('mes.epreuves');
     Route::get('mes-resultats', [UserController::class, 'mesResultats'])->name('mes.resultats');
     Route::get('mes-resultats/{id}', [UserController::class, 'detailResultat'])->name('mes.resultats.detail');
     Route::get('mes-questions', [UserController::class, 'mesQuestions'])->name('mes.questions');
-    
-    // Déconnexion
     Route::post('logout', [UserController::class, 'logout'])->name('logout');
 });
 
@@ -263,7 +253,6 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'isAdmin'])->group(f
         'epreuves' => 'epreuve'
     ]);
     
-    // Actions sur les épreuves
     Route::prefix('epreuves/{epreuve}')->name('epreuves.')->group(function() {
         Route::post('toggle-status', [AdminEpreuveController::class, 'toggleStatus'])->name('toggle');
         Route::post('duplicate', [AdminEpreuveController::class, 'duplicate'])->name('duplicate');
@@ -287,11 +276,8 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'isAdmin'])->group(f
     // ==========================================
     // GESTION DES QUIZ (ADMIN)
     // ==========================================
-    
-    // Routes principales des quiz
     Route::resource('quiz', QuizController::class)->parameters(['quiz' => 'quiz']);
     
-    // Routes supplémentaires pour les quiz
     Route::prefix('quiz/{quiz}')->name('quiz.')->group(function() {
         Route::post('toggle-status', [QuizController::class, 'toggleStatus'])->name('toggle');
         Route::post('duplicate', [QuizController::class, 'duplicate'])->name('duplicate');
@@ -301,7 +287,7 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'isAdmin'])->group(f
     });
     
     // ==========================================
-    // GESTION DES QUESTIONS (admin/questions) - UN SEUL GROUPE
+    // GESTION DES QUESTIONS
     // ==========================================
     Route::prefix('questions')->name('questions.')->controller(QuestionController::class)->group(function() {
         Route::get('/', 'index')->name('index');
@@ -333,7 +319,6 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'isAdmin'])->group(f
     Route::get('/api/chapitres', [QuestionController::class, 'getChapitres'])->name('api.chapitres');
     Route::get('/api/quizs', [QuestionController::class, 'getQuizs'])->name('api.quizs');
     
-    // Routes existantes pour les résultats (via QuizController)
     Route::get('resultats', [QuizController::class, 'resultats'])->name('resultats');
     Route::get('resultats/{resultat}', [QuizController::class, 'showResultat'])->name('resultats.show');
     Route::delete('resultats/{resultat}', [QuizController::class, 'destroyResultat'])->name('resultats.destroy');
@@ -359,14 +344,17 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'isAdmin'])->group(f
         Route::get('export', 'export')->name('export');
     });
     
-    // Gestion des contacts
-    Route::prefix('contacts')->name('contacts.')->controller(ContactController::class)->group(function() {
+    // ==========================================
+    // GESTION DES CONTACTS (ADMIN) - CORRIGÉE
+    // ==========================================
+    Route::prefix('contacts')->name('contacts.')->controller(AdminContactController::class)->group(function() {
         Route::get('/', 'indexAdmin')->name('index');
-        Route::get('{contact}', 'showAdmin')->name('show');
-        Route::delete('{contact}', 'destroyAdmin')->name('destroy');
-        Route::post('{contact}/reply', 'replyAdmin')->name('reply');
-        Route::post('bulk-actions', 'bulkActions')->name('bulk-actions');
-        Route::get('export', 'export')->name('export');
+        Route::get('/{contact}', 'showAdmin')->name('show');
+        Route::delete('/{contact}', 'destroyAdmin')->name('destroy');
+        Route::get('/{contact}/reply', 'replyAdmin')->name('reply');
+        Route::post('/{contact}/status', 'updateStatus')->name('update-status');
+        Route::post('/bulk-actions', 'bulkActions')->name('bulk-actions');
+        Route::get('/export', 'export')->name('export');
     });
     
     // Gestion de la newsletter

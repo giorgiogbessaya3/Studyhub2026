@@ -1,13 +1,11 @@
 @extends('layouts.admin')
 
-@section('title', 'Tableau de bord - StudyHub')
-
+@section('title', 'Tableau de bord - StudyHub Admin')
 @section('page-title', 'Tableau de bord')
 @section('breadcrumb', 'Vue d\'ensemble')
 
 @section('content')
-
-<!-- Stats Cards - Simplifié -->
+<!-- Stats Cards - Dynamiques -->
 <div class="row g-3 mb-4">
     <div class="col-xl-3 col-md-6">
         <div class="card border-0 shadow-sm h-100">
@@ -18,7 +16,7 @@
                     </div>
                 </div>
                 <div>
-                    <h3 class="mb-1 fw-bold">1,247</h3>
+                    <h3 class="mb-1 fw-bold">{{ number_format($stats['epreuves']) }}</h3>
                     <p class="text-muted mb-0 small">Épreuves</p>
                 </div>
             </div>
@@ -34,7 +32,7 @@
                     </div>
                 </div>
                 <div>
-                    <h3 class="mb-1 fw-bold">486</h3>
+                    <h3 class="mb-1 fw-bold">{{ number_format($stats['cours']) }}</h3>
                     <p class="text-muted mb-0 small">Cours</p>
                 </div>
             </div>
@@ -50,7 +48,7 @@
                     </div>
                 </div>
                 <div>
-                    <h3 class="mb-1 fw-bold">3,842</h3>
+                    <h3 class="mb-1 fw-bold">{{ number_format($stats['utilisateurs']) }}</h3>
                     <p class="text-muted mb-0 small">Utilisateurs</p>
                 </div>
             </div>
@@ -66,8 +64,43 @@
                     </div>
                 </div>
                 <div>
-                    <h3 class="mb-1 fw-bold">89</h3>
-                    <p class="text-muted mb-0 small">Questions</p>
+                    <h3 class="mb-1 fw-bold">{{ number_format($stats['questions']) }}</h3>
+                    <p class="text-muted mb-0 small">Questions en attente</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Stats supplémentaires (optionnel) -->
+<div class="row g-3 mb-4">
+    <div class="col-xl-3 col-md-6">
+        <div class="card border-0 shadow-sm bg-primary bg-opacity-10">
+            <div class="card-body d-flex align-items-center p-4">
+                <div class="flex-shrink-0 me-3">
+                    <div class="bg-primary text-white rounded-3 p-3">
+                        <i class="ti ti-question-mark fs-4"></i>
+                    </div>
+                </div>
+                <div>
+                    <h3 class="mb-1 fw-bold text-primary">{{ number_format($stats['quiz']) }}</h3>
+                    <p class="text-muted mb-0 small">Quiz</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-xl-3 col-md-6">
+        <div class="card border-0 shadow-sm bg-info bg-opacity-10">
+            <div class="card-body d-flex align-items-center p-4">
+                <div class="flex-shrink-0 me-3">
+                    <div class="bg-info text-white rounded-3 p-3">
+                        <i class="ti ti-mail fs-4"></i>
+                    </div>
+                </div>
+                <div>
+                    <h3 class="mb-1 fw-bold text-info">{{ number_format($stats['contacts_non_lus']) }}</h3>
+                    <p class="text-muted mb-0 small">Messages non lus</p>
                 </div>
             </div>
         </div>
@@ -81,7 +114,7 @@
             <a href="{{ url('/admin/epreuves/create') }}" class="btn btn-primary btn-sm">
                 <i class="ti ti-plus me-1"></i> Épreuve
             </a>
-            <a href="{{ url('/admin/cours/create') }}" class="btn btn-success btn-sm">
+            <a href="{{ url('/admin/chapitres/create') }}" class="btn btn-success btn-sm">
                 <i class="ti ti-plus me-1"></i> Cours
             </a>
             <a href="{{ url('/admin/quiz/create') }}" class="btn btn-warning btn-sm text-white">
@@ -101,7 +134,7 @@
 <div class="row g-4">
     
     <!-- Dernières épreuves -->
-    <div class="col-lg-8">
+    <div class="col-lg-6">
         <div class="card border-0 shadow-sm h-100">
             <div class="card-header bg-white border-bottom-0 pt-4 pb-0 px-4">
                 <div class="d-flex justify-content-between align-items-center">
@@ -112,193 +145,253 @@
                 </div>
             </div>
             <div class="card-body p-4">
-                <div class="table-responsive">
-                    <table class="table table-hover align-middle mb-0">
-                        <thead class="table-light">
-                            <tr>
-                                <th>Épreuve</th>
-                                <th>Classe</th>
-                                <th>Type</th>
-                                <th>Date</th>
-                                <th class="text-end">Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td>
-                                    <div class="d-flex align-items-center">
-                                        <span class="bg-primary bg-opacity-10 text-primary rounded p-2 me-3">
-                                            <i class="ti ti-calculator"></i>
-                                        </span>
-                                        <div>
-                                            <div class="fw-semibold">Mathématiques - Fonctions</div>
-                                            <small class="text-muted">Terminale S</small>
+                @if($dernieresEpreuves->isEmpty())
+                    <p class="text-muted text-center py-4">Aucune épreuve récente</p>
+                @else
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Épreuve</th>
+                                    <th>Classe</th>
+                                    <th>Type</th>
+                                    <th>Date</th>
+                                    <th class="text-end">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach($dernieresEpreuves as $epreuve)
+                                <tr>
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            <span class="bg-primary bg-opacity-10 text-primary rounded p-2 me-3">
+                                                <i class="ti ti-file-text"></i>
+                                            </span>
+                                            <div>
+                                                <div class="fw-semibold">{{ Str::limit($epreuve->titre, 30) }}</div>
+                                                <small class="text-muted">{{ $epreuve->matiere->nom ?? 'N/A' }}</small>
+                                            </div>
                                         </div>
-                                    </div>
-                                </td>
-                                <td><span class="badge bg-light text-dark">Terminale</span></td>
-                                <td><span class="badge bg-warning">Examen blanc</span></td>
-                                <td class="text-muted small">Aujourd'hui</td>
-                                <td class="text-end">
-                                    <button class="btn btn-sm btn-light me-1"><i class="ti ti-edit"></i></button>
-                                    <button class="btn btn-sm btn-light text-danger"><i class="ti ti-trash"></i></button>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>
-                                    <div class="d-flex align-items-center">
-                                        <span class="bg-success bg-opacity-10 text-success rounded p-2 me-3">
-                                            <i class="ti ti-atom"></i>
-                                        </span>
-                                        <div>
-                                            <div class="fw-semibold">Physique - Mécanique</div>
-                                            <small class="text-muted">Première</small>
-                                        </div>
-                                    </div>
-                                </td>
-                                <td><span class="badge bg-light text-dark">Première</span></td>
-                                <td><span class="badge bg-success">Devoir</span></td>
-                                <td class="text-muted small">Hier</td>
-                                <td class="text-end">
-                                    <button class="btn btn-sm btn-light me-1"><i class="ti ti-edit"></i></button>
-                                    <button class="btn btn-sm btn-light text-danger"><i class="ti ti-trash"></i></button>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>
-                                    <div class="d-flex align-items-center">
-                                        <span class="bg-info bg-opacity-10 text-info rounded p-2 me-3">
-                                            <i class="ti ti-leaf"></i>
-                                        </span>
-                                        <div>
-                                            <div class="fw-semibold">SVT - Photosynthèse</div>
-                                            <small class="text-muted">Seconde</small>
-                                        </div>
-                                    </div>
-                                </td>
-                                <td><span class="badge bg-light text-dark">Seconde</span></td>
-                                <td><span class="badge bg-info">Interrogation</span></td>
-                                <td class="text-muted small">Il y a 2 jours</td>
-                                <td class="text-end">
-                                    <button class="btn btn-sm btn-light me-1"><i class="ti ti-edit"></i></button>
-                                    <button class="btn btn-sm btn-light text-danger"><i class="ti ti-trash"></i></button>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
+                                    </td>
+                                    <td><span class="badge bg-light text-dark">{{ $epreuve->classe->nom ?? 'N/A' }}</span></td>
+                                    <td><span class="badge bg-warning">{{ $epreuve->typeEpreuve->nom ?? 'Épreuve' }}</span></td>
+                                    <td class="text-muted small">{{ $epreuve->created_at->diffForHumans() }}</td>
+                                    <td class="text-end">
+                                        <a href="{{ url('/admin/epreuves/' . $epreuve->id . '/edit') }}" class="btn btn-sm btn-light me-1"><i class="ti ti-edit"></i></a>
+                                        <button class="btn btn-sm btn-light text-danger" onclick="deleteEpreuve({{ $epreuve->id }})"><i class="ti ti-trash"></i></button>
+                                    </td>
+                                </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
+                @endif
             </div>
         </div>
     </div>
     
-    <!-- Sidebar droite -->
-    <div class="col-lg-4">
-        
-        <!-- Questions en attente -->
-        <div class="card border-0 shadow-sm mb-4">
+    <!-- Derniers cours -->
+    <div class="col-lg-6">
+        <div class="card border-0 shadow-sm h-100">
             <div class="card-header bg-white border-bottom-0 pt-4 pb-0 px-4">
-                <h5 class="card-title mb-0 fw-bold">Questions en attente</h5>
+                <div class="d-flex justify-content-between align-items-center">
+                    <h5 class="card-title mb-0 fw-bold">Derniers cours</h5>
+                    <a href="{{ url('/admin/chapitres') }}" class="btn btn-sm btn-outline-primary">
+                        Voir tout
+                    </a>
+                </div>
             </div>
             <div class="card-body p-4">
-                <div class="d-flex align-items-start mb-3 pb-3 border-bottom">
-                    <img src="{{ asset('admin/images/profile/user-2.jpg') }}" class="rounded-circle me-3" width="40" height="40" alt="">
-                    <div class="flex-grow-1">
-                        <div class="d-flex justify-content-between align-items-start">
-                            <div>
-                                <div class="fw-semibold small">Marie Dupont</div>
-                                <div class="text-muted small">Terminale • Maths</div>
-                            </div>
-                            <span class="badge bg-danger small">Urgent</span>
-                        </div>
-                        <p class="small text-muted mb-0 mt-1">Problème d'intégration...</p>
+                @if($derniersCours->isEmpty())
+                    <p class="text-muted text-center py-4">Aucun cours récent</p>
+                @else
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Cours</th>
+                                    <th>Classe</th>
+                                    <th>Matière</th>
+                                    <th>Date</th>
+                                    <th class="text-end">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach($derniersCours as $cours)
+                                <tr>
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            <span class="bg-success bg-opacity-10 text-success rounded p-2 me-3">
+                                                <i class="ti ti-book"></i>
+                                            </span>
+                                            <div>
+                                                <div class="fw-semibold">{{ Str::limit($cours->titre, 30) }}</div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td><span class="badge bg-light text-dark">{{ $cours->classe->nom ?? 'N/A' }}</span></td>
+                                    <td>{{ $cours->matiere->nom ?? 'N/A' }}</td>
+                                    <td class="text-muted small">{{ $cours->created_at->diffForHumans() }}</td>
+                                    <td class="text-end">
+                                        <a href="{{ url('/admin/chapitres/' . $cours->id . '/edit') }}" class="btn btn-sm btn-light me-1"><i class="ti ti-edit"></i></a>
+                                        <button class="btn btn-sm btn-light text-danger"><i class="ti ti-trash"></i></button>
+                                    </td>
+                                </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
                     </div>
-                </div>
-                
-                <div class="d-flex align-items-start mb-3 pb-3 border-bottom">
-                    <img src="{{ asset('admin/images/profile/user-3.jpg') }}" class="rounded-circle me-3" width="40" height="40" alt="">
-                    <div class="flex-grow-1">
-                        <div class="d-flex justify-content-between align-items-start">
-                            <div>
-                                <div class="fw-semibold small">Lucas Martin</div>
-                                <div class="text-muted small">Première • Physique</div>
-                            </div>
-                            <span class="badge bg-warning small">En attente</span>
-                        </div>
-                        <p class="small text-muted mb-0 mt-1">Équations différentielles...</p>
-                    </div>
-                </div>
-                
-                <div class="d-flex align-items-start">
-                    <img src="{{ asset('admin/images/profile/user-4.jpg') }}" class="rounded-circle me-3" width="40" height="40" alt="">
-                    <div class="flex-grow-1">
-                        <div class="d-flex justify-content-between align-items-start">
-                            <div>
-                                <div class="fw-semibold small">Emma Bernard</div>
-                                <div class="text-muted small">Seconde • SVT</div>
-                            </div>
-                            <span class="badge bg-info small">Nouveau</span>
-                        </div>
-                        <p class="small text-muted mb-0 mt-1">La cellule et son...</p>
-                    </div>
-                </div>
-                
-                <a href="{{ url('/admin/assistance/questions') }}" class="btn btn-outline-primary w-100 mt-3 btn-sm">
-                    Voir toutes les questions
-                </a>
+                @endif
             </div>
         </div>
-        
-        <!-- Répartition rapide -->
+    </div>
+    
+    <!-- Questions en attente -->
+    <div class="col-lg-6">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-header bg-white border-bottom-0 pt-4 pb-0 px-4">
+                <div class="d-flex justify-content-between align-items-center">
+                    <h5 class="card-title mb-0 fw-bold">Questions en attente</h5>
+                    <span class="badge bg-danger">{{ $stats['questions'] }} en attente</span>
+                </div>
+            </div>
+            <div class="card-body p-4">
+                @if($questionsEnAttente->isEmpty())
+                    <p class="text-muted text-center py-4">Aucune question en attente</p>
+                @else
+                    @foreach($questionsEnAttente as $question)
+                    <div class="d-flex align-items-start mb-3 pb-3 border-bottom">
+                        <img src="{{ $question->user->avatar_url ?? asset('admin/images/profile/default.jpg') }}" 
+                             class="rounded-circle me-3" width="40" height="40" alt="">
+                        <div class="flex-grow-1">
+                            <div class="d-flex justify-content-between align-items-start">
+                                <div>
+                                    <div class="fw-semibold small">{{ $question->user->name ?? 'Anonyme' }}</div>
+                                    <div class="text-muted small">{{ $question->classe->nom ?? 'N/A' }} • {{ $question->matiere->nom ?? 'N/A' }}</div>
+                                </div>
+                                <span class="badge bg-warning small">En attente</span>
+                            </div>
+                            <p class="small text-muted mb-0 mt-1">{{ Str::limit($question->titre, 50) }}</p>
+                            <div class="mt-2">
+                                <a href="{{ url('/admin/assistance/questions/' . $question->id) }}" class="btn btn-sm btn-outline-primary btn-sm">Répondre</a>
+                            </div>
+                        </div>
+                    </div>
+                    @endforeach
+                    
+                    <a href="{{ url('/admin/assistance/questions') }}" class="btn btn-outline-primary w-100 mt-3 btn-sm">
+                        Voir toutes les questions
+                    </a>
+                @endif
+            </div>
+        </div>
+    </div>
+    
+    <!-- Derniers quiz -->
+    <div class="col-lg-6">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-header bg-white border-bottom-0 pt-4 pb-0 px-4">
+                <div class="d-flex justify-content-between align-items-center">
+                    <h5 class="card-title mb-0 fw-bold">Derniers quiz</h5>
+                    <a href="{{ url('/admin/quiz') }}" class="btn btn-sm btn-outline-primary">
+                        Voir tout
+                    </a>
+                </div>
+            </div>
+            <div class="card-body p-4">
+                @if($derniersQuiz->isEmpty())
+                    <p class="text-muted text-center py-4">Aucun quiz récent</p>
+                @else
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Quiz</th>
+                                    <th>Classe</th>
+                                    <th>Questions</th>
+                                    <th>Statut</th>
+                                    <th class="text-end">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach($derniersQuiz as $quiz)
+                                <tr>
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            <span class="bg-warning bg-opacity-10 text-warning rounded p-2 me-3">
+                                                <i class="ti ti-question-mark"></i>
+                                            </span>
+                                            <div>
+                                                <div class="fw-semibold">{{ Str::limit($quiz->titre, 30) }}</div>
+                                                <small class="text-muted">{{ $quiz->matiere->nom ?? 'N/A' }}</small>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td><span class="badge bg-light text-dark">{{ $quiz->classe->nom ?? 'N/A' }}</span></td>
+                                    <td>{{ $quiz->questions_count ?? 0 }}</td>
+                                    <td>
+                                        @if($quiz->statut == 'publie')
+                                            <span class="badge bg-success">Publié</span>
+                                        @elseif($quiz->statut == 'brouillon')
+                                            <span class="badge bg-secondary">Brouillon</span>
+                                        @else
+                                            <span class="badge bg-warning">Archivé</span>
+                                        @endif
+                                    </td>
+                                    <td class="text-end">
+                                        <a href="{{ url('/admin/quiz/' . $quiz->id . '/edit') }}" class="btn btn-sm btn-light me-1"><i class="ti ti-edit"></i></a>
+                                        <button class="btn btn-sm btn-light text-danger"><i class="ti ti-trash"></i></button>
+                                    </td>
+                                </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
+                @endif
+            </div>
+        </div>
+    </div>
+    
+    <!-- Répartition par classe -->
+    <div class="col-lg-12">
         <div class="card border-0 shadow-sm">
             <div class="card-header bg-white border-bottom-0 pt-4 pb-0 px-4">
-                <h5 class="card-title mb-0 fw-bold">Répartition par classe</h5>
+                <h5 class="card-title mb-0 fw-bold">Répartition des épreuves par classe</h5>
             </div>
             <div class="card-body p-4">
-                <div class="mb-3">
-                    <div class="d-flex justify-content-between small mb-1">
-                        <span>Terminale</span>
-                        <span class="fw-semibold">35%</span>
+                <div class="row">
+                    @foreach($classes as $classe)
+                    <div class="col-md-3 mb-3">
+                        <div class="d-flex justify-content-between small mb-1">
+                            <span>{{ $classe['nom'] }}</span>
+                            <span class="fw-semibold">{{ round(($classe['total'] / $totalEpreuves) * 100) }}%</span>
+                        </div>
+                        <div class="progress" style="height: 8px;">
+                            <div class="progress-bar bg-primary" style="width: {{ ($classe['total'] / $totalEpreuves) * 100 }}%"></div>
+                        </div>
+                        <small class="text-muted">{{ $classe['total'] }} épreuve(s)</small>
                     </div>
-                    <div class="progress" style="height: 6px;">
-                        <div class="progress-bar bg-primary" style="width: 35%"></div>
-                    </div>
-                </div>
-                <div class="mb-3">
-                    <div class="d-flex justify-content-between small mb-1">
-                        <span>Première</span>
-                        <span class="fw-semibold">28%</span>
-                    </div>
-                    <div class="progress" style="height: 6px;">
-                        <div class="progress-bar bg-success" style="width: 28%"></div>
-                    </div>
-                </div>
-                <div class="mb-3">
-                    <div class="d-flex justify-content-between small mb-1">
-                        <span>Seconde</span>
-                        <span class="fw-semibold">20%</span>
-                    </div>
-                    <div class="progress" style="height: 6px;">
-                        <div class="progress-bar bg-warning" style="width: 20%"></div>
-                    </div>
-                </div>
-                <div>
-                    <div class="d-flex justify-content-between small mb-1">
-                        <span>Collège</span>
-                        <span class="fw-semibold">17%</span>
-                    </div>
-                    <div class="progress" style="height: 6px;">
-                        <div class="progress-bar bg-info" style="width: 17%"></div>
-                    </div>
+                    @endforeach
                 </div>
             </div>
         </div>
-        
     </div>
 </div>
 
 <!-- Footer simple -->
 <div class="text-center text-muted small py-4 mt-4 border-top">
-    <p class="mb-0">StudyHub © 2026 - Plateforme éducative</p>
+    <p class="mb-0">StudyHub © {{ date('Y') }} - Plateforme éducative</p>
 </div>
 
 @endsection
+
+@push('scripts')
+<script>
+    function deleteEpreuve(id) {
+        if (confirm('Êtes-vous sûr de vouloir supprimer cette épreuve ?')) {
+            // Implémenter la suppression
+            console.log('Supprimer épreuve ' + id);
+        }
+    }
+</script>
+@endpush

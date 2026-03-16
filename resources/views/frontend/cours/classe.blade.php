@@ -145,19 +145,9 @@
     <div class="absolute top-20 left-20 w-72 h-72 bg-primary-500/20 rounded-full blur-3xl animate-pulse"></div>
     <div class="absolute bottom-20 right-20 w-96 h-96 bg-secondary-500/20 rounded-full blur-3xl animate-pulse animation-delay-2000"></div>
     
-    <div class="container mx-auto px-4 relative z-10 py-5">
+    <div class="container mx-auto px-4 relative z-10 py-2">
         <!-- Fil d'Ariane -->
-        <nav class="mb-6 text-sm text-white/80">
-            <ol class="flex items-center flex-wrap gap-1">
-                <li><a href="/" class="hover:text-white transition-colors flex items-center gap-1">
-                    <i class="fas fa-home text-xs"></i> Accueil
-                </a></li>
-                <li><span class="mx-1">/</span></li>
-                <li><a href="/cours" class="hover:text-white transition-colors">Cours</a></li>
-                <li><span class="mx-1">/</span></li>
-                <li class="text-white font-medium">{{ $classe->nom }}</li>
-            </ol>
-        </nav>
+        
         
         <!-- En-tête -->
         <div class="flex flex-col md:flex-row items-center gap-8">

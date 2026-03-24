@@ -136,23 +136,7 @@
     <div class="hidden sm:block absolute bottom-20 right-20 w-96 h-96 bg-secondary-500/20 rounded-full blur-3xl animate-pulse animation-delay-2000"></div>
     
     <div class="container mx-auto px-4 sm:px-6 relative z-10 py-4 sm:py-5">
-        <!-- Fil d'Ariane compact -->
-        <nav class="mb-3 sm:mb-4 text-xs sm:text-sm text-white/80 overflow-x-auto whitespace-nowrap pb-1 hide-scrollbar" data-aos="fade-down">
-            <ol class="flex items-center">
-                <li><a href="/" class="hover:text-white transition-colors flex items-center gap-1">
-                    <i class="fas fa-home text-[10px] sm:text-xs"></i>
-                    <span class="hidden sm:inline">Accueil</span>
-                </a></li>
-                <li><span class="mx-1">/</span></li>
-                <li><a href="/cours" class="hover:text-white transition-colors whitespace-nowrap">Cours</a></li>
-                <li><span class="mx-1">/</span></li>
-                <li><a href="/cours/classe/{{ $chapitre->classe->nom }}" class="hover:text-white transition-colors whitespace-nowrap">{{ $chapitre->classe->nom }}</a></li>
-                <li><span class="mx-1">/</span></li>
-                <li><a href="/cours/classe/{{ $chapitre->classe->nom }}/matiere/{{ $chapitre->matiere->nom }}" class="hover:text-white transition-colors whitespace-nowrap">{{ $chapitre->matiere->nom }}</a></li>
-                <li><span class="mx-1">/</span></li>
-                <li class="text-white font-medium truncate max-w-[100px] sm:max-w-xs">{{ $chapitre->titre }}</li>
-            </ol>
-        </nav>
+        
         
         <!-- En-tête compact -->
         <div class="flex flex-col gap-3 sm:gap-4" data-aos="fade-right">

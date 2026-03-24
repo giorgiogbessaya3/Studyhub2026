@@ -704,15 +704,15 @@
                     <ul class="space-y-4">
                         <li class="flex items-start gap-3">
                             <i class="fas fa-envelope text-primary-500 mt-1"></i>
-                            <span>contact@studyhub.fr</span>
+                            <span>contact@studyhubbenin.com</span>
                         </li>
                         <li class="flex items-start gap-3">
                             <i class="fas fa-phone text-primary-500 mt-1"></i>
-                            <span>+33 1 23 45 67 89</span>
+                            <span>(+229) 0194358858</span>
                         </li>
                         <li class="flex items-start gap-3">
                             <i class="fas fa-map-marker-alt text-primary-500 mt-1"></i>
-                            <span>Paris, France</span>
+                            <span>BENIN, Cotonou</span>
                         </li>
                     </ul>
                     

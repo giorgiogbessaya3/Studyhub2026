@@ -63,7 +63,7 @@
                         </div>
                         <div>
                             <h3 class="font-semibold text-gray-800 mb-1">Adresse</h3>
-                            <p class="text-gray-600">123 Avenue de l'Éducation<br>75001 Paris, France</p>
+                            <p class="text-gray-600">Cotonou Benin</p>
                         </div>
                     </div>
                     
@@ -73,8 +73,8 @@
                         </div>
                         <div>
                             <h3 class="font-semibold text-gray-800 mb-1">Téléphone</h3>
-                            <p class="text-gray-600">+33 1 23 45 67 89</p>
-                            <p class="text-sm text-gray-500">Lun-Ven, 9h-18h</p>
+                            <p class="text-gray-600">(+229) 0194358858</p>
+                            
                         </div>
                     </div>
                     
@@ -84,8 +84,8 @@
                         </div>
                         <div>
                             <h3 class="font-semibold text-gray-800 mb-1">Email</h3>
-                            <p class="text-gray-600">contact@studyhub.fr</p>
-                            <p class="text-sm text-gray-500">Réponse sous 24-48h</p>
+                            <p class="text-gray-600">contact@studyhubbenin.com</p>
+                           
                         </div>
                     </div>
                 </div>
@@ -156,7 +156,7 @@
                         <label class="block text-sm font-medium text-gray-700 mb-1">Email *</label>
                         <input type="email" name="email" value="{{ old('email') }}" 
                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 @error('email') border-red-500 @enderror"
-                               placeholder="jean.dupont@exemple.fr"
+                               placeholder="jean.dupont@exemple.com"
                                required>
                         @error('email')
                             <p class="mt-1 text-xs text-red-500">{{ $message }}</p>
@@ -168,7 +168,7 @@
                         <label class="block text-sm font-medium text-gray-700 mb-1">Téléphone <span class="text-gray-400 text-xs">(optionnel)</span></label>
                         <input type="tel" name="phone" value="{{ old('phone') }}" 
                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 @error('phone') border-red-500 @enderror"
-                               placeholder="+33 6 12 34 56 78">
+                               placeholder="+220 01xxxxxxxx">
                         @error('phone')
                             <p class="mt-1 text-xs text-red-500">{{ $message }}</p>
                         @enderror

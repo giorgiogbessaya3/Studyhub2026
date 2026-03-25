@@ -13,7 +13,7 @@
     <link rel="apple-touch-icon" href="{{ asset('img/logo.png') }}">
     
     <!-- Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="assets/js/cdn.tailwindcss.js"></script>
     
     <!-- Google Fonts - POLICES MODERNES -->
     <link rel="preconnect" href="https://fonts.googleapis.com">

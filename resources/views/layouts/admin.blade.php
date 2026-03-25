@@ -8,7 +8,9 @@
     
     <!-- Styles -->
     <link rel="stylesheet" href="{{ asset('admin/css/styles.min.css') }}">
-    <link rel="shortcut icon" href="{{ asset('admin/images/logos/favicon.png') }}" type="image/png">
+     <link rel="icon" type="image/png" href="{{ asset('img/logo.png') }}">
+    <link rel="shortcut icon" href="{{ asset('img/logo.png') }}">
+    <link rel="apple-touch-icon" href="{{ asset('img/logo.png') }}">
     
     <!-- Tabler Icons -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/dist/tabler-icons.min.css">

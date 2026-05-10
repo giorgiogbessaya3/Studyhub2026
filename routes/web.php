@@ -17,7 +17,7 @@ use App\Http\Controllers\Frontend\QuizController as FrontendQuizController;
 // ==========================================
 // CONTROLLERS AUTH
 // ==========================================
-use App\Http\Controllers\HomeController;
+
 
 // ==========================================
 // CONTROLLERS ADMIN - STUDYHUB

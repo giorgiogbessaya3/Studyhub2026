@@ -13,12 +13,10 @@
     <link rel="apple-touch-icon" href="{{ asset('img/logo.png') }}">
     
     <!-- Tailwind CSS -->
-    <script src="assets/js/cdn.tailwindcss.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
     
-    <!-- Google Fonts - POLICES MODERNES -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -32,8 +30,8 @@
             theme: {
                 extend: {
                     fontFamily: {
-                        sans: ['Outfit', 'sans-serif'],
-                        display: ['Plus Jakarta Sans', 'sans-serif'],
+                        sans: ['Inter', 'sans-serif'],
+                        display: ['Poppins', 'sans-serif'],
                     },
                     colors: {
                         primary: {
@@ -228,9 +226,6 @@
                         <a href="{{ url('/assistance') }}" class="px-4 py-2 rounded-lg text-slate-600 hover:text-primary-600 hover:bg-primary-50 transition-all {{ request()->is('assistance*') ? 'text-primary-600 bg-primary-50 font-medium' : '' }}">
                             Assistance
                         </a>
-                        <a href="{{ url('/contact') }}" class="px-4 py-2 rounded-lg text-slate-600 hover:text-primary-600 hover:bg-primary-50 transition-all {{ request()->is('contact') ? 'text-primary-600 bg-primary-50 font-medium' : '' }}">
-                            Contact
-                        </a>
                         
                         @auth
                             @if(Auth::user()->isAdmin())
@@ -312,17 +307,6 @@
                                                 <p class="text-xs text-slate-500">Gérer vos informations</p>
                                             </div>
                                         </a>
-                                        
-                                        <a href="{{ url('/mes-cours') }}" class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-primary-50 text-slate-700 transition-colors group">
-                                            <div class="w-9 h-9 bg-primary-100 rounded-full flex items-center justify-center group-hover:bg-primary-200 transition-colors">
-                                                <i class="fas fa-book text-primary-600"></i>
-                                            </div>
-                                            <div>
-                                                <p class="font-medium">Mes cours</p>
-                                                <p class="text-xs text-slate-500">Cours suivis</p>
-                                            </div>
-                                        </a>
-                                        
                                         <a href="{{ url('/mes-resultats') }}" class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-primary-50 text-slate-700 transition-colors group">
                                             <div class="w-9 h-9 bg-primary-100 rounded-full flex items-center justify-center group-hover:bg-primary-200 transition-colors">
                                                 <i class="fas fa-chart-bar text-primary-600"></i>
@@ -470,14 +454,6 @@
                     <span class="font-medium">Assistance</span>
                 </a>
                 
-                <!-- LIEN CONTACT -->
-                <a href="{{ url('/contact') }}" class="flex items-center gap-3 px-4 py-3 rounded-xl {{ request()->is('contact') ? 'bg-primary-50 text-primary-600' : 'text-slate-700 hover:bg-slate-50' }} transition-colors">
-                    <div class="w-8 h-8 {{ request()->is('contact') ? 'bg-primary-100' : 'bg-slate-100' }} rounded-full flex items-center justify-center">
-                        <i class="fas fa-envelope {{ request()->is('contact') ? 'text-primary-600' : 'text-slate-500' }}"></i>
-                    </div>
-                    <span class="font-medium">Contact</span>
-                </a>
-                
                 @auth
                     @if(Auth::user()->isAdmin())
                         <a href="{{ url('/admin/dashboard') }}" class="flex items-center gap-3 px-4 py-3 rounded-xl {{ request()->is('admin*') ? 'bg-purple-50 text-purple-600' : 'text-slate-700 hover:bg-slate-50' }} transition-colors">
@@ -506,12 +482,7 @@
                         <span class="font-medium">Mon profil</span>
                     </a>
                     
-                    <a href="{{ url('/mes-cours') }}" class="flex items-center gap-3 px-4 py-3 rounded-xl {{ request()->is('mes-cours') ? 'bg-primary-50 text-primary-600' : 'text-slate-700 hover:bg-slate-50' }} transition-colors">
-                        <div class="w-8 h-8 {{ request()->is('mes-cours') ? 'bg-primary-100' : 'bg-slate-100' }} rounded-full flex items-center justify-center">
-                            <i class="fas fa-book {{ request()->is('mes-cours') ? 'text-primary-600' : 'text-slate-500' }}"></i>
-                        </div>
-                        <span class="font-medium">Mes cours</span>
-                    </a>
+                    
                     
                     <a href="{{ url('/mes-resultats') }}" class="flex items-center gap-3 px-4 py-3 rounded-xl {{ request()->is('mes-resultats') ? 'bg-primary-50 text-primary-600' : 'text-slate-700 hover:bg-slate-50' }} transition-colors">
                         <div class="w-8 h-8 {{ request()->is('mes-resultats') ? 'bg-primary-100' : 'bg-slate-100' }} rounded-full flex items-center justify-center">
@@ -585,14 +556,6 @@
                     <i class="fas fa-question-circle text-lg"></i>
                 </div>
                 <span class="text-xs font-medium">Quiz</span>
-            </a>
-            
-            <!-- LIEN CONTACT DANS BOTTOM NAV -->
-            <a href="{{ url('/contact') }}" class="flex flex-col items-center justify-center w-full h-full gap-1 {{ request()->is('contact') ? 'text-primary-600' : 'text-slate-400' }}">
-                <div class="w-10 h-10 rounded-full flex items-center justify-center {{ request()->is('contact') ? 'bg-primary-100' : '' }}">
-                    <i class="fas fa-envelope text-lg"></i>
-                </div>
-                <span class="text-xs font-medium">Contact</span>
             </a>
             
             @auth
@@ -704,15 +667,15 @@
                     <ul class="space-y-4">
                         <li class="flex items-start gap-3">
                             <i class="fas fa-envelope text-primary-500 mt-1"></i>
-                            <span>contact@studyhubbenin.com</span>
+                            <span>contact@studyhub.fr</span>
                         </li>
                         <li class="flex items-start gap-3">
                             <i class="fas fa-phone text-primary-500 mt-1"></i>
-                            <span>(+229) 0194358858</span>
+                            <span>+33 1 23 45 67 89</span>
                         </li>
                         <li class="flex items-start gap-3">
                             <i class="fas fa-map-marker-alt text-primary-500 mt-1"></i>
-                            <span>BENIN, Cotonou</span>
+                            <span>Paris, France</span>
                         </li>
                     </ul>
                     
@@ -895,4 +858,4 @@
 
     @yield('scripts')
 </body> 
-</html>
+</html> 

@@ -16,16 +16,42 @@
                 </span>
             </div>
             <div class="card-body">
-                <!-- Type et classe/matière -->
+                <!-- Type -->
                 <div class="mb-4">
-                    <div class="d-flex gap-2 mb-2">
+                    <div class="d-flex gap-2 flex-wrap">
                         <span class="badge bg-info fs-6">{{ $epreuve->typeEpreuve->nom ?? 'Non défini' }}</span>
-                        <span class="badge bg-light text-dark fs-6">
-                            <i class="ti ti-users me-1"></i>{{ $epreuve->classe->nom ?? 'N/A' }}
-                        </span>
-                        <span class="badge bg-light text-dark fs-6">
-                            <i class="ti ti-book me-1"></i>{{ $epreuve->matiere->nom ?? 'N/A' }}
-                        </span>
+                    </div>
+                </div>
+
+                <!-- Classes associées -->
+                <div class="mb-4">
+                    <h6 class="fw-semibold mb-2">
+                        <i class="ti ti-users me-1"></i> Classes concernées
+                    </h6>
+                    <div class="d-flex gap-2 flex-wrap">
+                        @forelse($epreuve->classes as $classe)
+                            <span class="badge bg-primary fs-6">
+                                {{ $classe->nom }}
+                            </span>
+                        @empty
+                            <span class="text-muted">Aucune classe associée</span>
+                        @endforelse
+                    </div>
+                </div>
+
+                <!-- Matières associées -->
+                <div class="mb-4">
+                    <h6 class="fw-semibold mb-2">
+                        <i class="ti ti-book me-1"></i> Matières concernées
+                    </h6>
+                    <div class="d-flex gap-2 flex-wrap">
+                        @forelse($epreuve->matieres as $matiere)
+                            <span class="badge bg-success fs-6">
+                                {{ $matiere->nom }}
+                            </span>
+                        @empty
+                            <span class="text-muted">Aucune matière associée</span>
+                        @endforelse
                     </div>
                 </div>
 
@@ -66,12 +92,14 @@
                     <div class="col-md-3 col-6">
                         <div class="border rounded p-2 text-center">
                             <small class="text-muted d-block">Fichier</small>
-                            <strong>
-                                {{-- Utilisation d'une URL directe au lieu de route() --}}
-                                <a href="{{ url('admin/epreuves/' . $epreuve->id . '/download') }}" class="text-decoration-none">
-                                    <i class="ti ti-download"></i> Télécharger
+                            <div class="d-flex justify-content-center gap-1">
+                                <button type="button" class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#viewFileModal" onclick="loadPdfPreview()">
+                                    <i class="ti ti-eye"></i> Voir
+                                </button>
+                                <a href="{{ route('admin.epreuves.download', $epreuve) }}" class="btn btn-sm btn-success">
+                                    <i class="ti ti-download"></i>
                                 </a>
-                            </strong>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -110,9 +138,9 @@
                             @endif
                         </div>
                         <div class="d-flex gap-2">
-                            <a href="{{ Storage::url($epreuve->correction->fichier) }}" class="btn btn-sm btn-outline-primary" target="_blank" title="Visualiser">
+                            <button type="button" class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#viewCorrectionModal" onclick="loadCorrectionPreview()">
                                 <i class="ti ti-eye"></i>
-                            </a>
+                            </button>
                             <a href="{{ Storage::url($epreuve->correction->fichier) }}" class="btn btn-sm btn-outline-success" download title="Télécharger">
                                 <i class="ti ti-download"></i>
                             </a>
@@ -147,6 +175,12 @@
                 <i class="ti ti-arrow-left me-1"></i> Retour à la liste
             </a>
             <div class="d-flex gap-2">
+                <form action="{{ route('admin.epreuves.duplicate', $epreuve) }}" method="POST" onsubmit="return confirm('Dupliquer cette épreuve ?')">
+                    @csrf
+                    <button type="submit" class="btn btn-outline-info px-4">
+                        <i class="ti ti-copy me-1"></i> Dupliquer
+                    </button>
+                </form>
                 <a href="{{ route('admin.epreuves.edit', $epreuve) }}" class="btn btn-outline-primary px-4">
                     <i class="ti ti-edit me-1"></i> Modifier
                 </a>
@@ -157,6 +191,64 @@
                         <i class="ti ti-trash me-1"></i> Supprimer
                     </button>
                 </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Voir Épreuve -->
+<div class="modal fade" id="viewFileModal" tabindex="-1" aria-labelledby="viewFileModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="viewFileModalLabel">
+                    <i class="ti ti-file-text me-2"></i>
+                    Aperçu : {{ $epreuve->titre }}
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body p-0" style="min-height: 500px;">
+                <div id="pdfPreviewContainer" class="text-center p-5">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Chargement...</span>
+                    </div>
+                    <p class="mt-3">Chargement du fichier...</p>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <a href="{{ route('admin.epreuves.download', $epreuve) }}" class="btn btn-success">
+                    <i class="ti ti-download me-1"></i> Télécharger
+                </a>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Voir Correction -->
+<div class="modal fade" id="viewCorrectionModal" tabindex="-1" aria-labelledby="viewCorrectionModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="viewCorrectionModalLabel">
+                    <i class="ti ti-file-text me-2"></i>
+                    Aperçu de la correction
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body p-0" style="min-height: 500px;">
+                <div id="pdfCorrectionContainer" class="text-center p-5">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Chargement...</span>
+                    </div>
+                    <p class="mt-3">Chargement de la correction...</p>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <a href="{{ Storage::url($epreuve->correction->fichier ?? '#') }}" class="btn btn-success" download>
+                    <i class="ti ti-download me-1"></i> Télécharger
+                </a>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>
             </div>
         </div>
     </div>
@@ -233,5 +325,111 @@
     .border.rounded.p-2 {
         background-color: #f8f9fa;
     }
+    .modal-xl {
+        max-width: 1140px;
+    }
+    iframe {
+        width: 100%;
+        height: 70vh;
+        border: none;
+    }
+    .embed-responsive {
+        position: relative;
+        display: block;
+        width: 100%;
+        padding: 0;
+        overflow: hidden;
+    }
 </style>
+@endpush
+
+@push('scripts')
+<script>
+    function loadPdfPreview() {
+        const url = "{{ route('admin.epreuves.download', $epreuve) }}";
+        const container = document.getElementById('pdfPreviewContainer');
+        
+        // Vérifier si c'est un PDF via l'extension
+        const fileName = "{{ strtolower($epreuve->nom_fichier_original ?? '') }}";
+        
+        if (fileName.endsWith('.pdf')) {
+            container.innerHTML = `
+                <div class="embed-responsive">
+                    <iframe src="${url}#toolbar=0&navpanes=0&scrollbar=0" 
+                            frameborder="0"
+                            allowfullscreen>
+                    </iframe>
+                </div>
+            `;
+        } else {
+            container.innerHTML = `
+                <div class="text-center p-5">
+                    <i class="ti ti-file fs-1 text-muted mb-3 d-block"></i>
+                    <p>Ce type de fichier (${fileName.split('.').pop()}) ne peut pas être prévisualisé directement.</p>
+                    <a href="${url}" class="btn btn-primary">
+                        <i class="ti ti-download me-1"></i> Télécharger le fichier
+                    </a>
+                </div>
+            `;
+        }
+    }
+    
+    function loadCorrectionPreview() {
+        @if($epreuve->correction)
+            const url = "{{ Storage::url($epreuve->correction->fichier) }}";
+            const container = document.getElementById('pdfCorrectionContainer');
+            const fileName = "{{ strtolower($epreuve->correction->nom_fichier_original ?? '') }}";
+            
+            if (fileName.endsWith('.pdf')) {
+                container.innerHTML = `
+                    <div class="embed-responsive">
+                        <iframe src="${url}#toolbar=0&navpanes=0&scrollbar=0" 
+                                frameborder="0"
+                                allowfullscreen>
+                        </iframe>
+                    </div>
+                `;
+            } else {
+                container.innerHTML = `
+                    <div class="text-center p-5">
+                        <i class="ti ti-file fs-1 text-muted mb-3 d-block"></i>
+                        <p>Ce type de fichier (${fileName.split('.').pop()}) ne peut pas être prévisualisé directement.</p>
+                        <a href="${url}" class="btn btn-primary">
+                            <i class="ti ti-download me-1"></i> Télécharger le fichier
+                        </a>
+                    </div>
+                `;
+            }
+        @endif
+    }
+    
+    // Réinitialiser le container quand le modal se ferme
+    document.getElementById('viewFileModal')?.addEventListener('hidden.bs.modal', function () {
+        const container = document.getElementById('pdfPreviewContainer');
+        if (container) {
+            container.innerHTML = `
+                <div class="text-center p-5">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Chargement...</span>
+                    </div>
+                    <p class="mt-3">Chargement du fichier...</p>
+                </div>
+            `;
+        }
+    });
+    
+    document.getElementById('viewCorrectionModal')?.addEventListener('hidden.bs.modal', function () {
+        const container = document.getElementById('pdfCorrectionContainer');
+        if (container) {
+            container.innerHTML = `
+                <div class="text-center p-5">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Chargement...</span>
+                    </div>
+                    <p class="mt-3">Chargement de la correction...</p>
+                </div>
+            `;
+        }
+    });
+</script>
 @endpush

@@ -19,7 +19,7 @@ class EpreuveController extends Controller
      */
     public function index()
     {
-        $epreuves = Epreuve::with(['classe', 'matiere', 'typeEpreuve', 'correction'])
+        $epreuves = Epreuve::with(['classes', 'matieres', 'typeEpreuve', 'correction'])
             ->orderBy('created_at', 'desc')
             ->paginate(15);
 
@@ -52,10 +52,12 @@ class EpreuveController extends Controller
         $validated = $request->validate([
             'titre'                => 'required|string|max:255',
             'description'          => 'nullable|string',
-            'classe_id'            => 'required|exists:classes,id',
-            'matiere_id'           => 'required|exists:matieres,id',
             'type_epreuve_id'      => 'required|exists:type_epreuves,id',
             'fichier'              => 'required|file|mimes:pdf,doc,docx,zip|max:10240',
+            'classes'              => 'required|array|min:1',
+            'classes.*'            => 'exists:classes,id',
+            'matieres'             => 'required|array|min:1',
+            'matieres.*'           => 'exists:matieres,id',
             'annee'                => 'nullable|integer|min:2000|max:' . date('Y'),
             'duree'                => 'nullable|integer|min:0',
             'bareme'               => 'nullable|integer|min:0',
@@ -69,9 +71,13 @@ class EpreuveController extends Controller
         }
 
         $validated['statut'] = $request->boolean('statut', true);
-        $validated['slug']   = Str::slug($validated['titre']);
+        $validated['slug']   = Str::slug($validated['titre'] . '-' . Str::random(5));
 
-        Epreuve::create($validated);
+        $epreuve = Epreuve::create($validated);
+        
+        // Attacher les classes et matières
+        $epreuve->classes()->attach($request->classes);
+        $epreuve->matieres()->attach($request->matieres);
 
         return redirect()->route('admin.epreuves.index')
             ->with('success', 'Épreuve créée avec succès.');
@@ -82,7 +88,7 @@ class EpreuveController extends Controller
      */
     public function show(Epreuve $epreuve)
     {
-        $epreuve->load(['classe', 'matiere', 'typeEpreuve', 'correction']);
+        $epreuve->load(['classes', 'matieres', 'typeEpreuve', 'correction']);
         return view('admin.epreuves.show', compact('epreuve'));
     }
 
@@ -94,6 +100,8 @@ class EpreuveController extends Controller
         $classes = Classe::where('statut', true)->orderBy('nom')->get();
         $matieres = Matiere::where('statut', true)->orderBy('nom')->get();
         $types = TypeEpreuve::where('statut', true)->orderBy('nom')->get();
+        
+        $epreuve->load(['classes', 'matieres']);
 
         return view('admin.epreuves.edit', compact('epreuve', 'classes', 'matieres', 'types'));
     }
@@ -106,10 +114,12 @@ class EpreuveController extends Controller
         $validated = $request->validate([
             'titre'                => 'required|string|max:255',
             'description'          => 'nullable|string',
-            'classe_id'            => 'required|exists:classes,id',
-            'matiere_id'           => 'required|exists:matieres,id',
             'type_epreuve_id'      => 'required|exists:type_epreuves,id',
             'fichier'              => 'nullable|file|mimes:pdf,doc,docx,zip|max:10240',
+            'classes'              => 'required|array|min:1',
+            'classes.*'            => 'exists:classes,id',
+            'matieres'             => 'required|array|min:1',
+            'matieres.*'           => 'exists:matieres,id',
             'annee'                => 'nullable|integer|min:2000|max:' . date('Y'),
             'duree'                => 'nullable|integer|min:0',
             'bareme'               => 'nullable|integer|min:0',
@@ -126,9 +136,13 @@ class EpreuveController extends Controller
         }
 
         $validated['statut'] = $request->boolean('statut', true);
-        $validated['slug']   = Str::slug($validated['titre']);
+        $validated['slug']   = Str::slug($validated['titre'] . '-' . Str::random(5));
 
         $epreuve->update($validated);
+        
+        // Synchroniser les classes et matières
+        $epreuve->classes()->sync($request->classes);
+        $epreuve->matieres()->sync($request->matieres);
 
         return redirect()->route('admin.epreuves.index')
             ->with('success', 'Épreuve mise à jour avec succès.');
@@ -139,10 +153,12 @@ class EpreuveController extends Controller
      */
     public function destroy(Epreuve $epreuve)
     {
+        // Supprimer le fichier de l'épreuve
         if ($epreuve->fichier) {
             Storage::disk('public')->delete($epreuve->fichier);
         }
 
+        // Supprimer la correction associée si elle existe
         if ($epreuve->correction) {
             if ($epreuve->correction->fichier) {
                 Storage::disk('public')->delete($epreuve->correction->fichier);
@@ -150,6 +166,11 @@ class EpreuveController extends Controller
             $epreuve->correction->delete();
         }
 
+        // Supprimer les relations many-to-many
+        $epreuve->classes()->detach();
+        $epreuve->matieres()->detach();
+
+        // Supprimer l'épreuve
         $epreuve->delete();
 
         return redirect()->route('admin.epreuves.index')
@@ -178,10 +199,11 @@ class EpreuveController extends Controller
     {
         $newEpreuve = $epreuve->replicate();
         $newEpreuve->titre = $newEpreuve->titre . ' (copie)';
-        $newEpreuve->slug = Str::slug($newEpreuve->titre);
+        $newEpreuve->slug = Str::slug($newEpreuve->titre . '-' . Str::random(5));
         $newEpreuve->created_at = now();
         $newEpreuve->updated_at = now();
 
+        // Copier le fichier
         if ($epreuve->fichier) {
             $extension = pathinfo($epreuve->fichier, PATHINFO_EXTENSION);
             $newPath = 'epreuves/' . Str::random(40) . '.' . $extension;
@@ -191,6 +213,10 @@ class EpreuveController extends Controller
         }
 
         $newEpreuve->save();
+
+        // Dupliquer les relations many-to-many
+        $newEpreuve->classes()->attach($epreuve->classes->pluck('id')->toArray());
+        $newEpreuve->matieres()->attach($epreuve->matieres->pluck('id')->toArray());
 
         return redirect()->route('admin.epreuves.edit', $newEpreuve)
             ->with('success', 'Épreuve dupliquée avec succès.');
@@ -216,7 +242,7 @@ class EpreuveController extends Controller
      */
     public function corrections()
     {
-        $corrections = Correction::with(['epreuve.classe', 'epreuve.matiere'])
+        $corrections = Correction::with(['epreuve.classes', 'epreuve.matieres'])
             ->orderBy('created_at', 'desc')
             ->paginate(15);
 

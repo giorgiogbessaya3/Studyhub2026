@@ -13,8 +13,6 @@ class Epreuve extends Model
         'titre',
         'slug',
         'description',
-        'classe_id',
-        'matiere_id',
         'type_epreuve_id',
         'fichier',
         'nom_fichier_original',
@@ -31,14 +29,18 @@ class Epreuve extends Model
         'bareme' => 'integer',
     ];
 
-    public function classe()
+    // Relation many-to-many avec les classes
+    public function classes()
     {
-        return $this->belongsTo(Classe::class);
+        return $this->belongsToMany(Classe::class, 'epreuve_classe')
+                    ->withTimestamps();
     }
 
-    public function matiere()
+    // Relation many-to-many avec les matières
+    public function matieres()
     {
-        return $this->belongsTo(Matiere::class);
+        return $this->belongsToMany(Matiere::class, 'epreuve_matiere')
+                    ->withTimestamps();
     }
 
     public function typeEpreuve()

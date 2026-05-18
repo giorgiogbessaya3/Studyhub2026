@@ -6,7 +6,7 @@
 
 @section('content')
 <div class="row justify-content-center">
-    <div class="col-lg-10">
+    <div class="col-lg-12">
         <div class="card border-0 shadow-sm">
             <div class="card-header bg-white py-3">
                 <h5 class="card-title mb-0">Informations de l'épreuve</h5>
@@ -21,7 +21,6 @@
                             <div class="border rounded-3 p-3 bg-light">
                                 <label class="form-label fw-semibold mb-3">Fichier de l'épreuve</label>
                                 
-                                <!-- Zone de fichier -->
                                 <div class="mb-3">
                                     <input type="file" 
                                            class="form-control @error('fichier') is-invalid @enderror" 
@@ -39,7 +38,6 @@
 
                                 <hr>
 
-                                <!-- Année, durée, barème -->
                                 <div class="mb-3">
                                     <label class="form-label fw-semibold">Année</label>
                                     <input type="number" 
@@ -108,46 +106,70 @@
                                     @enderror
                                 </div>
 
-                                <!-- Classe -->
-                                <div class="col-md-4">
-                                    <label class="form-label fw-semibold">Classe <span class="text-danger">*</span></label>
-                                    <select class="form-select @error('classe_id') is-invalid @enderror" 
-                                            name="classe_id" 
-                                            id="classe_id"
-                                            required>
-                                        <option value="">Sélectionnez</option>
-                                        @foreach($classes as $classe)
-                                            <option value="{{ $classe->id }}" {{ old('classe_id') == $classe->id ? 'selected' : '' }}>
-                                                {{ $classe->nom }}
-                                            </option>
-                                        @endforeach
-                                    </select>
-                                    @error('classe_id')
-                                        <div class="invalid-feedback">{{ $message }}</div>
+                                <!-- Classes avec checkboxes -->
+                                <div class="col-12">
+                                    <label class="form-label fw-semibold">Classes <span class="text-danger">*</span></label>
+                                    <div class="border rounded-3 p-3 @error('classes') is-invalid @enderror" style="max-height: 200px; overflow-y: auto;">
+                                        <div class="row">
+                                            @php
+                                                $oldClasses = old('classes', []);
+                                            @endphp
+                                            @foreach($classes as $classe)
+                                                <div class="col-md-4 mb-2">
+                                                    <div class="form-check">
+                                                        <input class="form-check-input" 
+                                                               type="checkbox" 
+                                                               name="classes[]" 
+                                                               value="{{ $classe->id }}"
+                                                               id="classe_{{ $classe->id }}"
+                                                               {{ in_array($classe->id, $oldClasses) ? 'checked' : '' }}>
+                                                        <label class="form-check-label" for="classe_{{ $classe->id }}">
+                                                            {{ $classe->nom }}
+                                                        </label>
+                                                    </div>
+                                                </div>
+                                            @endforeach
+                                        </div>
+                                    </div>
+                                    @error('classes')
+                                        <div class="invalid-feedback d-block">{{ $message }}</div>
                                     @enderror
+                                    <small class="text-muted">Cochez une ou plusieurs classes</small>
                                 </div>
 
-                                <!-- Matière -->
-                                <div class="col-md-4">
-                                    <label class="form-label fw-semibold">Matière <span class="text-danger">*</span></label>
-                                    <select class="form-select @error('matiere_id') is-invalid @enderror" 
-                                            name="matiere_id" 
-                                            id="matiere_id"
-                                            required>
-                                        <option value="">Sélectionnez</option>
-                                        @foreach($matieres as $matiere)
-                                            <option value="{{ $matiere->id }}" {{ old('matiere_id') == $matiere->id ? 'selected' : '' }}>
-                                                {{ $matiere->nom }}
-                                            </option>
-                                        @endforeach
-                                    </select>
-                                    @error('matiere_id')
-                                        <div class="invalid-feedback">{{ $message }}</div>
+                                <!-- Matières avec checkboxes -->
+                                <div class="col-12">
+                                    <label class="form-label fw-semibold">Matières <span class="text-danger">*</span></label>
+                                    <div class="border rounded-3 p-3 @error('matieres') is-invalid @enderror" style="max-height: 200px; overflow-y: auto;">
+                                        <div class="row">
+                                            @php
+                                                $oldMatieres = old('matieres', []);
+                                            @endphp
+                                            @foreach($matieres as $matiere)
+                                                <div class="col-md-4 mb-2">
+                                                    <div class="form-check">
+                                                        <input class="form-check-input" 
+                                                               type="checkbox" 
+                                                               name="matieres[]" 
+                                                               value="{{ $matiere->id }}"
+                                                               id="matiere_{{ $matiere->id }}"
+                                                               {{ in_array($matiere->id, $oldMatieres) ? 'checked' : '' }}>
+                                                        <label class="form-check-label" for="matiere_{{ $matiere->id }}">
+                                                            {{ $matiere->nom }}
+                                                        </label>
+                                                    </div>
+                                                </div>
+                                            @endforeach
+                                        </div>
+                                    </div>
+                                    @error('matieres')
+                                        <div class="invalid-feedback d-block">{{ $message }}</div>
                                     @enderror
+                                    <small class="text-muted">Cochez une ou plusieurs matières</small>
                                 </div>
 
                                 <!-- Type d'épreuve -->
-                                <div class="col-md-4">
+                                <div class="col-12">
                                     <label class="form-label fw-semibold">Type <span class="text-danger">*</span></label>
                                     <select class="form-select @error('type_epreuve_id') is-invalid @enderror" 
                                             name="type_epreuve_id" 
@@ -192,12 +214,3 @@
     </div>
 </div>
 @endsection
-
-@push('styles')
-<style>
-    /* Optionnel : ajustements */
-    .bg-light {
-        background-color: #f8f9fa !important;
-    }
-</style>
-@endpush

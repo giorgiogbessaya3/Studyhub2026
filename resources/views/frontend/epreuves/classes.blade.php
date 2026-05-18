@@ -1,6 +1,7 @@
 @extends('layouts.app')
 
 @section('title', 'Classes - StudyHub')
+@section('meta_description', 'Toutes les classes de la 6ème à la Terminale : épreuves, annales et sujets corrigés disponibles gratuitement.')
 
 @section('content')
 <!-- Hero Section - Même style que les autres pages -->
@@ -37,9 +38,7 @@
                         <i class="fas fa-home text-xs"></i> Accueil
                     </a></li>
                     <li><span class="mx-1">/</span></li>
-                    <li><a href="{{ route('epreuves') }}" class="hover:text-white transition-colors">Épreuves</a></li>
-                    <li><span class="mx-1">/</span></li>
-                    <li class="text-white font-medium">Classes</li>
+                    <li class="text-white font-medium">Épreuves</li>
                 </ol>
             </nav>
         </div>
@@ -109,7 +108,7 @@
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
                 @foreach($classesByCycle['college'] as $index => $classe)
                 @php
-                    // Configuration des couleurs par classe (comme dans la page des cours)
+                    // Configuration des couleurs par classe
                     $colors = [
                         '6ème' => ['bg' => '#3b82f6', 'gradient' => 'from-blue-600 to-blue-700', 'light' => 'bg-blue-50', 'text' => 'text-blue-600'],
                         '5ème' => ['bg' => '#22c55e', 'gradient' => 'from-green-600 to-green-700', 'light' => 'bg-green-50', 'text' => 'text-green-600'],
@@ -117,6 +116,9 @@
                         '3ème' => ['bg' => '#f97316', 'gradient' => 'from-orange-600 to-orange-700', 'light' => 'bg-orange-50', 'text' => 'text-orange-600'],
                     ];
                     $color = $colors[$classe->nom] ?? ['bg' => '#3b82f6', 'gradient' => 'from-primary-600 to-primary-700', 'light' => 'bg-primary-50', 'text' => 'text-primary-600'];
+                    
+                    // Compter le nombre d'épreuves pour cette classe
+                    $nombreEpreuves = $classe->epreuves_count ?? $classe->epreuves()->where('statut', true)->count();
                     
                     // Icône spécifique à la classe
                     $icons = [
@@ -162,7 +164,7 @@
                                 </div>
                                 <div>
                                     <h3 class="font-bold text-white text-xl">{{ $classe->nom }}</h3>
-                                    <p class="text-xs text-white/80">{{ $classe->epreuves_count ?? rand(50, 120) }} épreuves</p>
+                                    <p class="text-xs text-white/80">{{ $nombreEpreuves }} épreuves</p>
                                 </div>
                             </div>
                         </div>
@@ -182,34 +184,25 @@
                         
                         <!-- Tags matières principales -->
                         <div class="flex flex-wrap gap-1.5 mb-4">
-                            @foreach(['Maths', 'Français', 'Histoire'] as $matiere)
+                            @foreach($classe->matieres->take(3) as $matiere)
                             <span class="px-2 py-1 text-xs rounded-full bg-primary-50 text-primary-600">
-                                {{ $matiere }}
+                                {{ $matiere->nom }}
                             </span>
                             @endforeach
-                            <span class="px-2 py-1 text-xs rounded-full bg-gray-100 text-gray-600">+{{ rand(2, 4) }}</span>
+                            @if($classe->matieres->count() > 3)
+                            <span class="px-2 py-1 text-xs rounded-full bg-gray-100 text-gray-600">+{{ $classe->matieres->count() - 3 }}</span>
+                            @endif
                         </div>
                         
                         <!-- Statistiques -->
                         <div class="grid grid-cols-2 gap-2 mb-4">
                             <div class="text-center p-2 bg-gray-50 rounded-lg">
-                                <div class="font-bold text-gray-800">{{ $classe->epreuves_count ?? rand(50, 120) }}</div>
+                                <div class="font-bold text-gray-800">{{ $nombreEpreuves }}</div>
                                 <div class="text-xs text-gray-500">Épreuves</div>
                             </div>
                             <div class="text-center p-2 bg-gray-50 rounded-lg">
-                                <div class="font-bold text-gray-800">{{ rand(3, 8) }}</div>
-                                <div class="text-xs text-gray-500">Années</div>
-                            </div>
-                        </div>
-                        
-                        <!-- Barre de progression -->
-                        <div class="mb-4">
-                            <div class="flex justify-between text-xs mb-1">
-                                <span class="text-gray-500">Taux de réussite</span>
-                                <span class="font-medium text-primary-600">{{ rand(70, 95) }}%</span>
-                            </div>
-                            <div class="w-full bg-gray-200 rounded-full h-1.5">
-                                <div class="bg-primary-600 h-1.5 rounded-full" style="width: {{ rand(70, 95) }}%"></div>
+                                <div class="font-bold text-gray-800">{{ $classe->matieres->count() }}</div>
+                                <div class="text-xs text-gray-500">Matières</div>
                             </div>
                         </div>
                         
@@ -253,6 +246,9 @@
                         'Terminale' => ['bg' => '#ec4899', 'gradient' => 'from-pink-600 to-pink-700', 'light' => 'bg-pink-50', 'text' => 'text-pink-600'],
                     ];
                     $color = $colors[$classe->nom] ?? ['bg' => '#8b5cf6', 'gradient' => 'from-primary-600 to-primary-700', 'light' => 'bg-primary-50', 'text' => 'text-primary-600'];
+                    
+                    // Compter le nombre d'épreuves pour cette classe
+                    $nombreEpreuves = $classe->epreuves_count ?? $classe->epreuves()->where('statut', true)->count();
                     
                     // Icône spécifique à la classe
                     $icons = [
@@ -299,7 +295,7 @@
                                 </div>
                                 <div>
                                     <h3 class="font-bold text-white text-xl">{{ $classe->nom }}</h3>
-                                    <p class="text-xs text-white/80">{{ $classe->epreuves_count ?? rand(80, 200) }} épreuves</p>
+                                    <p class="text-xs text-white/80">{{ $nombreEpreuves }} épreuves</p>
                                 </div>
                             </div>
                         </div>
@@ -317,36 +313,27 @@
                             </p>
                         @endif
                         
-                        <!-- Tags spécialités -->
+                        <!-- Tags matières -->
                         <div class="flex flex-wrap gap-1.5 mb-4">
-                            @if($isTerminale)
-                                <span class="px-2 py-1 text-xs rounded-lg bg-primary-50 text-primary-600">Maths</span>
-                                <span class="px-2 py-1 text-xs rounded-lg bg-primary-50 text-primary-600">Physique</span>
-                                <span class="px-2 py-1 text-xs rounded-lg bg-primary-50 text-primary-600">SVT</span>
-                                <span class="px-2 py-1 text-xs rounded-lg bg-gray-100 text-gray-600">+3</span>
-                            @elseif($classe->nom == 'Première')
-                                <span class="px-2 py-1 text-xs rounded-lg bg-primary-50 text-primary-600">Maths</span>
-                                <span class="px-2 py-1 text-xs rounded-lg bg-primary-50 text-primary-600">Physique</span>
-                                <span class="px-2 py-1 text-xs rounded-lg bg-primary-50 text-primary-600">SVT</span>
-                                <span class="px-2 py-1 text-xs rounded-lg bg-gray-100 text-gray-600">+3</span>
-                            @else
-                                <span class="px-2 py-1 text-xs rounded-full bg-primary-50 text-primary-600">Maths</span>
-                                <span class="px-2 py-1 text-xs rounded-full bg-primary-50 text-primary-600">Physique</span>
-                                <span class="px-2 py-1 text-xs rounded-full bg-primary-50 text-primary-600">SVT</span>
-                                <span class="px-2 py-1 text-xs rounded-full bg-primary-50 text-primary-600">SES</span>
-                                <span class="px-2 py-1 text-xs rounded-full bg-gray-100 text-gray-600">+4</span>
+                            @foreach($classe->matieres->take(4) as $matiere)
+                            <span class="px-2 py-1 text-xs rounded-lg bg-primary-50 text-primary-600">
+                                {{ $matiere->nom }}
+                            </span>
+                            @endforeach
+                            @if($classe->matieres->count() > 4)
+                            <span class="px-2 py-1 text-xs rounded-lg bg-gray-100 text-gray-600">+{{ $classe->matieres->count() - 4 }}</span>
                             @endif
                         </div>
                         
                         <!-- Statistiques -->
                         <div class="grid grid-cols-2 gap-2 mb-4">
                             <div class="text-center p-2 bg-gray-50 rounded-lg">
-                                <div class="font-bold text-gray-800">{{ $classe->epreuves_count ?? rand(80, 200) }}</div>
+                                <div class="font-bold text-gray-800">{{ $nombreEpreuves }}</div>
                                 <div class="text-xs text-gray-500">Épreuves</div>
                             </div>
                             <div class="text-center p-2 bg-gray-50 rounded-lg">
-                                <div class="font-bold text-gray-800">{{ rand(4, 10) }}</div>
-                                <div class="text-xs text-gray-500">Spécialités</div>
+                                <div class="font-bold text-gray-800">{{ $classe->matieres->count() }}</div>
+                                <div class="text-xs text-gray-500">Matières</div>
                             </div>
                         </div>
                         
@@ -364,7 +351,7 @@
         @endif
         
         <!-- Section information -->
-        <section class="mt-12 bg-gradient-to-br from-primary-50 to-white rounded-3xl p-8 border border-primary-100" data-aos="fade-up">
+        <section id="brevet" class="mt-12 bg-gradient-to-br from-primary-50 to-white rounded-3xl p-8 border border-primary-100" data-aos="fade-up">
             <div class="flex flex-col md:flex-row items-center gap-8">
                 <div class="flex-1 text-center md:text-left">
                     <h3 class="text-xl font-bold text-gray-800 mb-3">Nouveautés dans la banque d'épreuves</h3>

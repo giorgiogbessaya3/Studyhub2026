@@ -111,19 +111,19 @@
 <div class="card border-0 shadow-sm mb-4">
     <div class="card-body p-3">
         <div class="d-flex flex-wrap gap-2">
-            <a href="{{ url('/admin/epreuves/create') }}" class="btn btn-primary btn-sm">
+            <a href="{{ route('admin.epreuves.create') }}" class="btn btn-primary btn-sm">
                 <i class="ti ti-plus me-1"></i> Épreuve
             </a>
-            <a href="{{ url('/admin/chapitres/create') }}" class="btn btn-success btn-sm">
+            <a href="{{ route('admin.chapitres.create') }}" class="btn btn-success btn-sm">
                 <i class="ti ti-plus me-1"></i> Cours
             </a>
-            <a href="{{ url('/admin/quiz/create') }}" class="btn btn-warning btn-sm text-white">
+            <a href="{{ route('admin.quiz.create') }}" class="btn btn-warning btn-sm text-white">
                 <i class="ti ti-plus me-1"></i> Quiz
             </a>
-            <a href="{{ url('/admin/users/create') }}" class="btn btn-info btn-sm text-white">
+            <a href="{{ route('admin.users.create') }}" class="btn btn-info btn-sm text-white">
                 <i class="ti ti-plus me-1"></i> Utilisateur
             </a>
-            <a href="{{ url('/admin/assistance/questions') }}" class="btn btn-outline-secondary btn-sm ms-auto">
+            <a href="{{ route('admin.assistance.questions') }}" class="btn btn-outline-secondary btn-sm ms-auto">
                 <i class="ti ti-messages me-1"></i> Voir questions
             </a>
         </div>
@@ -139,7 +139,7 @@
             <div class="card-header bg-white border-bottom-0 pt-4 pb-0 px-4">
                 <div class="d-flex justify-content-between align-items-center">
                     <h5 class="card-title mb-0 fw-bold">Dernières épreuves</h5>
-                    <a href="{{ url('/admin/epreuves') }}" class="btn btn-sm btn-outline-primary">
+                    <a href="{{ route('admin.epreuves.index') }}" class="btn btn-sm btn-outline-primary">
                         Voir tout
                     </a>
                 </div>
@@ -153,7 +153,8 @@
                             <thead class="table-light">
                                 <tr>
                                     <th>Épreuve</th>
-                                    <th>Classe</th>
+                                    <th>Classe(s)</th>
+                                    <th>Matière(s)</th>
                                     <th>Type</th>
                                     <th>Date</th>
                                     <th class="text-end">Actions</th>
@@ -169,15 +170,31 @@
                                             </span>
                                             <div>
                                                 <div class="fw-semibold">{{ Str::limit($epreuve->titre, 30) }}</div>
-                                                <small class="text-muted">{{ $epreuve->matiere->nom ?? 'N/A' }}</small>
                                             </div>
                                         </div>
                                     </td>
-                                    <td><span class="badge bg-light text-dark">{{ $epreuve->classe->nom ?? 'N/A' }}</span></td>
+                                    <td>
+                                        <span class="badge bg-light text-dark">
+                                            @forelse($epreuve->classes as $classe)
+                                                {{ $classe->nom }}{{ !$loop->last ? ', ' : '' }}
+                                            @empty
+                                                N/A
+                                            @endforelse
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-light text-dark">
+                                            @forelse($epreuve->matieres as $matiere)
+                                                {{ $matiere->nom }}{{ !$loop->last ? ', ' : '' }}
+                                            @empty
+                                                N/A
+                                            @endforelse
+                                        </span>
+                                    </td>
                                     <td><span class="badge bg-warning">{{ $epreuve->typeEpreuve->nom ?? 'Épreuve' }}</span></td>
                                     <td class="text-muted small">{{ $epreuve->created_at->diffForHumans() }}</td>
                                     <td class="text-end">
-                                        <a href="{{ url('/admin/epreuves/' . $epreuve->id . '/edit') }}" class="btn btn-sm btn-light me-1"><i class="ti ti-edit"></i></a>
+                                        <a href="{{ route('admin.epreuves.edit', $epreuve->id) }}" class="btn btn-sm btn-light me-1"><i class="ti ti-edit"></i></a>
                                         <button class="btn btn-sm btn-light text-danger" onclick="deleteEpreuve({{ $epreuve->id }})"><i class="ti ti-trash"></i></button>
                                     </td>
                                 </tr>
@@ -196,7 +213,7 @@
             <div class="card-header bg-white border-bottom-0 pt-4 pb-0 px-4">
                 <div class="d-flex justify-content-between align-items-center">
                     <h5 class="card-title mb-0 fw-bold">Derniers cours</h5>
-                    <a href="{{ url('/admin/chapitres') }}" class="btn btn-sm btn-outline-primary">
+                    <a href="{{ route('admin.chapitres.index') }}" class="btn btn-sm btn-outline-primary">
                         Voir tout
                     </a>
                 </div>
@@ -233,7 +250,7 @@
                                     <td>{{ $cours->matiere->nom ?? 'N/A' }}</td>
                                     <td class="text-muted small">{{ $cours->created_at->diffForHumans() }}</td>
                                     <td class="text-end">
-                                        <a href="{{ url('/admin/chapitres/' . $cours->id . '/edit') }}" class="btn btn-sm btn-light me-1"><i class="ti ti-edit"></i></a>
+                                        <a href="{{ route('admin.chapitres.edit', $cours->id) }}" class="btn btn-sm btn-light me-1"><i class="ti ti-edit"></i></a>
                                         <button class="btn btn-sm btn-light text-danger"><i class="ti ti-trash"></i></button>
                                     </td>
                                 </tr>
@@ -273,13 +290,13 @@
                             </div>
                             <p class="small text-muted mb-0 mt-1">{{ Str::limit($question->titre, 50) }}</p>
                             <div class="mt-2">
-                                <a href="{{ url('/admin/assistance/questions/' . $question->id) }}" class="btn btn-sm btn-outline-primary btn-sm">Répondre</a>
+                                <a href="{{ route('admin.assistance.questions.show', $question->id) }}" class="btn btn-sm btn-outline-primary">Répondre</a>
                             </div>
                         </div>
                     </div>
                     @endforeach
                     
-                    <a href="{{ url('/admin/assistance/questions') }}" class="btn btn-outline-primary w-100 mt-3 btn-sm">
+                    <a href="{{ route('admin.assistance.questions') }}" class="btn btn-outline-primary w-100 mt-3 btn-sm">
                         Voir toutes les questions
                     </a>
                 @endif
@@ -293,7 +310,7 @@
             <div class="card-header bg-white border-bottom-0 pt-4 pb-0 px-4">
                 <div class="d-flex justify-content-between align-items-center">
                     <h5 class="card-title mb-0 fw-bold">Derniers quiz</h5>
-                    <a href="{{ url('/admin/quiz') }}" class="btn btn-sm btn-outline-primary">
+                    <a href="{{ route('admin.quiz.index') }}" class="btn btn-sm btn-outline-primary">
                         Voir tout
                     </a>
                 </div>
@@ -339,7 +356,7 @@
                                         @endif
                                     </td>
                                     <td class="text-end">
-                                        <a href="{{ url('/admin/quiz/' . $quiz->id . '/edit') }}" class="btn btn-sm btn-light me-1"><i class="ti ti-edit"></i></a>
+                                        <a href="{{ route('admin.quiz.edit', $quiz->id) }}" class="btn btn-sm btn-light me-1"><i class="ti ti-edit"></i></a>
                                         <button class="btn btn-sm btn-light text-danger"><i class="ti ti-trash"></i></button>
                                     </td>
                                 </tr>

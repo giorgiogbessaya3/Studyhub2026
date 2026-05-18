@@ -21,21 +21,20 @@ class EpreuveControllers extends Controller
     {
         $settings = Setting::first();
         
-        // Récupérer toutes les classes actives avec le comptage des épreuves
-        $classes = Classe::withCount(['epreuves' => function($q) {
-                $q->where('statut', true);
-            }])
-            ->where('statut', true)
+        $classes = Classe::where('statut', true)
             ->orderBy('ordre')
             ->get();
         
-        // Statistiques
+        foreach ($classes as $classe) {
+            $classe->epreuves_count = $classe->epreuves()->where('statut', true)->count();
+        }
+        
         $stats = [
             'total' => Epreuve::where('statut', true)->count(),
-            'total_college' => Epreuve::whereHas('classe', function($q) {
+            'total_college' => Epreuve::whereHas('classes', function($q) {
                 $q->where('cycle', 'college');
             })->where('statut', true)->count(),
-            'total_lycee' => Epreuve::whereHas('classe', function($q) {
+            'total_lycee' => Epreuve::whereHas('classes', function($q) {
                 $q->where('cycle', 'lycee');
             })->where('statut', true)->count(),
             'avec_correction' => Epreuve::has('correction')->where('statut', true)->count(),
@@ -57,14 +56,26 @@ class EpreuveControllers extends Controller
             abort(404, 'Classe non trouvée');
         }
         
-        // Récupérer les types d'épreuves qui ont des épreuves pour cette classe
-        $types = TypeEpreuve::where('statut', true)
-            ->withCount(['epreuves' => function($q) use ($classe) {
-                $q->where('classe_id', $classe->id)->where('statut', true);
-            }])
-            ->having('epreuves_count', '>', 0)
-            ->orderBy('nom')
-            ->get();
+        // Récupérer les types avec comptage manuel
+        $types = TypeEpreuve::where('statut', true)->get();
+        
+        // Filtrer et compter manuellement
+        $filteredTypes = collect();
+        foreach ($types as $type) {
+            $count = Epreuve::where('statut', true)
+                ->where('type_epreuve_id', $type->id)
+                ->whereHas('classes', function($q) use ($classe) {
+                    $q->where('classes.id', $classe->id);
+                })
+                ->count();
+            
+            if ($count > 0) {
+                $type->epreuves_count = $count;
+                $filteredTypes->push($type);
+            }
+        }
+        
+        $types = $filteredTypes->sortBy('nom');
 
         return view('frontend.epreuves.types', compact('settings', 'classe', 'types'));
     }
@@ -83,20 +94,29 @@ class EpreuveControllers extends Controller
             abort(404, 'Classe ou type d\'épreuve non trouvé');
         }
         
-        // Récupérer les matières qui ont des épreuves pour cette classe et ce type
-        $matieres = Matiere::where('statut', true)
-            ->whereHas('epreuves', function($q) use ($classe, $type) {
-                $q->where('classe_id', $classe->id)
-                  ->where('type_epreuve_id', $type->id)
-                  ->where('statut', true);
-            })
-            ->withCount(['epreuves' => function($q) use ($classe, $type) {
-                $q->where('classe_id', $classe->id)
-                  ->where('type_epreuve_id', $type->id)
-                  ->where('statut', true);
-            }])
-            ->orderBy('nom')
-            ->get();
+        // Récupérer les matières
+        $matieres = Matiere::where('statut', true)->get();
+        
+        // Filtrer et compter manuellement
+        $filteredMatieres = collect();
+        foreach ($matieres as $matiere) {
+            $count = Epreuve::where('statut', true)
+                ->where('type_epreuve_id', $type->id)
+                ->whereHas('classes', function($q) use ($classe) {
+                    $q->where('classes.id', $classe->id);
+                })
+                ->whereHas('matieres', function($q) use ($matiere) {
+                    $q->where('matieres.id', $matiere->id);
+                })
+                ->count();
+            
+            if ($count > 0) {
+                $matiere->epreuves_count = $count;
+                $filteredMatieres->push($matiere);
+            }
+        }
+        
+        $matieres = $filteredMatieres->sortBy('nom');
 
         return view('frontend.epreuves.matieres', compact('settings', 'classe', 'type', 'matieres'));
     }
@@ -116,12 +136,16 @@ class EpreuveControllers extends Controller
             abort(404, 'Éléments non trouvés');
         }
 
-        // Construction de la requête
-        $query = Epreuve::with(['classe', 'matiere', 'typeEpreuve', 'correction'])
-            ->where('classe_id', $classe->id)
-            ->where('matiere_id', $matiere->id)
+        // Construction de la requête avec les relations many-to-many
+        $query = Epreuve::with(['classes', 'matieres', 'typeEpreuve', 'correction'])
+            ->where('statut', true)
             ->where('type_epreuve_id', $type->id)
-            ->where('statut', true);
+            ->whereHas('classes', function($q) use ($classe) {
+                $q->where('classes.id', $classe->id);
+            })
+            ->whereHas('matieres', function($q) use ($matiere) {
+                $q->where('matieres.id', $matiere->id);
+            });
 
         // Filtre par année
         if ($request->filled('annee')) {
@@ -184,10 +208,14 @@ class EpreuveControllers extends Controller
         $epreuves = $query->paginate(12)->withQueryString();
 
         // Années disponibles pour le filtre
-        $annees = Epreuve::where('classe_id', $classe->id)
-            ->where('matiere_id', $matiere->id)
+        $annees = Epreuve::where('statut', true)
             ->where('type_epreuve_id', $type->id)
-            ->where('statut', true)
+            ->whereHas('classes', function($q) use ($classe) {
+                $q->where('classes.id', $classe->id);
+            })
+            ->whereHas('matieres', function($q) use ($matiere) {
+                $q->where('matieres.id', $matiere->id);
+            })
             ->whereNotNull('annee')
             ->distinct()
             ->orderBy('annee', 'desc')
@@ -216,14 +244,18 @@ class EpreuveControllers extends Controller
             abort(404, 'Épreuve non trouvée');
         }
 
-        $epreuve->load(['classe', 'matiere', 'typeEpreuve', 'correction']);
+        $epreuve->load(['classes', 'matieres', 'typeEpreuve', 'correction']);
         
-        // Épreuves similaires
-        $similaires = Epreuve::with(['classe', 'matiere', 'typeEpreuve'])
-            ->where('classe_id', $epreuve->classe_id)
-            ->where('matiere_id', $epreuve->matiere_id)
-            ->where('id', '!=', $epreuve->id)
+        $similaires = Epreuve::with(['classes', 'matieres', 'typeEpreuve'])
             ->where('statut', true)
+            ->where('id', '!=', $epreuve->id)
+            ->where(function($query) use ($epreuve) {
+                $query->whereHas('classes', function($q) use ($epreuve) {
+                    $q->whereIn('classes.id', $epreuve->classes->pluck('id')->toArray());
+                })->orWhereHas('matieres', function($q) use ($epreuve) {
+                    $q->whereIn('matieres.id', $epreuve->matieres->pluck('id')->toArray());
+                });
+            })
             ->latest()
             ->take(4)
             ->get();
@@ -266,11 +298,12 @@ class EpreuveControllers extends Controller
         }
 
         if (!$epreuve->correction) {
-            return redirect('/epreuves/' . ($epreuve->slug ?? $epreuve->id))
+            $slug = $epreuve->slug ?? $epreuve->id;
+            return redirect('/epreuves/' . $slug)
                 ->with('error', 'La correction n\'est pas encore disponible');
         }
 
-        $epreuve->load(['classe', 'matiere', 'typeEpreuve', 'correction']);
+        $epreuve->load(['classes', 'matieres', 'typeEpreuve', 'correction']);
 
         return view('frontend.epreuves.correction', compact('settings', 'epreuve'));
     }
@@ -300,9 +333,6 @@ class EpreuveControllers extends Controller
     // FONCTIONS PRIVÉES UTILITAIRES
     // ==========================================
     
-    /**
-     * Trouver une classe par ID ou nom
-     */
     private function findClasse($identifier)
     {
         if (is_numeric($identifier)) {
@@ -310,7 +340,7 @@ class EpreuveControllers extends Controller
                 ->where('statut', true)
                 ->first();
         }
-
+        
         $classe = Classe::where('nom', $identifier)
             ->where('statut', true)
             ->first();
@@ -334,9 +364,6 @@ class EpreuveControllers extends Controller
         return $classe;
     }
 
-    /**
-     * Trouver une matière par ID ou nom
-     */
     private function findMatiere($identifier)
     {
         if (is_numeric($identifier)) {
@@ -350,9 +377,6 @@ class EpreuveControllers extends Controller
             ->first();
     }
 
-    /**
-     * Trouver un type d'épreuve par ID, slug ou nom
-     */
     private function findTypeEpreuve($identifier)
     {
         if (is_numeric($identifier)) {
@@ -361,22 +385,11 @@ class EpreuveControllers extends Controller
                 ->first();
         }
         
-        $type = TypeEpreuve::where('slug', $identifier)
+        return TypeEpreuve::where('nom', $identifier)
             ->where('statut', true)
             ->first();
-        
-        if (!$type) {
-            $type = TypeEpreuve::where('nom', $identifier)
-                ->where('statut', true)
-                ->first();
-        }
-        
-        return $type;
     }
 
-    /**
-     * Trouver une épreuve par ID ou slug
-     */
     private function findEpreuve($identifier)
     {
         if (is_numeric($identifier)) {

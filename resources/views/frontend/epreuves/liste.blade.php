@@ -1,16 +1,15 @@
 @extends('layouts.app')
 
 @section('title', 'Épreuves - ' . $matiere->nom . ' - ' . $classe->nom . ' - StudyHub')
+@section('meta_description', 'Toutes les épreuves de ' . $matiere->nom . ' pour la classe de ' . $classe->nom . ' - Sujets et corrigés disponibles.')
 
 @section('content')
 <!-- Hero Section - Style unifié -->
 <section class="relative bg-gradient-to-br from-slate-900 via-primary-900 to-primary-800 min-h-[250px] flex items-center overflow-hidden">
-    <!-- Background dots pattern -->
     <div class="absolute inset-0 opacity-20" 
          style="background-image: radial-gradient(circle at 1px 1px, white 1px, transparent 0); background-size: 40px 40px;">
     </div>
     
-    <!-- Blobs décoratifs (masqués sur mobile) -->
     <div class="hidden sm:block absolute top-20 left-20 w-72 h-72 bg-primary-500/20 rounded-full blur-3xl animate-pulse"></div>
     <div class="hidden sm:block absolute bottom-20 right-20 w-96 h-96 bg-secondary-500/20 rounded-full blur-3xl animate-pulse animation-delay-2000"></div>
     
@@ -18,16 +17,16 @@
         <!-- Fil d'Ariane compact -->
         <nav class="mb-3 sm:mb-4 text-xs sm:text-sm text-white/80 overflow-x-auto whitespace-nowrap pb-1 hide-scrollbar" data-aos="fade-down">
             <ol class="flex items-center">
-                <li><a href="/" class="hover:text-white transition-colors flex items-center gap-1">
+                <li><a href="{{ route('home') }}" class="hover:text-white transition-colors flex items-center gap-1">
                     <i class="fas fa-home text-[10px] sm:text-xs"></i>
                     <span class="hidden sm:inline">Accueil</span>
                 </a></li>
                 <li><span class="mx-1">/</span></li>
-                <li><a href="/epreuves" class="hover:text-white transition-colors whitespace-nowrap">Épreuves</a></li>
+                <li><a href="{{ route('epreuves.index') }}" class="hover:text-white transition-colors whitespace-nowrap">Épreuves</a></li>
                 <li><span class="mx-1">/</span></li>
-                <li><a href="/epreuves/classe/{{ $classe->nom }}/types" class="hover:text-white transition-colors whitespace-nowrap">{{ $classe->nom }}</a></li>
+                <li><a href="{{ route('epreuves.types', $classe->nom) }}" class="hover:text-white transition-colors whitespace-nowrap">{{ $classe->nom }}</a></li>
                 <li><span class="mx-1">/</span></li>
-                <li><a href="/epreuves/classe/{{ $classe->nom }}/type/{{ $type->slug }}/matieres" class="hover:text-white transition-colors whitespace-nowrap">{{ $type->nom }}</a></li>
+                <li><a href="{{ route('epreuves.matieres', ['classe' => $classe->nom, 'type' => $type->id]) }}" class="hover:text-white transition-colors whitespace-nowrap">{{ $type->nom }}</a></li>
                 <li><span class="mx-1">/</span></li>
                 <li class="text-white font-medium truncate max-w-[100px] sm:max-w-xs">{{ $matiere->nom }}</li>
             </ol>
@@ -49,7 +48,6 @@
                 </div>
             </div>
             
-            <!-- Statistiques rapides -->
             <div class="bg-white/10 backdrop-blur rounded-lg sm:rounded-xl px-3 py-1.5 sm:px-4 sm:py-2 self-end sm:self-auto">
                 <span class="text-white text-xs sm:text-sm whitespace-nowrap">
                     {{ $epreuves->total() }} épreuve{{ $epreuves->total() > 1 ? 's' : '' }}
@@ -58,7 +56,6 @@
         </div>
     </div>
     
-    <!-- Wave Separator simplifié -->
     <div class="absolute bottom-0 left-0 right-0 h-6 sm:h-12 overflow-hidden">
         <svg viewBox="0 0 1440 120" fill="none" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none" class="w-full h-full">
             <path d="M0 120L60 105C120 90 240 60 360 45C480 30 600 30 720 37.5C840 45 960 60 1080 67.5C1200 75 1320 75 1380 75L1440 75V120H1380C1320 120 1200 120 1080 120C960 120 840 120 720 120C600 120 480 120 360 120C240 120 120 120 60 120H0Z" 
@@ -67,7 +64,6 @@
     </div>
 </section>
 
-<!-- Contenu principal -->
 <div class="max-w-7xl mx-auto px-4 py-4 sm:py-5">
 
     @if($epreuves->isEmpty())
@@ -79,9 +75,48 @@
             <p class="text-sm sm:text-base text-gray-500 max-w-md mx-auto px-4">
                 Aucune épreuve n'est disponible pour le moment.
             </p>
+            <div class="mt-6">
+                <a href="{{ route('epreuves.matieres', ['classe' => $classe->nom, 'type' => $type->id]) }}" 
+                   class="inline-flex items-center gap-2 text-primary-600 hover:text-primary-700">
+                    <i class="fas fa-arrow-left"></i>
+                    Retour aux matières
+                </a>
+            </div>
         </div>
     @else
-        <!-- En-tête de section -->
+        <!-- Filtres -->
+        <div class="bg-white rounded-xl shadow-sm p-4 mb-6" data-aos="fade-up">
+            <div class="flex flex-wrap items-center justify-between gap-3">
+                <div class="flex items-center gap-2">
+                    <i class="fas fa-filter text-gray-400"></i>
+                    <span class="text-sm font-medium text-gray-700">Filtrer par :</span>
+                </div>
+                <div class="flex flex-wrap gap-2">
+                    <form method="GET" action="{{ route('epreuves.liste', ['classe' => $classe->nom, 'type' => $type->id, 'matiere' => $matiere->id]) }}" class="flex flex-wrap gap-2 items-center">
+                        <select name="annee" onchange="this.form.submit()" class="px-3 py-1.5 text-sm border border-gray-300 rounded-lg focus:ring-primary-500 focus:border-primary-500">
+                            <option value="">Toutes les années</option>
+                            @foreach($annees as $annee)
+                            <option value="{{ $annee }}" {{ request('annee') == $annee ? 'selected' : '' }}>{{ $annee }}</option>
+                            @endforeach
+                        </select>
+                        
+                        <select name="sort" onchange="this.form.submit()" class="px-3 py-1.5 text-sm border border-gray-300 rounded-lg focus:ring-primary-500 focus:border-primary-500">
+                            <option value="recent" {{ request('sort', 'recent') == 'recent' ? 'selected' : '' }}>Plus récent</option>
+                            <option value="ancien" {{ request('sort') == 'ancien' ? 'selected' : '' }}>Plus ancien</option>
+                            <option value="titre" {{ request('sort') == 'titre' ? 'selected' : '' }}>Titre (A-Z)</option>
+                        </select>
+                        
+                        @if(request('annee') || request('sort') != 'recent')
+                        <a href="{{ route('epreuves.liste', ['classe' => $classe->nom, 'type' => $type->id, 'matiere' => $matiere->id]) }}" 
+                           class="px-3 py-1.5 text-sm bg-gray-100 text-gray-600 rounded-lg hover:bg-gray-200 transition-colors">
+                            <i class="fas fa-times mr-1"></i> Réinitialiser
+                        </a>
+                        @endif
+                    </form>
+                </div>
+            </div>
+        </div>
+
         <div class="flex items-center gap-4 mb-6 sm:mb-8" data-aos="fade-up">
             <div class="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-br from-primary-600 to-primary-700 rounded-xl sm:rounded-2xl flex items-center justify-center shadow-lg">
                 <i class="fas fa-list text-white text-sm sm:text-base"></i>
@@ -92,11 +127,9 @@
             </div>
         </div>
 
-        <!-- Grille des épreuves - responsive -->
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
             @foreach($epreuves as $index => $epreuve)
             @php
-                // Couleur basée sur l'ID pour varier les cartes
                 $colors = [
                     'bg' => ['#3b82f6', '#22c55e', '#eab308', '#8b5cf6', '#ec4899', '#f97316'],
                     'light' => ['bg-blue-50', 'bg-green-50', 'bg-yellow-50', 'bg-purple-50', 'bg-pink-50', 'bg-orange-50'],
@@ -112,30 +145,25 @@
                  data-aos="fade-up" 
                  data-aos-delay="{{ $index * 50 }}">
                 
-                <!-- En-tête avec dégradé -->
                 <div class="relative h-20 sm:h-24 overflow-hidden" 
                      style="background: linear-gradient(135deg, {{ $mainColor }} 0%, {{ $mainColor }}dd 100%);">
                     
-                    <!-- Pattern de fond -->
                     <div class="absolute inset-0 opacity-10" 
                          style="background-image: url('data:image/svg+xml,%3Csvg width="60" height="60" viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg"%3E%3Cg fill="none" fill-rule="evenodd"%3E%3Cg fill="%23ffffff" fill-opacity="0.4"%3E%3Cpath d="M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z"/%3E%3C/g%3E%3C/g%3E%3C/svg%3E'); background-size: 20px 20px;">
                     </div>
                     
-                    <!-- Cercles décoratifs -->
                     <div class="absolute -right-8 -top-8 w-24 h-24 bg-white/20 rounded-full"></div>
                     <div class="absolute -left-8 -bottom-8 w-24 h-24 bg-white/20 rounded-full"></div>
                     
-                    <!-- Type d'épreuve -->
                     <div class="absolute bottom-3 left-4">
                         <div class="flex items-center gap-2">
                             <div class="w-8 h-8 bg-white/30 backdrop-blur rounded-lg flex items-center justify-center">
                                 <i class="fas fa-file-alt text-white text-sm"></i>
                             </div>
-                            <span class="text-white text-xs sm:text-sm font-medium">{{ $epreuve->typeEpreuve->nom }}</span>
+                            <span class="text-white text-xs sm:text-sm font-medium">{{ $epreuve->typeEpreuve->nom ?? $type->nom }}</span>
                         </div>
                     </div>
                     
-                    <!-- Badge année -->
                     @if($epreuve->annee)
                     <div class="absolute top-3 right-3 bg-white/30 backdrop-blur-sm text-white px-2 py-1 rounded-full text-xs font-medium">
                         {{ $epreuve->annee }}
@@ -144,17 +172,14 @@
                 </div>
                 
                 <div class="p-4 sm:p-5">
-                    <!-- Titre -->
                     <h3 class="text-base sm:text-lg font-bold text-gray-800 mb-2 group-hover:text-primary-600 transition-colors line-clamp-2">
                         {{ $epreuve->titre }}
                     </h3>
                     
-                    <!-- Description -->
                     @if($epreuve->description)
                         <p class="text-xs sm:text-sm text-gray-500 mb-3 line-clamp-2">{{ $epreuve->description }}</p>
                     @endif
                     
-                    <!-- Métadonnées -->
                     <div class="flex flex-wrap items-center gap-3 mb-4">
                         @if($epreuve->duree)
                         <span class="text-xs text-gray-500 flex items-center gap-1">
@@ -169,26 +194,12 @@
                             {{ $epreuve->bareme }} pts
                         </span>
                         @endif
-                        
-                        @if($epreuve->difficulte)
-                        <span class="text-xs text-gray-500 flex items-center gap-1">
-                            <i class="fas fa-signal" style="color: {{ $mainColor }};"></i> 
-                            {{ $epreuve->difficulte }}/5
-                        </span>
-                        @endif
                     </div>
                     
-                    <!-- Tags -->
                     <div class="flex flex-wrap gap-1.5 mb-4">
-                        @php
-                            $tags = ['Sujet officiel', 'Annales', 'Corrigé inclus'];
-                            shuffle($tags);
-                            $selectedTags = array_slice($tags, 0, 2);
-                        @endphp
-                        
-                        @foreach($selectedTags as $tag)
+                        @foreach($epreuve->matieres->take(2) as $matiereItem)
                         <span class="px-2 py-1 text-xs rounded-full {{ $lightClass }} {{ $textClass }}">
-                            {{ $tag }}
+                            {{ $matiereItem->nom }}
                         </span>
                         @endforeach
                         @if($epreuve->correction)
@@ -198,39 +209,23 @@
                         @endif
                     </div>
                     
-                    <!-- Barre de progression (disponibilité) -->
-                    <div class="mb-4">
-                        <div class="flex justify-between text-xs mb-1">
-                            <span class="text-gray-500">Disponibilité</span>
-                            <span class="font-medium" style="color: {{ $mainColor }};">{{ rand(80, 100) }}%</span>
-                        </div>
-                        <div class="w-full bg-gray-200 rounded-full h-1.5">
-                            <div class="h-1.5 rounded-full transition-all" 
-                                 style="width: {{ rand(80, 100) }}%; background-color: {{ $mainColor }};"></div>
-                        </div>
-                    </div>
-                    
-                    <!-- Trois boutons d'action -->
                     <div class="grid grid-cols-3 gap-2 mt-4 pt-4 border-t border-gray-100">
-                        <!-- Bouton Détails -->
-                        <a href="/epreuves/{{ $epreuve->slug ?? $epreuve->id }}" 
+                        <a href="{{ route('epreuves.show', $epreuve->slug ?? $epreuve->id) }}" 
                            class="flex flex-col items-center justify-center gap-1 px-2 py-2 bg-primary-50 text-primary-600 rounded-lg hover:bg-primary-100 transition-colors group"
                            title="Voir détails">
                             <i class="fas fa-eye text-sm"></i>
                             <span class="text-[10px] sm:text-xs font-medium">Détails</span>
                         </a>
                         
-                        <!-- Bouton Télécharger -->
-                        <a href="/epreuves/{{ $epreuve->slug ?? $epreuve->id }}/download" 
+                        <a href="{{ route('epreuves.download', $epreuve->slug ?? $epreuve->id) }}" 
                            class="flex flex-col items-center justify-center gap-1 px-2 py-2 bg-green-50 text-green-600 rounded-lg hover:bg-green-100 transition-colors group"
                            title="Télécharger l'épreuve">
                             <i class="fas fa-download text-sm"></i>
                             <span class="text-[10px] sm:text-xs font-medium">Télécharger</span>
                         </a>
                         
-                        <!-- Bouton Corrigé -->
                         @if($epreuve->correction)
-                        <a href="/epreuves/{{ $epreuve->slug ?? $epreuve->id }}/correction" 
+                        <a href="{{ route('epreuves.correction', $epreuve->slug ?? $epreuve->id) }}" 
                            class="flex flex-col items-center justify-center gap-1 px-2 py-2 bg-purple-50 text-purple-600 rounded-lg hover:bg-purple-100 transition-colors group"
                            title="Voir le corrigé">
                             <i class="fas fa-check-circle text-sm"></i>
@@ -250,20 +245,17 @@
             @endforeach
         </div>
         
-        <!-- Pagination responsive -->
         <div class="mt-6 sm:mt-8">
-            {{ $epreuves->links() }}
+            {{ $epreuves->withQueryString()->links() }}
         </div>
         
-        <!-- Information sur les résultats -->
         <div class="text-center mt-4 text-xs sm:text-sm text-gray-500">
             Affichage de {{ $epreuves->firstItem() ?? 0 }} à {{ $epreuves->lastItem() ?? 0 }} sur {{ $epreuves->total() }} épreuve{{ $epreuves->total() > 1 ? 's' : '' }}
         </div>
     @endif
     
-    <!-- Navigation retour -->
     <div class="text-center mt-6 sm:mt-8" data-aos="fade-up">
-        <a href="/epreuves/classe/{{ $classe->nom }}/type/{{ $type->slug }}/matieres" 
+        <a href="{{ route('epreuves.matieres', ['classe' => $classe->nom, 'type' => $type->id]) }}" 
            class="inline-flex items-center gap-2 text-gray-600 hover:text-primary-600 transition-colors text-sm sm:text-base">
             <i class="fas fa-arrow-left"></i>
             Retour aux matières
@@ -292,11 +284,6 @@
     overflow: hidden;
 }
 
-.scroll-mt-24 {
-    scroll-margin-top: 6rem;
-}
-
-/* Hide scrollbar for breadcrumb */
 .hide-scrollbar::-webkit-scrollbar {
     display: none;
 }
@@ -305,7 +292,6 @@
     scrollbar-width: none;
 }
 
-/* Animation au scroll */
 [data-aos] {
     opacity: 0;
     transition-property: opacity, transform;
@@ -325,23 +311,10 @@
     transform: translateY(0);
 }
 
-.hover\:-translate-y-2:hover {
-    transform: translateY(-0.25rem);
-}
-
-/* Améliorations responsives */
 @media (max-width: 640px) {
     .container {
         padding-left: 1rem;
         padding-right: 1rem;
-    }
-    
-    .text-2xl {
-        font-size: 1.25rem !important;
-    }
-    
-    .text-3xl {
-        font-size: 1.5rem !important;
     }
     
     .gap-6 {
@@ -352,30 +325,10 @@
         padding: 1rem !important;
     }
 }
-
-/* Animation pour les boutons */
-.btn-shine {
-    position: relative;
-    overflow: hidden;
-}
-.btn-shine::after {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: -100%;
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
-    transition: left 0.5s;
-}
-.btn-shine:hover::after {
-    left: 100%;
-}
 </style>
 
 @push('scripts')
 <script>
-    // Animation au scroll
     document.addEventListener('DOMContentLoaded', function() {
         const animatedElements = document.querySelectorAll('[data-aos]');
         
@@ -390,10 +343,7 @@
             });
         }
         
-        // Initial check
         checkVisibility();
-        
-        // Check on scroll
         window.addEventListener('scroll', checkVisibility);
     });
 </script>

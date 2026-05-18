@@ -19,7 +19,7 @@ class DashboardController extends Controller
 {
     public function index()
     {
-        // Statistiques générales
+        // Statistiques générales avec relations many-to-many
         $stats = [
             'epreuves' => Epreuve::count(),
             'cours' => Chapitre::count(),
@@ -29,8 +29,8 @@ class DashboardController extends Controller
             'contacts_non_lus' => Contact::where('lu', false)->count(),
         ];
 
-        // Dernières épreuves
-        $dernieresEpreuves = Epreuve::with(['classe', 'matiere', 'typeEpreuve'])
+        // Dernières épreuves - AVEC LES RELATIONS MANY-TO-MANY
+        $dernieresEpreuves = Epreuve::with(['classes', 'matieres', 'typeEpreuve'])
             ->latest()
             ->take(5)
             ->get();
@@ -59,7 +59,7 @@ class DashboardController extends Controller
             ->take(5)
             ->get();
 
-        // Répartition par classe
+        // Répartition par classe - Utilisation de la relation many-to-many
         $classes = Classe::withCount('epreuves')
             ->orderBy('ordre')
             ->get()
@@ -90,7 +90,7 @@ class DashboardController extends Controller
      */
     public function dashboardEpreuves()
     {
-        // Statistiques des épreuves
+        // Statistiques des épreuves avec relations many-to-many
         $stats = [
             'total' => Epreuve::count(),
             'avec_correction' => Epreuve::has('correction')->count(),
@@ -99,13 +99,13 @@ class DashboardController extends Controller
             'brouillons' => Epreuve::where('statut', false)->count(),
         ];
 
-        // Épreuves par classe
+        // Épreuves par classe - Utilisation de la relation many-to-many
         $epreuves_par_classe = Classe::withCount('epreuves')
             ->having('epreuves_count', '>', 0)
             ->orderBy('epreuves_count', 'desc')
             ->get();
 
-        // Épreuves par matière (top 10)
+        // Épreuves par matière (top 10) - Utilisation de la relation many-to-many
         $epreuves_par_matiere = Matiere::withCount('epreuves')
             ->having('epreuves_count', '>', 0)
             ->orderBy('epreuves_count', 'desc')
@@ -125,8 +125,8 @@ class DashboardController extends Controller
             ->orderBy('annee', 'desc')
             ->get();
 
-        // Dernières épreuves ajoutées
-        $dernieres_epreuves = Epreuve::with(['classe', 'matiere', 'typeEpreuve'])
+        // Dernières épreuves ajoutées avec relations many-to-many
+        $dernieres_epreuves = Epreuve::with(['classes', 'matieres', 'typeEpreuve'])
             ->latest()
             ->take(5)
             ->get();

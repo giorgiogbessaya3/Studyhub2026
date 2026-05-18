@@ -11,7 +11,8 @@ class Classe extends Model
 
     protected $fillable = [
         'nom',
-        'cycle',        // Ajout du champ cycle
+        'slug',
+        'cycle',
         'niveau',
         'description',
         'ordre',
@@ -33,11 +34,13 @@ class Classe extends Model
     }
 
     /**
-     * Relation avec les épreuves (one-to-many)
+     * Relation avec les épreuves (many-to-many)
+     * C'est ICI qu'il faut la définir !
      */
     public function epreuves()
     {
-        return $this->hasMany(Epreuve::class);
+        return $this->belongsToMany(Epreuve::class, 'epreuve_classe')
+                    ->withTimestamps();
     }
 
     /**
@@ -86,21 +89,5 @@ class Classe extends Model
     public function scopeOrdonnees($query)
     {
         return $query->orderBy('ordre')->orderBy('nom');
-    }
-
-    /**
-     * Vérifier si la classe est au collège
-     */
-    public function isCollege()
-    {
-        return $this->cycle === 'college';
-    }
-
-    /**
-     * Vérifier si la classe est au lycée
-     */
-    public function isLycee()
-    {
-        return $this->cycle === 'lycee';
     }
 }

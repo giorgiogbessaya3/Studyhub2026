@@ -3,268 +3,229 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-
-     <link rel="icon" type="image/png" href="{{ asset('img/logo.png') }}">
-    <link rel="shortcut icon" href="{{ asset('img/logo.png') }}">
-    <link rel="apple-touch-icon" href="{{ asset('img/logo.png') }}">
     <title>Connexion - StudyHub</title>
+    <link rel="icon" type="image/png" href="{{ asset('img/logo.png') }}">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { sans:['Inter','sans-serif'], display:['Poppins','sans-serif'] },
+                    colors: {
+                        primary: {
+                            50:'#eff6ff',100:'#dbeafe',200:'#bfdbfe',300:'#93c5fd',
+                            400:'#60a5fa',500:'#3b82f6',600:'#2563eb',700:'#1d4ed8',
+                            800:'#1e40af',900:'#1e3a8a',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
     <style>
-        body {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
-
-        .login-container {
-            max-width: 450px;
-            width: 90%;
-        }
-
-        .login-card {
-            background: white;
-            border-radius: 15px;
-            padding: 40px;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
-        }
-
-        .logo {
-            text-align: center;
-            margin-bottom: 30px;
-        }
-
-        .logo i {
-            font-size: 3rem;
-            color: #667eea;
-            background: #f0f3ff;
-            padding: 20px;
-            border-radius: 15px;
-        }
-
-        h2 {
-            color: #333;
-            font-weight: 600;
-            margin-bottom: 10px;
-        }
-
-        .subtitle {
-            color: #666;
-            font-size: 0.9rem;
-            margin-bottom: 30px;
-        }
-
-        .form-label {
-            font-weight: 500;
-            color: #444;
-            margin-bottom: 8px;
-        }
-
-        .input-group {
-            margin-bottom: 20px;
-        }
-
-        .input-group-text {
-            background: #f8f9fa;
-            border: 1px solid #ddd;
-            border-right: none;
-        }
-
-        .form-control {
-            border: 1px solid #ddd;
-            border-left: none;
-            padding: 10px 15px;
-        }
-
-        .form-control:focus {
-            border-color: #667eea;
-            box-shadow: none;
-        }
-
-        .password-toggle {
-            cursor: pointer;
-        }
-
-        .btn-login {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            border: none;
-            padding: 12px;
-            font-weight: 600;
-            border-radius: 8px;
-            width: 100%;
-            margin-top: 10px;
-            transition: opacity 0.3s;
-        }
-
-        .btn-login:hover {
-            opacity: 0.9;
-        }
-
-        .demo-section {
-            margin-top: 30px;
-            padding-top: 20px;
-            border-top: 1px solid #eee;
-        }
-
-        .demo-title {
-            color: #666;
-            font-size: 0.9rem;
-            margin-bottom: 15px;
-        }
-
-        .demo-buttons {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
-
-        .demo-btn {
-            background: #f8f9fa;
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            padding: 10px;
-            text-align: left;
-            cursor: pointer;
-            transition: background 0.3s;
-            font-size: 0.9rem;
-        }
-
-        .demo-btn:hover {
-            background: #e9ecef;
-        }
-
-        .demo-btn small {
-            display: block;
-            color: #666;
-            font-size: 0.8rem;
-            margin-top: 3px;
-        }
-
-        .alert {
-            font-size: 0.9rem;
-            padding: 10px 15px;
-            margin-bottom: 20px;
-        }
-
-        .register-link {
-            text-align: center;
-            margin-top: 20px;
-            font-size: 0.9rem;
-            color: #666;
-        }
-
-        .register-link a {
-            color: #667eea;
-            text-decoration: none;
-            font-weight: 500;
-        }
-
-        .register-link a:hover {
-            text-decoration: underline;
-        }
+        .blob { position:absolute; filter:blur(80px); opacity:0.3; animation:blob-move 20s infinite alternate; }
+        @keyframes blob-move { from{transform:translate(0,0) scale(1);} to{transform:translate(40px,-40px) scale(1.1);} }
     </style>
 </head>
-<body>
-    <div class="login-container">
-        <div class="login-card">
-            <div class="logo">
-                <i class="bi bi-book-half"></i>
+<body class="font-sans antialiased min-h-screen flex">
+
+    <!-- ═══ Panneau gauche — branding ═══ -->
+    <div class="hidden lg:flex lg:w-1/2 relative overflow-hidden flex-col justify-between p-12"
+         style="background-image:url('{{ asset('img/auth.jpg') }}');background-size:cover;background-position:center;">
+
+        <!-- Overlay dégradé -->
+        <div class="absolute inset-0 bg-gradient-to-br from-slate-900/75 via-primary-900/70 to-primary-800/65"></div>
+        <!-- Motif de points -->
+        <div class="absolute inset-0" style="background-image:radial-gradient(circle at 1px 1px,rgba(255,255,255,0.08) 1px,transparent 0);background-size:40px 40px"></div>
+
+        <!-- Logo + tagline -->
+        <div class="relative z-10">
+            <a href="{{ url('/') }}" class="flex items-center gap-3 mb-14">
+                <div class="w-12 h-12 bg-white/20 backdrop-blur rounded-2xl flex items-center justify-center border border-white/20 shadow-lg">
+                    <i class="fas fa-graduation-cap text-white text-xl"></i>
+                </div>
+                <span class="font-display text-2xl font-bold text-white tracking-tight">StudyHub</span>
+            </a>
+
+            <h1 class="font-display text-4xl xl:text-5xl font-bold text-white leading-tight mb-5">
+                Votre réussite<br>commence ici.
+            </h1>
+            <p class="text-primary-200 text-base leading-relaxed mb-10 max-w-sm">
+                Accédez à des milliers de cours, épreuves corrigées et quiz interactifs pour exceller dans vos études.
+            </p>
+
+            <!-- Fonctionnalités -->
+            <div class="space-y-4">
+                @foreach([
+                    ['fas fa-book-open',   'Cours structurés par classe et matière'],
+                    ['fas fa-file-alt',    'Épreuves corrigées avec corrections détaillées'],
+                    ['fas fa-brain',       'Quiz interactifs pour tester vos connaissances'],
+                    ['fas fa-headset',     'Assistance pédagogique par des professeurs'],
+                ] as [$icon, $text])
+                <div class="flex items-center gap-4">
+                    <div class="w-9 h-9 bg-white/15 rounded-xl flex items-center justify-center flex-shrink-0 border border-white/10">
+                        <i class="{{ $icon }} text-white text-sm"></i>
+                    </div>
+                    <span class="text-primary-100 text-sm">{{ $text }}</span>
+                </div>
+                @endforeach
             </div>
-            
-            <h2 class="text-center">StudyHub</h2>
-            <p class="subtitle text-center">Connectez-vous à votre espace</p>
+        </div>
 
-            @if($errors->any())
-                <div class="alert alert-danger">
-                    <i class="bi bi-exclamation-circle me-2"></i>
-                    Email ou mot de passe incorrect
+        <!-- Stats bas -->
+        <div class="relative z-10 flex gap-8 pt-8 border-t border-white/10">
+            <div>
+                <div class="text-2xl font-bold text-white font-display">
+                    {{ $nbEleves >= 1000 ? number_format($nbEleves/1000, 0).' k+' : $nbEleves.'+' }}
                 </div>
-            @endif
-
-            @if(session('status'))
-                <div class="alert alert-success">
-                    <i class="bi bi-check-circle me-2"></i>
-                    {{ session('status') }}
-                </div>
-            @endif
-
-            <form method="POST" action="{{ route('login') }}">
-                @csrf
-
-                <div class="mb-3">
-                    <label class="form-label">Email</label>
-                    <div class="input-group">
-                        <span class="input-group-text"><i class="bi bi-envelope"></i></span>
-                        <input type="email" class="form-control" name="email" value="{{ old('email') }}" required autofocus>
-                    </div>
-                </div>
-
-                <div class="mb-3">
-                    <label class="form-label">Mot de passe</label>
-                    <div class="input-group">
-                        <span class="input-group-text"><i class="bi bi-lock"></i></span>
-                        <input type="password" class="form-control" name="password" id="password" required>
-                        <span class="input-group-text password-toggle" onclick="togglePassword()">
-                            <i class="bi bi-eye" id="toggleIcon"></i>
-                        </span>
-                    </div>
-                </div>
-
-                <div class="d-flex justify-content-between align-items-center mb-3">
-                    <div class="form-check">
-                        <input class="form-check-input" type="checkbox" name="remember" id="remember">
-                        <label class="form-check-label" for="remember">Se souvenir</label>
-                    </div>
-                    <a href="{{ route('password.request') }}" class="text-decoration-none small">Mot de passe oublié?</a>
-                </div>
-
-                <button type="submit" class="btn-login" id="submitBtn">
-                    <span class="spinner-border spinner-border-sm d-none me-2" id="spinner"></span>
-                    <span id="btnText">Se connecter</span>
-                </button>
-            </form>
-
-            <div class="register-link">
-                Pas encore de compte ? <a href="{{ route('register') }}">S'inscrire</a>
+                <div class="text-primary-300 text-xs mt-0.5">Élèves actifs</div>
             </div>
+            <div>
+                <div class="text-2xl font-bold text-white font-display">
+                    {{ $nbEpreuves >= 1000 ? number_format($nbEpreuves/1000, 0).' k+' : $nbEpreuves.'+' }}
+                </div>
+                <div class="text-primary-300 text-xs mt-0.5">Épreuves</div>
+            </div>
+            <div>
+                <div class="text-2xl font-bold text-white font-display">{{ $satisfaction }}%</div>
+                <div class="text-primary-300 text-xs mt-0.5">Satisfaction</div>
+            </div>
+        </div>
+    </div>
 
-            
+    <!-- ═══ Panneau droit — formulaire ═══ -->
+    <div class="w-full lg:w-1/2 flex flex-col min-h-screen bg-slate-50 overflow-y-auto">
+        <div class="flex-1 flex items-center justify-center px-6 sm:px-12 py-12">
+            <div class="w-full max-w-md">
+
+                <!-- Logo mobile uniquement -->
+                <div class="flex lg:hidden items-center gap-3 justify-center mb-8">
+                    <div class="w-10 h-10 bg-gradient-to-br from-primary-600 to-primary-800 rounded-xl flex items-center justify-center shadow-lg">
+                        <i class="fas fa-graduation-cap text-white text-sm"></i>
+                    </div>
+                    <span class="font-display text-xl font-bold text-slate-900">StudyHub</span>
+                </div>
+
+                <!-- En-tête formulaire -->
+                <div class="mb-8">
+                    <h2 class="font-display text-3xl font-bold text-slate-900 mb-1">Bon retour !</h2>
+                    <p class="text-slate-500 text-sm">Connectez-vous à votre espace d'apprentissage</p>
+                </div>
+
+                <!-- Alertes -->
+                @if($errors->any())
+                    <div class="flex items-start gap-3 bg-red-50 border border-red-200 text-red-700 rounded-xl px-4 py-3 mb-6 text-sm">
+                        <i class="fas fa-exclamation-circle mt-0.5 flex-shrink-0"></i>
+                        <span>Email ou mot de passe incorrect. Veuillez réessayer.</span>
+                    </div>
+                @endif
+                @if(session('status'))
+                    <div class="flex items-start gap-3 bg-green-50 border border-green-200 text-green-700 rounded-xl px-4 py-3 mb-6 text-sm">
+                        <i class="fas fa-check-circle mt-0.5 flex-shrink-0"></i>
+                        <span>{{ session('status') }}</span>
+                    </div>
+                @endif
+
+                <!-- Formulaire -->
+                <form method="POST" action="{{ route('login') }}" id="loginForm" class="space-y-5">
+                    @csrf
+
+                    <!-- Email -->
+                    <div>
+                        <label for="email" class="block text-xs font-semibold text-slate-600 uppercase tracking-wider mb-2">
+                            Adresse email
+                        </label>
+                        <div class="relative">
+                            <i class="fas fa-envelope absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 text-sm pointer-events-none"></i>
+                            <input type="email" id="email" name="email"
+                                   value="{{ old('email') }}"
+                                   placeholder="votre@email.com"
+                                   autocomplete="email" autofocus required
+                                   class="w-full py-3 pl-11 pr-4 bg-white border border-slate-200 rounded-xl text-slate-800 placeholder-slate-400 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all shadow-sm {{ $errors->has('email') ? 'border-red-400' : '' }}">
+                        </div>
+                    </div>
+
+                    <!-- Mot de passe -->
+                    <div>
+                        <div class="flex items-center justify-between mb-2">
+                            <label for="password" class="text-xs font-semibold text-slate-600 uppercase tracking-wider">
+                                Mot de passe
+                            </label>
+                            <a href="{{ route('password.request') }}" class="text-xs text-primary-600 hover:text-primary-700 font-medium transition-colors">
+                                Mot de passe oublié ?
+                            </a>
+                        </div>
+                        <div class="relative">
+                            <i class="fas fa-lock absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 text-sm pointer-events-none"></i>
+                            <input type="password" id="password" name="password"
+                                   placeholder="••••••••"
+                                   autocomplete="current-password" required
+                                   class="w-full py-3 pl-11 pr-12 bg-white border border-slate-200 rounded-xl text-slate-800 placeholder-slate-400 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all shadow-sm {{ $errors->has('password') ? 'border-red-400' : '' }}">
+                            <button type="button" onclick="togglePassword('password','eyeIcon')"
+                                    class="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 transition-colors">
+                                <i id="eyeIcon" class="fas fa-eye text-sm"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Se souvenir -->
+                    <div class="flex items-center gap-2.5">
+                        <input type="checkbox" id="remember" name="remember"
+                               class="w-4 h-4 rounded border-slate-300 text-primary-600 focus:ring-primary-500 cursor-pointer">
+                        <label for="remember" class="text-sm text-slate-600 cursor-pointer select-none">
+                            Se souvenir de moi
+                        </label>
+                    </div>
+
+                    <!-- Bouton -->
+                    <button type="submit" id="submitBtn"
+                            class="w-full bg-primary-600 hover:bg-primary-700 text-white font-semibold py-3.5 rounded-xl transition-all hover:shadow-lg hover:shadow-primary-500/30 flex items-center justify-center gap-2 text-sm mt-2">
+                        <i id="btnIcon" class="fas fa-sign-in-alt"></i>
+                        <span id="btnText">Se connecter</span>
+                    </button>
+                </form>
+
+                <!-- Lien inscription -->
+                <p class="text-center text-sm text-slate-500 mt-8">
+                    Pas encore de compte ?
+                    <a href="{{ route('register') }}" class="text-primary-600 hover:text-primary-700 font-semibold transition-colors">
+                        S'inscrire gratuitement
+                    </a>
+                </p>
+
+                <div class="text-center mt-4">
+                    <a href="{{ url('/') }}" class="text-xs text-slate-400 hover:text-slate-600 transition-colors inline-flex items-center gap-1.5">
+                        <i class="fas fa-arrow-left text-xs"></i> Retour à l'accueil
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="text-center py-4 border-t border-slate-100">
+            <p class="text-xs text-slate-400">&copy; {{ date('Y') }} StudyHub. Tous droits réservés.</p>
         </div>
     </div>
 
     <script>
-        function togglePassword() {
-            const password = document.getElementById('password');
-            const icon = document.getElementById('toggleIcon');
-            
-            if (password.type === 'password') {
-                password.type = 'text';
-                icon.classList.remove('bi-eye');
-                icon.classList.add('bi-eye-slash');
-            } else {
-                password.type = 'password';
-                icon.classList.remove('bi-eye-slash');
-                icon.classList.add('bi-eye');
-            }
+        function togglePassword(fieldId, iconId) {
+            const field = document.getElementById(fieldId);
+            const icon  = document.getElementById(iconId);
+            field.type  = field.type === 'password' ? 'text' : 'password';
+            icon.classList.toggle('fa-eye');
+            icon.classList.toggle('fa-eye-slash');
         }
 
-        function fillDemo(email, password) {
-            document.querySelector('input[name="email"]').value = email;
-            document.querySelector('input[name="password"]').value = password;
-        }
-
-        document.getElementById('loginForm')?.addEventListener('submit', function() {
-            const btn = document.getElementById('submitBtn');
-            const spinner = document.getElementById('spinner');
-            const btnText = document.getElementById('btnText');
-            
+        document.getElementById('loginForm').addEventListener('submit', function() {
+            const btn  = document.getElementById('submitBtn');
+            const text = document.getElementById('btnText');
+            const icon = document.getElementById('btnIcon');
             btn.disabled = true;
-            spinner.classList.remove('d-none');
-            btnText.textContent = 'Connexion...';
+            btn.classList.add('opacity-75','cursor-not-allowed');
+            icon.className = 'fas fa-spinner fa-spin';
+            text.textContent = 'Connexion en cours…';
         });
     </script>
 </body>

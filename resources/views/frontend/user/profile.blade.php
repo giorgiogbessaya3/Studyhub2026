@@ -57,8 +57,8 @@
     <div class="flex flex-col lg:flex-row gap-4 lg:gap-6">
         
         <!-- Colonne de gauche - Carte profil compacte -->
-        <div class="lg:w-80 xl:w-96">
-            <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden sticky top-20">
+        <div class="lg:w-72">
+            <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden sticky top-16 lg:top-20">
                 <!-- En-tête avec dégradé -->
                 <div class="h-16 bg-gradient-to-r from-primary-600 to-primary-700 relative">
                     <div class="absolute -bottom-8 left-1/2 -translate-x-1/2">

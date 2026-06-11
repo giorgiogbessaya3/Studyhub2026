@@ -41,6 +41,14 @@ class RegisterController extends Controller
         $this->middleware('guest');
     }
 
+    public function showRegistrationForm()
+    {
+        $nbEleves       = User::where('role', 'eleve')->count();
+        $derniersEleves = User::where('role', 'eleve')->latest()->take(4)->get();
+
+        return view('auth.register', compact('nbEleves', 'derniersEleves'));
+    }
+
     /**
      * Get a validator for an incoming registration request.
      *

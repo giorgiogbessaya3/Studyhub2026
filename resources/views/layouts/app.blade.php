@@ -173,11 +173,9 @@
             100% { background-position: -200% 0; }
         }
 
-        /* Mobile adjustments */
+        /* Mobile — espace pour la bottom nav fixe */
         @media (max-width: 1023px) {
-            main {
-                padding-bottom: 80px;
-            }
+            main { padding-bottom: 64px; }
         }
 
         /* Avatar animations */
@@ -188,6 +186,10 @@
             transform: scale(1.05);
             box-shadow: 0 10px 25px -5px rgba(59, 130, 246, 0.4);
         }
+
+        /* Animation delay utilities */
+        .animation-delay-2000 { animation-delay: 2s; }
+        .animation-delay-4000 { animation-delay: 4s; }
     </style>
     
     @yield('styles')
@@ -329,18 +331,15 @@
                                     </div>
                                     
                                     <div class="border-t border-slate-100 p-2">
-                                        <form method="POST" action="{{ route('logout') }}" id="logout-form-desktop">
-                                            @csrf
-                                            <button type="submit" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-red-50 text-red-600 transition-colors group">
-                                                <div class="w-9 h-9 bg-red-100 rounded-full flex items-center justify-center group-hover:bg-red-200 transition-colors">
-                                                    <i class="fas fa-sign-out-alt text-red-600"></i>
-                                                </div>
-                                                <div class="text-left">
-                                                    <p class="font-medium">Déconnexion</p>
-                                                    <p class="text-xs text-red-400">Se déconnecter</p>
-                                                </div>
-                                            </button>
-                                        </form>
+                                        <button type="button" onclick="openLogoutModal()" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-red-50 text-red-600 transition-colors group">
+                                            <div class="w-9 h-9 bg-red-100 rounded-full flex items-center justify-center group-hover:bg-red-200 transition-colors">
+                                                <i class="fas fa-sign-out-alt text-red-600"></i>
+                                            </div>
+                                            <div class="text-left">
+                                                <p class="font-medium">Déconnexion</p>
+                                                <p class="text-xs text-red-400">Se déconnecter</p>
+                                            </div>
+                                        </button>
                                     </div>
                                 </div>
                             </div>
@@ -362,219 +361,36 @@
     <div class="lg:hidden fixed top-0 left-0 right-0 z-50">
         <div class="glass border-b border-white/20">
             <div class="px-4 h-16 flex items-center justify-between">
-                <!-- Logo and Name -->
+                <!-- Nom de l'application -->
                 <a href="{{ url('/') }}" class="flex items-center gap-2">
-                    <div class="w-10 h-10 bg-gradient-to-br from-primary-600 to-primary-800 rounded-xl flex items-center justify-center shadow-lg">
+                    <div class="w-9 h-9 bg-gradient-to-br from-primary-600 to-primary-800 rounded-xl flex items-center justify-center shadow-lg">
                         <i class="fas fa-graduation-cap text-white text-sm"></i>
                     </div>
                     <span class="font-display text-xl font-bold text-slate-900">StudyHub</span>
                 </a>
 
-                <!-- Right side icons -->
+                <!-- Recherche + Déconnexion -->
                 <div class="flex items-center gap-2">
-                    <!-- Search Icon -->
-                    <button onclick="toggleSearch()" class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-slate-100 transition-colors">
+                    <button onclick="toggleSearch()" class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-slate-100 transition-colors" aria-label="Rechercher">
                         <i class="fas fa-search text-slate-600 text-lg"></i>
                     </button>
 
-                    <!-- Mobile Menu Button -->
-                    <button onclick="toggleMobileMenu()" class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-slate-100 transition-colors" id="mobileMenuButton">
-                        <i class="fas fa-bars text-slate-600 text-lg" id="menuIcon"></i>
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Mobile Menu Panel (slide-down) -->
-    <div id="mobileMenuPanel" class="lg:hidden fixed top-16 left-0 right-0 bg-white shadow-xl z-40 hidden transform transition-all duration-300 ease-in-out max-h-[80vh] overflow-y-auto">
-        <div class="p-4 border-b border-slate-100">
-            @auth
-                <div class="flex items-center gap-3 mb-4 p-3 bg-primary-50 rounded-xl">
-                    <img src="{{ Auth::user()->avatar_url }}" 
-                         alt="{{ Auth::user()->name }}" 
-                         class="w-14 h-14 rounded-full border-3 border-primary-200 object-cover"
-                         onerror="this.src='https://ui-avatars.com/api/?name={{ urlencode(Auth::user()->name) }}&background=3b82f6&color=fff&size=56'">
-                    <div class="flex-1">
-                        <p class="font-semibold text-slate-800">{{ Auth::user()->name }}</p>
-                        <p class="text-xs text-slate-500 truncate">{{ Auth::user()->email }}</p>
-                        <div class="mt-1">
-                            @if(Auth::user()->isAdmin())
-                                <span class="inline-flex items-center px-2 py-0.5 bg-purple-100 text-purple-700 text-xs rounded-full">
-                                    <i class="fas fa-crown mr-1"></i> Administrateur
-                                </span>
-                            @elseif(Auth::user()->isEnseignant())
-                                <span class="inline-flex items-center px-2 py-0.5 bg-green-100 text-green-700 text-xs rounded-full">
-                                    <i class="fas fa-chalkboard-teacher mr-1"></i> Enseignant
-                                </span>
-                            @else
-                                <span class="inline-flex items-center px-2 py-0.5 bg-blue-100 text-blue-700 text-xs rounded-full">
-                                    <i class="fas fa-user-graduate mr-1"></i> Élève
-                                </span>
-                            @endif
-                        </div>
-                    </div>
-                </div>
-            @endauth
-
-            <!-- Navigation Links -->
-            <div class="space-y-1">
-                <a href="{{ url('/') }}" class="flex items-center gap-3 px-4 py-3 rounded-xl {{ request()->is('/') ? 'bg-primary-50 text-primary-600' : 'text-slate-700 hover:bg-slate-50' }} transition-colors">
-                    <div class="w-8 h-8 {{ request()->is('/') ? 'bg-primary-100' : 'bg-slate-100' }} rounded-full flex items-center justify-center">
-                        <i class="fas fa-home {{ request()->is('/') ? 'text-primary-600' : 'text-slate-500' }}"></i>
-                    </div>
-                    <span class="font-medium">Accueil</span>
-                </a>
-                
-                <a href="{{ url('/cours') }}" class="flex items-center gap-3 px-4 py-3 rounded-xl {{ request()->is('cours*') ? 'bg-primary-50 text-primary-600' : 'text-slate-700 hover:bg-slate-50' }} transition-colors">
-                    <div class="w-8 h-8 {{ request()->is('cours*') ? 'bg-primary-100' : 'bg-slate-100' }} rounded-full flex items-center justify-center">
-                        <i class="fas fa-book {{ request()->is('cours*') ? 'text-primary-600' : 'text-slate-500' }}"></i>
-                    </div>
-                    <span class="font-medium">Cours</span>
-                </a>
-                
-                <a href="{{ url('/epreuves') }}" class="flex items-center gap-3 px-4 py-3 rounded-xl {{ request()->is('epreuves*') ? 'bg-primary-50 text-primary-600' : 'text-slate-700 hover:bg-slate-50' }} transition-colors">
-                    <div class="w-8 h-8 {{ request()->is('epreuves*') ? 'bg-primary-100' : 'bg-slate-100' }} rounded-full flex items-center justify-center">
-                        <i class="fas fa-file-alt {{ request()->is('epreuves*') ? 'text-primary-600' : 'text-slate-500' }}"></i>
-                    </div>
-                    <span class="font-medium">Épreuves</span>
-                </a>
-                
-                <a href="{{ url('/quiz') }}" class="flex items-center gap-3 px-4 py-3 rounded-xl {{ request()->is('quiz*') ? 'bg-primary-50 text-primary-600' : 'text-slate-700 hover:bg-slate-50' }} transition-colors">
-                    <div class="w-8 h-8 {{ request()->is('quiz*') ? 'bg-primary-100' : 'bg-slate-100' }} rounded-full flex items-center justify-center">
-                        <i class="fas fa-question-circle {{ request()->is('quiz*') ? 'text-primary-600' : 'text-slate-500' }}"></i>
-                    </div>
-                    <span class="font-medium">Quiz</span>
-                </a>
-                
-                <a href="{{ url('/assistance') }}" class="flex items-center gap-3 px-4 py-3 rounded-xl {{ request()->is('assistance*') ? 'bg-primary-50 text-primary-600' : 'text-slate-700 hover:bg-slate-50' }} transition-colors">
-                    <div class="w-8 h-8 {{ request()->is('assistance*') ? 'bg-primary-100' : 'bg-slate-100' }} rounded-full flex items-center justify-center">
-                        <i class="fas fa-headset {{ request()->is('assistance*') ? 'text-primary-600' : 'text-slate-500' }}"></i>
-                    </div>
-                    <span class="font-medium">Assistance</span>
-                </a>
-                
-                @auth
-                    @if(Auth::user()->isAdmin())
-                        <a href="{{ url('/admin/dashboard') }}" class="flex items-center gap-3 px-4 py-3 rounded-xl {{ request()->is('admin*') ? 'bg-purple-50 text-purple-600' : 'text-slate-700 hover:bg-slate-50' }} transition-colors">
-                            <div class="w-8 h-8 {{ request()->is('admin*') ? 'bg-purple-100' : 'bg-slate-100' }} rounded-full flex items-center justify-center">
-                                <i class="fas fa-cog {{ request()->is('admin*') ? 'text-purple-600' : 'text-slate-500' }}"></i>
-                            </div>
-                            <span class="font-medium">Administration</span>
-                        </a>
-                    @endif
-                    
-                    <div class="border-t border-slate-200 my-3"></div>
-                    
-                    <p class="text-xs font-semibold text-slate-400 uppercase tracking-wider px-4 mb-2">Mon espace</p>
-                    
-                    <a href="{{ url('/dashboard') }}" class="flex items-center gap-3 px-4 py-3 rounded-xl {{ request()->is('dashboard') ? 'bg-primary-50 text-primary-600' : 'text-slate-700 hover:bg-slate-50' }} transition-colors">
-                        <div class="w-8 h-8 {{ request()->is('dashboard') ? 'bg-primary-100' : 'bg-slate-100' }} rounded-full flex items-center justify-center">
-                            <i class="fas fa-chart-line {{ request()->is('dashboard') ? 'text-primary-600' : 'text-slate-500' }}"></i>
-                        </div>
-                        <span class="font-medium">Tableau de bord</span>
-                    </a>
-                    
-                    <a href="{{ url('/profile') }}" class="flex items-center gap-3 px-4 py-3 rounded-xl {{ request()->is('profile') ? 'bg-primary-50 text-primary-600' : 'text-slate-700 hover:bg-slate-50' }} transition-colors">
-                        <div class="w-8 h-8 {{ request()->is('profile') ? 'bg-primary-100' : 'bg-slate-100' }} rounded-full flex items-center justify-center">
-                            <i class="fas fa-user {{ request()->is('profile') ? 'text-primary-600' : 'text-slate-500' }}"></i>
-                        </div>
-                        <span class="font-medium">Mon profil</span>
-                    </a>
-                    
-                    
-                    
-                    <a href="{{ url('/mes-resultats') }}" class="flex items-center gap-3 px-4 py-3 rounded-xl {{ request()->is('mes-resultats') ? 'bg-primary-50 text-primary-600' : 'text-slate-700 hover:bg-slate-50' }} transition-colors">
-                        <div class="w-8 h-8 {{ request()->is('mes-resultats') ? 'bg-primary-100' : 'bg-slate-100' }} rounded-full flex items-center justify-center">
-                            <i class="fas fa-chart-bar {{ request()->is('mes-resultats') ? 'text-primary-600' : 'text-slate-500' }}"></i>
-                        </div>
-                        <span class="font-medium">Mes résultats</span>
-                    </a>
-                    
-                    <a href="{{ url('/mes-questions') }}" class="flex items-center gap-3 px-4 py-3 rounded-xl {{ request()->is('mes-questions') ? 'bg-primary-50 text-primary-600' : 'text-slate-700 hover:bg-slate-50' }} transition-colors">
-                        <div class="w-8 h-8 {{ request()->is('mes-questions') ? 'bg-primary-100' : 'bg-slate-100' }} rounded-full flex items-center justify-center">
-                            <i class="fas fa-question {{ request()->is('mes-questions') ? 'text-primary-600' : 'text-slate-500' }}"></i>
-                        </div>
-                        <span class="font-medium">Mes questions</span>
-                    </a>
-                @endauth
-            </div>
-            
-            @auth
-                <div class="border-t border-slate-200 mt-4 pt-4">
-                    <form method="POST" action="{{ route('logout') }}" id="logout-form-mobile">
-                        @csrf
-                        <button type="submit" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-red-600 hover:bg-red-50 transition-colors">
-                            <div class="w-8 h-8 bg-red-100 rounded-full flex items-center justify-center">
-                                <i class="fas fa-sign-out-alt text-red-600"></i>
-                            </div>
-                            <span class="font-medium">Déconnexion</span>
+                    @auth
+                        <button type="button" onclick="openLogoutModal()"
+                                class="w-10 h-10 flex items-center justify-center rounded-full bg-red-50 hover:bg-red-100 transition-colors"
+                                aria-label="Déconnexion">
+                            <i class="fas fa-sign-out-alt text-red-600 text-base"></i>
                         </button>
-                    </form>
+                    @else
+                        <a href="{{ route('login') }}"
+                           class="px-3 py-1.5 bg-primary-600 hover:bg-primary-700 text-white text-sm font-medium rounded-lg transition-colors">
+                            Connexion
+                        </a>
+                    @endauth
                 </div>
-            @else
-                <div class="border-t border-slate-200 mt-4 pt-4 flex flex-col gap-2">
-                    <a href="{{ route('login') }}" class="w-full flex items-center justify-center gap-2 px-4 py-3 bg-primary-600 hover:bg-primary-700 text-white font-medium rounded-xl transition-colors">
-                        <i class="fas fa-sign-in-alt"></i>
-                        <span>Se connecter</span>
-                    </a>
-                    <a href="{{ route('register') }}" class="w-full flex items-center justify-center gap-2 px-4 py-3 bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium rounded-xl transition-colors">
-                        <i class="fas fa-user-plus"></i>
-                        <span>S'inscrire</span>
-                    </a>
-                </div>
-            @endauth
+            </div>
         </div>
     </div>
-
-    <!-- Mobile Bottom Navigation (visible only on mobile) -->
-    <nav class="lg:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-slate-200 safe-bottom z-40 shadow-lg">
-        <div class="flex justify-around items-center h-16">
-            <a href="{{ url('/') }}" class="flex flex-col items-center justify-center w-full h-full gap-1 {{ request()->is('/') ? 'text-primary-600' : 'text-slate-400' }}">
-                <div class="w-10 h-10 rounded-full flex items-center justify-center {{ request()->is('/') ? 'bg-primary-100' : '' }}">
-                    <i class="fas fa-home text-lg"></i>
-                </div>
-                <span class="text-xs font-medium">Accueil</span>
-            </a>
-            
-            <a href="{{ url('/cours') }}" class="flex flex-col items-center justify-center w-full h-full gap-1 {{ request()->is('cours*') ? 'text-primary-600' : 'text-slate-400' }}">
-                <div class="w-10 h-10 rounded-full flex items-center justify-center {{ request()->is('cours*') ? 'bg-primary-100' : '' }}">
-                    <i class="fas fa-book text-lg"></i>
-                </div>
-                <span class="text-xs font-medium">Cours</span>
-            </a>
-            
-            <a href="{{ url('/epreuves') }}" class="flex flex-col items-center justify-center w-full h-full gap-1 {{ request()->is('epreuves*') ? 'text-primary-600' : 'text-slate-400' }}">
-                <div class="w-10 h-10 rounded-full flex items-center justify-center {{ request()->is('epreuves*') ? 'bg-primary-100' : '' }}">
-                    <i class="fas fa-file-alt text-lg"></i>
-                </div>
-                <span class="text-xs font-medium">Épreuves</span>
-            </a>
-            
-            <a href="{{ url('/quiz') }}" class="flex flex-col items-center justify-center w-full h-full gap-1 {{ request()->is('quiz*') ? 'text-primary-600' : 'text-slate-400' }}">
-                <div class="w-10 h-10 rounded-full flex items-center justify-center {{ request()->is('quiz*') ? 'bg-primary-100' : '' }}">
-                    <i class="fas fa-question-circle text-lg"></i>
-                </div>
-                <span class="text-xs font-medium">Quiz</span>
-            </a>
-            
-            @auth
-                <a href="{{ url('/dashboard') }}" class="flex flex-col items-center justify-center w-full h-full gap-1 {{ request()->is('dashboard') ? 'text-primary-600' : 'text-slate-400' }}">
-                    <div class="w-10 h-10 rounded-full flex items-center justify-center {{ request()->is('dashboard') ? 'bg-primary-100' : '' }}">
-                        <i class="fas fa-user text-lg"></i>
-                    </div>
-                    <span class="text-xs font-medium">Profil</span>
-                </a>
-            @else
-                <a href="{{ route('login') }}" class="flex flex-col items-center justify-center w-full h-full gap-1 text-slate-400">
-                    <div class="w-10 h-10 rounded-full flex items-center justify-center">
-                        <i class="fas fa-sign-in-alt text-lg"></i>
-                    </div>
-                    <span class="text-xs font-medium">Connexion</span>
-                </a>
-            @endauth
-        </div>
-    </nav>
 
     <!-- Search Overlay -->
     <div id="searchOverlay" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 hidden opacity-0 transition-opacity duration-300">
@@ -600,12 +416,89 @@
         </div>
     </div>
 
+    <!-- Mobile Bottom Navigation -->
+    <nav class="lg:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-slate-200 safe-bottom z-40 shadow-lg">
+        <div class="flex justify-around items-center h-16">
+            <a href="{{ url('/') }}" class="flex flex-col items-center justify-center w-full h-full gap-1 {{ request()->is('/') ? 'text-primary-600' : 'text-slate-400' }}">
+                <div class="w-10 h-10 rounded-full flex items-center justify-center {{ request()->is('/') ? 'bg-primary-100' : '' }}">
+                    <i class="fas fa-home text-lg"></i>
+                </div>
+                <span class="text-xs font-medium">Accueil</span>
+            </a>
+            <a href="{{ url('/cours') }}" class="flex flex-col items-center justify-center w-full h-full gap-1 {{ request()->is('cours*') ? 'text-primary-600' : 'text-slate-400' }}">
+                <div class="w-10 h-10 rounded-full flex items-center justify-center {{ request()->is('cours*') ? 'bg-primary-100' : '' }}">
+                    <i class="fas fa-book text-lg"></i>
+                </div>
+                <span class="text-xs font-medium">Cours</span>
+            </a>
+            <a href="{{ url('/epreuves') }}" class="flex flex-col items-center justify-center w-full h-full gap-1 {{ request()->is('epreuves*') ? 'text-primary-600' : 'text-slate-400' }}">
+                <div class="w-10 h-10 rounded-full flex items-center justify-center {{ request()->is('epreuves*') ? 'bg-primary-100' : '' }}">
+                    <i class="fas fa-file-alt text-lg"></i>
+                </div>
+                <span class="text-xs font-medium">Épreuves</span>
+            </a>
+            <a href="{{ url('/quiz') }}" class="flex flex-col items-center justify-center w-full h-full gap-1 {{ request()->is('quiz*') ? 'text-primary-600' : 'text-slate-400' }}">
+                <div class="w-10 h-10 rounded-full flex items-center justify-center {{ request()->is('quiz*') ? 'bg-primary-100' : '' }}">
+                    <i class="fas fa-question-circle text-lg"></i>
+                </div>
+                <span class="text-xs font-medium">Quiz</span>
+            </a>
+            @auth
+                <a href="{{ url('/dashboard') }}" class="flex flex-col items-center justify-center w-full h-full gap-1 {{ request()->is('dashboard') ? 'text-primary-600' : 'text-slate-400' }}">
+                    <div class="w-10 h-10 rounded-full flex items-center justify-center {{ request()->is('dashboard') ? 'bg-primary-100' : '' }}">
+                        <i class="fas fa-user text-lg"></i>
+                    </div>
+                    <span class="text-xs font-medium">Profil</span>
+                </a>
+            @else
+                <a href="{{ url('/assistance') }}" class="flex flex-col items-center justify-center w-full h-full gap-1 {{ request()->is('assistance*') ? 'text-primary-600' : 'text-slate-400' }}">
+                    <div class="w-10 h-10 rounded-full flex items-center justify-center {{ request()->is('assistance*') ? 'bg-primary-100' : '' }}">
+                        <i class="fas fa-headset text-lg"></i>
+                    </div>
+                    <span class="text-xs font-medium">Aide</span>
+                </a>
+            @endauth
+        </div>
+    </nav>
+
     <!-- Main Content -->
-    <main class="lg:pt-20 pt-16 min-h-screen">
+    <main class="lg:pt-20 pt-16 pb-16 lg:pb-0 min-h-screen">
         @yield('content')
     </main>
 
-    <!-- Footer -->
+    <!-- Modal de confirmation déconnexion -->
+    @auth
+    <div id="logoutModal" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-[60] hidden opacity-0 transition-opacity duration-200 flex items-end sm:items-center justify-center px-0 sm:px-4">
+        <div id="logoutModalBox" class="bg-white w-full sm:max-w-sm sm:rounded-2xl rounded-t-2xl shadow-2xl p-6 transform translate-y-4 sm:translate-y-0 sm:scale-95 transition-all duration-200">
+            <!-- Icône -->
+            <div class="flex items-center justify-center w-16 h-16 bg-red-100 rounded-full mx-auto mb-4">
+                <i class="fas fa-sign-out-alt text-red-600 text-2xl"></i>
+            </div>
+            <!-- Texte -->
+            <h3 class="text-lg font-bold text-slate-900 text-center mb-2">Déconnexion</h3>
+            <p class="text-sm text-slate-500 text-center mb-6">
+                Êtes-vous sûr de vouloir vous déconnecter de <span class="font-semibold text-slate-700">StudyHub</span> ?
+            </p>
+            <!-- Boutons -->
+            <div class="flex gap-3">
+                <button type="button" onclick="closeLogoutModal()"
+                        class="flex-1 px-4 py-3 border border-slate-200 rounded-xl text-sm font-medium text-slate-700 hover:bg-slate-50 transition-colors">
+                    Annuler
+                </button>
+                <button type="button" onclick="doLogout()"
+                        class="flex-1 px-4 py-3 bg-red-600 hover:bg-red-700 rounded-xl text-sm font-medium text-white transition-colors flex items-center justify-center gap-2">
+                    <i class="fas fa-sign-out-alt"></i> Déconnecter
+                </button>
+            </div>
+        </div>
+    </div>
+    <!-- Formulaire logout centralisé (soumis par le modal) -->
+    <form method="POST" action="{{ route('logout') }}" id="logout-form-confirm" class="hidden">
+        @csrf
+    </form>
+    @endauth
+
+    <!-- Footer Desktop uniquement -->
     <footer class="hidden lg:block bg-slate-900 text-slate-300 relative overflow-hidden">
         <!-- Background Pattern -->
         <div class="absolute inset-0 opacity-5">
@@ -750,101 +643,59 @@
         // Toggle desktop user menu
         function toggleDesktopUserMenu() {
             const menu = document.getElementById('desktopUserMenu');
-            if (menu) {
-                menu.classList.toggle('hidden');
-            }
+            if (menu) menu.classList.toggle('hidden');
         }
 
-        // Toggle mobile menu
-        function toggleMobileMenu() {
-            const panel = document.getElementById('mobileMenuPanel');
-            const icon = document.getElementById('menuIcon');
-            
-            if (panel.classList.contains('hidden')) {
-                panel.classList.remove('hidden');
-                icon.classList.remove('fa-bars');
-                icon.classList.add('fa-times');
-                document.body.style.overflow = 'hidden';
-            } else {
-                panel.classList.add('hidden');
-                icon.classList.remove('fa-times');
-                icon.classList.add('fa-bars');
-                document.body.style.overflow = '';
-            }
+        // Logout confirmation modal
+        function openLogoutModal() {
+            const modal = document.getElementById('logoutModal');
+            const box   = document.getElementById('logoutModalBox');
+            if (!modal) return;
+            modal.classList.remove('hidden');
+            setTimeout(() => {
+                modal.classList.remove('opacity-0');
+                box.classList.remove('translate-y-4', 'sm:scale-95');
+                box.classList.add('translate-y-0', 'sm:scale-100');
+            }, 10);
         }
 
-        // Close mobile menu when clicking a link
-        document.querySelectorAll('#mobileMenuPanel a').forEach(link => {
-            link.addEventListener('click', () => {
-                const panel = document.getElementById('mobileMenuPanel');
-                const icon = document.getElementById('menuIcon');
-                panel.classList.add('hidden');
-                icon.classList.remove('fa-times');
-                icon.classList.add('fa-bars');
-                document.body.style.overflow = '';
-            });
-        });
+        function closeLogoutModal() {
+            const modal = document.getElementById('logoutModal');
+            const box   = document.getElementById('logoutModalBox');
+            if (!modal) return;
+            modal.classList.add('opacity-0');
+            box.classList.remove('translate-y-0', 'sm:scale-100');
+            box.classList.add('translate-y-4', 'sm:scale-95');
+            setTimeout(() => modal.classList.add('hidden'), 200);
+        }
 
-        // Close menus when clicking outside
+        function doLogout() {
+            document.getElementById('logout-form-confirm').submit();
+        }
+
+        // Close desktop user menu when clicking outside
         document.addEventListener('click', (e) => {
-            // Desktop user menu
             const desktopMenu = document.getElementById('desktopUserMenu');
             const desktopButton = e.target.closest('[onclick="toggleDesktopUserMenu()"]');
             if (!desktopButton && desktopMenu && !desktopMenu.classList.contains('hidden')) {
                 desktopMenu.classList.add('hidden');
             }
-
-            // Mobile menu
-            const mobilePanel = document.getElementById('mobileMenuPanel');
-            const mobileButton = e.target.closest('#mobileMenuButton');
-            const mobileIcon = e.target.closest('#menuIcon');
-            
-            if (mobilePanel && !mobilePanel.classList.contains('hidden') && 
-                !mobileButton && !mobileIcon && 
-                !mobilePanel.contains(e.target)) {
-                mobilePanel.classList.add('hidden');
-                const icon = document.getElementById('menuIcon');
-                icon.classList.remove('fa-times');
-                icon.classList.add('fa-bars');
-                document.body.style.overflow = '';
+            // Close logout modal on backdrop click
+            const logoutModal = document.getElementById('logoutModal');
+            if (logoutModal && !logoutModal.classList.contains('hidden') && e.target === logoutModal) {
+                closeLogoutModal();
             }
         });
 
-        // Close search on escape key
+        // Close overlays on Escape key
         document.addEventListener('keydown', (e) => {
             if (e.key === 'Escape') {
                 const overlay = document.getElementById('searchOverlay');
-                if (overlay && !overlay.classList.contains('hidden')) {
-                    toggleSearch();
-                }
-                
-                const mobilePanel = document.getElementById('mobileMenuPanel');
-                if (mobilePanel && !mobilePanel.classList.contains('hidden')) {
-                    mobilePanel.classList.add('hidden');
-                    const icon = document.getElementById('menuIcon');
-                    icon.classList.remove('fa-times');
-                    icon.classList.add('fa-bars');
-                    document.body.style.overflow = '';
-                }
-                
+                if (overlay && !overlay.classList.contains('hidden')) toggleSearch();
                 const desktopMenu = document.getElementById('desktopUserMenu');
-                if (desktopMenu && !desktopMenu.classList.contains('hidden')) {
-                    desktopMenu.classList.add('hidden');
-                }
-            }
-        });
-
-        // Handle responsive behavior
-        window.addEventListener('resize', () => {
-            if (window.innerWidth >= 1024) {
-                const mobilePanel = document.getElementById('mobileMenuPanel');
-                if (mobilePanel && !mobilePanel.classList.contains('hidden')) {
-                    mobilePanel.classList.add('hidden');
-                    const icon = document.getElementById('menuIcon');
-                    icon.classList.remove('fa-times');
-                    icon.classList.add('fa-bars');
-                    document.body.style.overflow = '';
-                }
+                if (desktopMenu && !desktopMenu.classList.contains('hidden')) desktopMenu.classList.add('hidden');
+                const logoutModal = document.getElementById('logoutModal');
+                if (logoutModal && !logoutModal.classList.contains('hidden')) closeLogoutModal();
             }
         });
     </script>

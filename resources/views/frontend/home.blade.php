@@ -23,12 +23,12 @@
                     <span class="text-primary-100 text-sm font-medium">🚀 Plus de 10,000 élèves nous font confiance</span>
                 </div>
                 
-                <h1 class="font-display text-5xl md:text-6xl lg:text-7xl font-bold text-white leading-tight mb-6">
+                <h1 class="font-display text-2xl sm:text-4xl md:text-5xl lg:text-7xl font-bold text-white leading-tight mb-6">
                     Apprenez, Révisez,<br>
                     <span class="text-transparent bg-clip-text bg-gradient-to-r from-primary-200 to-secondary-400">Réussissez</span>
                 </h1>
-                
-                <p class="text-xl text-primary-100 mb-8 max-w-lg leading-relaxed">
+
+                <p class="text-base sm:text-xl text-primary-100 mb-8 max-w-lg leading-relaxed">
                     Accédez à des milliers de ressources pédagogiques, épreuves corrigées et cours interactifs du collège au lycée.
                 </p>
 
@@ -36,10 +36,15 @@
                 <div class="relative max-w-xl mb-8 group">
                     <div class="absolute -inset-1 bg-gradient-to-r from-primary-400 to-secondary-400 rounded-2xl blur opacity-25 group-hover:opacity-50 transition duration-1000"></div>
                     <form action="{{ route('search') }}" class="relative flex items-center bg-white rounded-2xl shadow-2xl p-2">
-                        <i class="fas fa-search text-slate-400 text-xl ml-4"></i>
-                        <input type="text" name="q" placeholder="Rechercher une matière, un chapitre ou une épreuve..." 
-                               class="flex-1 px-4 py-4 text-slate-700 placeholder-slate-400 bg-transparent border-none focus:outline-none focus:ring-0 text-lg">
-                        <button type="submit" class="bg-primary-600 hover:bg-primary-700 text-white px-8 py-3 rounded-xl font-semibold transition-all transform hover:scale-105 shadow-lg btn-shine hidden sm:block">
+                        <i class="fas fa-search text-slate-400 ml-3 sm:ml-4 text-base sm:text-xl flex-shrink-0"></i>
+                        <input type="text" name="q" placeholder="Rechercher une matière, un chapitre..."
+                               class="flex-1 px-3 py-3 sm:px-4 sm:py-4 text-slate-700 placeholder-slate-400 bg-transparent border-none focus:outline-none focus:ring-0 text-sm sm:text-lg min-w-0">
+                        <!-- Mobile: icon button -->
+                        <button type="submit" class="sm:hidden flex-shrink-0 w-10 h-10 bg-primary-600 hover:bg-primary-700 text-white rounded-xl flex items-center justify-center transition-colors">
+                            <i class="fas fa-arrow-right text-sm"></i>
+                        </button>
+                        <!-- Desktop: text button -->
+                        <button type="submit" class="hidden sm:block bg-primary-600 hover:bg-primary-700 text-white px-8 py-3 rounded-xl font-semibold transition-all transform hover:scale-105 shadow-lg btn-shine">
                             Rechercher
                         </button>
                     </form>

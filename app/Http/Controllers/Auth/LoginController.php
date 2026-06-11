@@ -3,6 +3,9 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
+use App\Models\Epreuve;
+use App\Models\QuizResultat;
+use App\Models\User;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
 use Illuminate\support\facades\Auth;
 
@@ -46,5 +49,16 @@ class LoginController extends Controller
     public function __construct()
     {
         $this->middleware('guest')->except('logout');
+    }
+
+    public function showLoginForm()
+    {
+        $nbEleves   = User::where('role', 'eleve')->count();
+        $nbEpreuves = Epreuve::count();
+
+        $avg = QuizResultat::avg('score');
+        $satisfaction = $avg !== null ? round($avg) : 0;
+
+        return view('auth.login', compact('nbEleves', 'nbEpreuves', 'satisfaction'));
     }
 }

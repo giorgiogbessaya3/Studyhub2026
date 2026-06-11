@@ -48,16 +48,16 @@ class ProductFormRequest extends FormRequest
             ],
             'original_price' => [
                 'required',
-                ' integer'
-
+                'integer',
             ],
             'status' => [
                 'nullable',
-                
             ],
             'image' => [
                 'nullable',
-               // 'image|mimes:jpeg,png,jpg'
+                'image',
+                'mimes:jpeg,png,jpg',
+                'max:2048',
             ],
         ];
     }

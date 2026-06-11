@@ -7,7 +7,6 @@ use App\Models\Classe;
 use App\Models\Matiere;
 use App\Models\TypeEpreuve;
 use App\Models\Epreuve;
-use App\Models\Correction;
 use App\Models\Setting;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
@@ -22,12 +21,9 @@ class EpreuveControllers extends Controller
         $settings = Setting::first();
         
         $classes = Classe::where('statut', true)
+            ->withCount(['epreuves' => fn($q) => $q->where('statut', true)])
             ->orderBy('ordre')
             ->get();
-        
-        foreach ($classes as $classe) {
-            $classe->epreuves_count = $classe->epreuves()->where('statut', true)->count();
-        }
         
         $stats = [
             'total' => Epreuve::where('statut', true)->count(),

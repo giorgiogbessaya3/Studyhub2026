@@ -36,7 +36,7 @@ class UserController extends Controller
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
             'password' => ['required', 'string', 'min:8', 'confirmed'],
-            'role_as' => ['required', 'integer', 'in:0,1'],
+            'role' => ['required', 'string', 'in:admin,enseignant,eleve'],
         ], [
             'name.required' => 'Le nom est obligatoire.',
             'email.required' => 'L\'email est obligatoire.',
@@ -44,14 +44,14 @@ class UserController extends Controller
             'password.required' => 'Le mot de passe est obligatoire.',
             'password.min' => 'Le mot de passe doit contenir au moins 8 caractères.',
             'password.confirmed' => 'Les mots de passe ne correspondent pas.',
-            'role_as.required' => 'Le rôle est obligatoire.',
+            'role.required' => 'Le rôle est obligatoire.',
         ]);
 
         User::create([
             'name' => $validated['name'],
             'email' => $validated['email'],
             'password' => Hash::make($validated['password']),
-            'role_as' => $validated['role_as'],
+            'role' => $validated['role'],
         ]);
 
         return redirect()->route('admin.users.index')
@@ -84,19 +84,19 @@ class UserController extends Controller
                 Rule::unique('users')->ignore($user->id)
             ],
             'password' => ['nullable', 'string', 'min:8'],
-            'role_as' => ['required', 'integer', 'in:0,1'],
+            'role' => ['required', 'string', 'in:admin,enseignant,eleve'],
         ], [
             'name.required' => 'Le nom est obligatoire.',
             'email.required' => 'L\'email est obligatoire.',
             'email.unique' => 'Cet email est déjà utilisé.',
             'password.min' => 'Le mot de passe doit contenir au moins 8 caractères.',
-            'role_as.required' => 'Le rôle est obligatoire.',
+            'role.required' => 'Le rôle est obligatoire.',
         ]);
 
         $updateData = [
             'name' => $validated['name'],
             'email' => $validated['email'],
-            'role_as' => $validated['role_as'],
+            'role' => $validated['role'],
         ];
 
         // Mettre à jour le mot de passe seulement si fourni

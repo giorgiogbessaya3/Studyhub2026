@@ -3,11 +3,10 @@
 namespace App\Http\Controllers\Frontend;
 
 use App\Http\Controllers\Controller;
-use App\Models\User;
 use App\Models\QuizResultat;
 use App\Models\Question;
 use App\Models\Reponse;
-use App\Models\Cours;
+use App\Models\Epreuve;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
@@ -137,9 +136,8 @@ class UserController extends Controller
      */
     public function mesCours()
     {
-        $user = Auth::user();
-        $cours = $user->coursSuivis()->paginate(12);
-        
+        $cours = collect();
+
         return view('frontend.user.mes-cours', compact('cours'));
     }
 
@@ -149,9 +147,18 @@ class UserController extends Controller
     public function mesEpreuves()
     {
         $user = Auth::user();
-        // À adapter selon votre modèle Epreuve
-        $epreuves = collect(); // Remplacer par la vraie requête
-        
+        $epreuves = collect();
+
+        if ($user->classe_id) {
+            $epreuves = Epreuve::whereHas('classes', function($q) use ($user) {
+                    $q->where('classes.id', $user->classe_id);
+                })
+                ->where('statut', true)
+                ->with(['typeEpreuve', 'correction'])
+                ->orderBy('created_at', 'desc')
+                ->paginate(12);
+        }
+
         return view('frontend.user.mes-epreuves', compact('epreuves'));
     }
 
@@ -226,9 +233,9 @@ class UserController extends Controller
 
         // Préparer les détails des réponses
         $details = [];
-        foreach ($resultat->quiz->questions as $index => $question) {
-            $reponseUtilisateur = $resultat->reponses[$index] ?? null;
-            $estCorrect = $reponseUtilisateur == $question->bonne_reponse;
+        foreach ($resultat->quiz->questions as $question) {
+            $reponseUtilisateur = $resultat->reponses[$question->id] ?? null;
+            $estCorrect = $reponseUtilisateur !== null && $reponseUtilisateur === $question->bonne_reponse;
             
             $details[] = [
                 'question' => $question,
@@ -354,12 +361,9 @@ class UserController extends Controller
      */
     public function apiMesCours()
     {
-        $user = Auth::user();
-        $cours = $user->coursSuivis()->get(['id', 'titre', 'slug', 'description', 'created_at']);
-        
         return response()->json([
             'success' => true,
-            'data' => $cours
+            'data' => []
         ]);
     }
 
@@ -368,10 +372,22 @@ class UserController extends Controller
      */
     public function apiMesEpreuves()
     {
-        // À adapter selon votre modèle
+        $user = Auth::user();
+        $epreuves = collect();
+
+        if ($user->classe_id) {
+            $epreuves = Epreuve::whereHas('classes', function($q) use ($user) {
+                    $q->where('classes.id', $user->classe_id);
+                })
+                ->where('statut', true)
+                ->with(['typeEpreuve'])
+                ->orderBy('created_at', 'desc')
+                ->get();
+        }
+
         return response()->json([
             'success' => true,
-            'data' => []
+            'data' => $epreuves
         ]);
     }
 
@@ -476,15 +492,4 @@ class UserController extends Controller
         return $totalQuestions > 0 ? round(($totalPoints / $totalQuestions) * 100, 1) : 0;
     }
 
-    /**
-     * Récupère l'URL de l'avatar (accesseur dans le modèle)
-     * Cette méthode est normalement dans le modèle User
-     */
-    private function getAvatarUrlAttribute($avatar)
-    {
-        if ($avatar) {
-            return asset('storage/' . $avatar);
-        }
-        return 'https://ui-avatars.com/api/?name=' . urlencode(Auth::user()->name) . '&background=3b82f6&color=fff&size=128';
-    }
 }

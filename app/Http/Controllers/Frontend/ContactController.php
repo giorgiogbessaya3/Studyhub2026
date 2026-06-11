@@ -35,13 +35,13 @@ class ContactController extends Controller
 
         // Créer le contact
         Contact::create([
-            'first_name' => $request->first_name,
-            'last_name' => $request->last_name,
-            'email' => $request->email,
-            'phone' => $request->phone,
-            'subject' => $request->subject,
-            'message' => $request->message,
-            'status' => 'new',
+            'first_name' => strip_tags($request->first_name),
+            'last_name'  => strip_tags($request->last_name),
+            'email'      => $request->email,
+            'phone'      => $request->phone ? strip_tags($request->phone) : null,
+            'subject'    => strip_tags($request->subject),
+            'message'    => strip_tags($request->message),
+            'status'     => 'new',
         ]);
 
         return redirect()->route('contact')

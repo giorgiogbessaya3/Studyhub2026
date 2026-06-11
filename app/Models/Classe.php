@@ -56,7 +56,7 @@ class Classe extends Model
      */
     public function assistanceQuestions()
     {
-        return $this->hasMany(Assistance::class);
+        return $this->hasMany(Question::class);
     }
 
     /**

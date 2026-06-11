@@ -8,7 +8,6 @@ use App\Models\QuizResultat;
 use App\Models\Classe;
 use App\Models\Matiere;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 
 class QuizController extends Controller
@@ -141,15 +140,14 @@ class QuizController extends Controller
         $reponses = [];
         $totalPoints = 0;
 
-        foreach ($quiz->questions as $index => $question) {
+        foreach ($quiz->questions as $question) {
             $reponseUtilisateur = $request->input('question_' . $question->id);
-            $reponses[$index] = $reponseUtilisateur;
-            
-            // Vérifier si la réponse est correcte
-            if ($reponseUtilisateur == $question->bonne_reponse) {
+            $reponses[$question->id] = $reponseUtilisateur;
+
+            if ($reponseUtilisateur !== null && $reponseUtilisateur === $question->bonne_reponse) {
                 $score += $question->points;
             }
-            
+
             $totalPoints += $question->points;
         }
 
@@ -197,10 +195,10 @@ class QuizController extends Controller
 
         // Préparer les détails des réponses
         $details = [];
-        foreach ($quiz->questions as $index => $question) {
-            $reponseUtilisateur = $resultat->reponses[$index] ?? null;
-            $estCorrect = $reponseUtilisateur == $question->bonne_reponse;
-            
+        foreach ($quiz->questions as $question) {
+            $reponseUtilisateur = $resultat->reponses[$question->id] ?? null;
+            $estCorrect = $reponseUtilisateur !== null && $reponseUtilisateur === $question->bonne_reponse;
+
             $details[] = [
                 'question' => $question,
                 'reponse_utilisateur' => $reponseUtilisateur,

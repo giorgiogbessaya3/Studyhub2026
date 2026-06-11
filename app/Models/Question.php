@@ -62,14 +62,14 @@ class Question extends Model
         return null;
     }
 
-    public function getStatutBadgeAttribute()
+    public function getStatutBadgeClassAttribute(): string
     {
         return match($this->statut) {
-            'en_attente' => '<span class="badge bg-warning">En attente</span>',
-            'publiee' => '<span class="badge bg-success">Publiée</span>',
-            'resolue' => '<span class="badge bg-info">Résolue</span>',
-            'fermee' => '<span class="badge bg-secondary">Fermée</span>',
-            default => '<span class="badge bg-light">Inconnu</span>'
+            'en_attente' => 'bg-warning',
+            'publiee'    => 'bg-success',
+            'resolue'    => 'bg-info',
+            'fermee'     => 'bg-secondary',
+            default      => 'bg-light',
         };
     }
 

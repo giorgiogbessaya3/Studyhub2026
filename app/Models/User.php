@@ -65,11 +65,6 @@ class User extends Authenticatable
         return $this->belongsTo(Classe::class);
     }
 
-    public function coursSuivis()
-    {
-        return $this->belongsToMany(Cours::class, 'cours_user')->withTimestamps();
-    }
-
     public function resultatsQuiz()
     {
         return $this->hasMany(QuizResultat::class);

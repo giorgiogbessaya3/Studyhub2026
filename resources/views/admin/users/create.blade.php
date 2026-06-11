@@ -72,13 +72,14 @@
                 </div>
 
                 <div class="col-md-6 mb-3">
-                    <label for="role_as" class="form-label fw-medium">Rôle <span class="text-danger">*</span></label>
-                    <select name="role_as" class="form-select @error('role_as') is-invalid @enderror" required>
+                    <label for="role" class="form-label fw-medium">Rôle <span class="text-danger">*</span></label>
+                    <select name="role" class="form-select @error('role') is-invalid @enderror" required>
                         <option value="">Sélectionnez un rôle</option>
-                        <option value="0" {{ old('role_as') == '0' ? 'selected' : '' }}>Utilisateur</option>
-                        <option value="1" {{ old('role_as') == '1' ? 'selected' : '' }}>Administrateur</option>
+                        <option value="eleve" {{ old('role') == 'eleve' ? 'selected' : '' }}>Élève</option>
+                        <option value="enseignant" {{ old('role') == 'enseignant' ? 'selected' : '' }}>Enseignant</option>
+                        <option value="admin" {{ old('role') == 'admin' ? 'selected' : '' }}>Administrateur</option>
                     </select>
-                    @error('role_as')
+                    @error('role')
                         <div class="invalid-feedback">{{ $message }}</div>
                     @enderror
                 </div>

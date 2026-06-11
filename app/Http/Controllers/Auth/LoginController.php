@@ -3,7 +3,6 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
-use App\Providers\RouteServiceProvider;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
 use Illuminate\support\facades\Auth;
 
@@ -30,12 +29,12 @@ class LoginController extends Controller
     /*protected $redirectTo = RouteServiceProvider::HOME;*/
     protected function authenticated()
     {
-        if(Auth::user()->role_as == '1')
+        if(Auth::user()->isAdmin())
         {
-            return redirect('admin/dashboard')->with('status' , 'Bienvenu a la partie administration');
+            return redirect('admin/dashboard')->with('status' , 'Bienvenu dans la partie administration');
         }
         else{
-            return redirect('/')->with('status' , 'vous ne pouvez acceeder en tand que utilisateur');
+            return redirect('/')->with('status' , 'Bienvenu sur Studyhub');
         }
     }
 

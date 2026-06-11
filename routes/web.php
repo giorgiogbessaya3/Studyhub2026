@@ -124,8 +124,8 @@ Route::prefix('quiz')->name('quiz.')->controller(FrontendQuizController::class)-
 // ROUTES PUBLIQUES - CONTACT & NEWSLETTER
 // ==========================================
 Route::get('contact', [FrontendController::class, 'contact'])->name('contact');
-Route::post('contact', [ContactController::class, 'store'])->name('contact.store');
-Route::post('newsletter/subscribe', [ContactController::class, 'newsletter'])->name('newsletter.subscribe');
+Route::post('contact', [ContactController::class, 'store'])->name('contact.store')->middleware('throttle:5,1');
+Route::post('newsletter/subscribe', [ContactController::class, 'newsletter'])->name('newsletter.subscribe')->middleware('throttle:3,1');
 
 // ==========================================
 // ROUTES PUBLIQUES - RECHERCHE

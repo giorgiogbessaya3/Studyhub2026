@@ -78,17 +78,20 @@
                 </div>
 
                 <div class="col-md-6 mb-3">
-                    <label for="role_as" class="form-label fw-medium">Rôle <span class="text-danger">*</span></label>
-                    <select name="role_as" class="form-select @error('role_as') is-invalid @enderror" required>
+                    <label for="role" class="form-label fw-medium">Rôle <span class="text-danger">*</span></label>
+                    <select name="role" class="form-select @error('role') is-invalid @enderror" required>
                         <option value="">Sélectionnez un rôle</option>
-                        <option value="0" {{ old('role_as', $user->role_as) == '0' ? 'selected' : '' }}>
-                            Utilisateur
+                        <option value="eleve" {{ old('role', $user->role) == 'eleve' ? 'selected' : '' }}>
+                            Élève
                         </option>
-                        <option value="1" {{ old('role_as', $user->role_as) == '1' ? 'selected' : '' }}>
+                        <option value="enseignant" {{ old('role', $user->role) == 'enseignant' ? 'selected' : '' }}>
+                            Enseignant
+                        </option>
+                        <option value="admin" {{ old('role', $user->role) == 'admin' ? 'selected' : '' }}>
                             Administrateur
                         </option>
                     </select>
-                    @error('role_as')
+                    @error('role')
                         <div class="invalid-feedback">{{ $message }}</div>
                     @enderror
                 </div>
@@ -192,12 +195,13 @@ document.addEventListener('DOMContentLoaded', function() {
     }, 5000);
 
     // Confirmation si changement de rôle
-    const roleSelect = document.querySelector('select[name="role_as"]');
-    const originalRole = "{{ $user->role_as }}";
-    
+    const roleSelect = document.querySelector('select[name="role"]');
+    const originalRole = "{{ $user->role }}";
+    const roleLabels = { admin: 'Administrateur', enseignant: 'Enseignant', eleve: 'Élève' };
+
     roleSelect.addEventListener('change', function() {
         if (this.value !== originalRole) {
-            const roleName = this.value === '1' ? 'Administrateur' : 'Utilisateur';
+            const roleName = roleLabels[this.value] ?? this.value;
             if (!confirm(`Êtes-vous sûr de vouloir changer le rôle de cet utilisateur en "${roleName}" ?`)) {
                 this.value = originalRole;
             }

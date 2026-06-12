@@ -831,9 +831,6 @@
     <script src="https://cdn.ckeditor.com/ckeditor5/39.0.1/classic/ckeditor.js"></script>
     <script src="https://cdn.ckeditor.com/ckeditor5/39.0.1/classic/translations/fr.js"></script>
     
-    <!-- MathType pour les formules -->
-    <script src="https://cdn.jsdelivr.net/npm/@wiris/mathtype-ckeditor5@8.3.0/dist/mathtype-ckeditor5.js"></script>
-
     @yield('scripts')
 </body> 
 </html> 

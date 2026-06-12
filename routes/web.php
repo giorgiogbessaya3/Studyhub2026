@@ -509,7 +509,9 @@ Route::get('recherche', function() {
 // ==========================================
 // PAGE 404 - FALLBACK
 // ==========================================
-Route::fallback([FrontendController::class, 'notFound'])->name('notfound');
+Route::fallback(function () {
+    return response()->view('errors.404', [], 404);
+})->name('notfound');
 
 // ==========================================
 // TEST DE ROUTES (UNIQUEMENT EN LOCAL)

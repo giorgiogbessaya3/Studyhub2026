@@ -1,7 +1,10 @@
 <IfModule mod_rewrite.c>
     RewriteEngine On
 
-    # Tout ce qui n'est pas déjà dans public/ → redirige vers public/
-    RewriteRule ^$ public/ [L]
-    RewriteRule (.*) public/$1 [L]
+    # Servir directement les fichiers et dossiers existants
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_FILENAME} !-d
+
+    # Tout le reste → index.php (point d'entrée Laravel custom)
+    RewriteRule ^ index.php [L]
 </IfModule>

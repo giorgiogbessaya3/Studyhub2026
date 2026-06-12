@@ -8,9 +8,9 @@
     <title>@yield('title', 'StudyHub - Plateforme Éducative')</title>
 
     <!-- Favicon -->
-    <link rel="icon" type="image/png" href="{{ asset('studylogo.png') }}">
-    <link rel="shortcut icon" href="{{ asset('studylogo.png') }}">
-    <link rel="apple-touch-icon" href="{{ asset('studylogo.png') }}">
+    <link rel="icon" type="image/png" href="{{ asset('study/logo.png') }}">
+    <link rel="shortcut icon" href="{{ asset('study/logo.png') }}">
+    <link rel="apple-touch-icon" href="{{ asset('study/logo.png') }}">
 
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>

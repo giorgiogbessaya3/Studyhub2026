@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Vérification email - StudyHub</title>
-    <link rel="icon" type="image/png" href="{{ asset('studylogo.png') }}">
+    <link rel="icon" type="image/png" href="{{ asset('study/logo.png') }}">
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -23,7 +23,7 @@
 
     <!-- Panneau gauche -->
     <div class="hidden lg:flex lg:w-1/2 relative overflow-hidden flex-col justify-between p-12"
-         style="background-image:url('{{ asset('studyauth.jpg') }}');background-size:cover;background-position:center;">
+         style="background-image:url('{{ asset('study/auth.jpg') }}');background-size:cover;background-position:center;">
         <div class="absolute inset-0 bg-gradient-to-br from-slate-900/75 via-primary-900/70 to-primary-800/65"></div>
         <div class="absolute inset-0" style="background-image:radial-gradient(circle at 1px 1px,rgba(255,255,255,0.08) 1px,transparent 0);background-size:40px 40px"></div>
 

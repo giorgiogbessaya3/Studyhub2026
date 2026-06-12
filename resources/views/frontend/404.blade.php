@@ -9,9 +9,9 @@
 
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-     <link rel="icon" type="image/png" href="{{ asset('studylogo.png') }}">
-    <link rel="shortcut icon" href="{{ asset('studylogo.png') }}">
-    <link rel="apple-touch-icon" href="{{ asset('studylogo.png') }}">
+     <link rel="icon" type="image/png" href="{{ asset('study/logo.png') }}">
+    <link rel="shortcut icon" href="{{ asset('study/logo.png') }}">
+    <link rel="apple-touch-icon" href="{{ asset('study/logo.png') }}">
     <style>
         :root {
             --primary: #2563eb;

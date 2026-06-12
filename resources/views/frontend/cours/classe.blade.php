@@ -175,7 +175,7 @@
 
             <!-- Illustration -->
             <div class="hidden lg:block w-80">
-                <img src="{{ asset('studycar1.png') }}"
+                <img src="{{ asset('study/car1.png') }}"
                      alt="Illustration" class="w-full drop-shadow-2xl animate-float">
             </div>
         </div>

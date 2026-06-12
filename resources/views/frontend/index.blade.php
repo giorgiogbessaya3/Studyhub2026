@@ -50,7 +50,7 @@
             <!-- Image (cachée sur mobile) -->
             <div class="hidden lg:block flex-1">
                 <div class="relative">
-                    <img src="{{ asset('studycar1.png') }}"
+                    <img src="{{ asset('study/car1.png') }}"
                          alt="Student"
                          class="w-full max-w-md mx-auto animate-float"
                          onerror="this.src='https://placehold.co/600x400/3b82f6/white?text=StudyHub'">

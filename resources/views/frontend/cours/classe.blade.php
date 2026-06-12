@@ -63,7 +63,7 @@
             'badge' => 'bg-pink-400'
         ],
     ];
-    
+
     $classeColor = $classeColors[$classe->nom] ?? [
         'gradient' => 'from-primary-600 to-primary-700',
         'light' => 'bg-primary-50',
@@ -72,9 +72,9 @@
         'icon' => 'fa-school',
         'badge' => 'bg-primary-400'
     ];
-    
+
     $cycle = in_array($classe->nom, ['6ème', '5ème', '4ème', '3ème']) ? 'Collège' : 'Lycée';
-    
+
     // Configuration des icônes par matière (fallback)
     $defaultIcons = [
         'Mathématiques' => 'fas fa-calculator',
@@ -104,7 +104,7 @@
         'Latin' => 'fas fa-scroll',
         'Grec' => 'fas fa-columns',
     ];
-    
+
     // Configuration des couleurs par matière (fallback)
     $defaultColors = [
         'Mathématiques' => '#3b82f6',
@@ -137,18 +137,18 @@
 <!-- Hero Section avec dégradé -->
 <section class="relative bg-gradient-to-br from-slate-900 via-primary-900 to-primary-800 min-h-[300px] flex items-center overflow-hidden">
     <!-- Background dots pattern -->
-    <div class="absolute inset-0 opacity-20" 
+    <div class="absolute inset-0 opacity-20"
          style="background-image: radial-gradient(circle at 1px 1px, white 1px, transparent 0); background-size: 40px 40px;">
     </div>
-    
+
     <!-- Blobs décoratifs -->
     <div class="absolute top-20 left-20 w-72 h-72 bg-primary-500/20 rounded-full blur-3xl animate-pulse"></div>
     <div class="absolute bottom-20 right-20 w-96 h-96 bg-secondary-500/20 rounded-full blur-3xl animate-pulse animation-delay-2000"></div>
-    
+
     <div class="container mx-auto px-4 relative z-10 py-2">
         <!-- Fil d'Ariane -->
-        
-        
+
+
         <!-- En-tête -->
         <div class="flex flex-col md:flex-row items-center gap-8">
             <div class="flex-1 text-center md:text-left">
@@ -157,11 +157,11 @@
                     <i class="fas {{ $classeColor['icon'] }} mr-2"></i>
                     {{ $cycle }}
                 </span>
-                
+
                 <h1 class="text-2xl md:text-3xl lg:text-4xl font-bold text-white mb-2">
                     {{ $classe->nom }}
                 </h1>
-                
+
                 @if($classe->description)
                     <p class="text-white/80 text-base md:text-lg max-w-2xl">
                         {{ $classe->description }}
@@ -172,10 +172,10 @@
                     </p>
                 @endif
             </div>
-            
+
             <!-- Illustration -->
             <div class="hidden lg:block w-80">
-                <img src="/img/car1.png" 
+                <img src="{{ asset('img/car1.png') }}"
                      alt="Illustration" class="w-full drop-shadow-2xl animate-float">
             </div>
         </div>
@@ -184,7 +184,7 @@
 
 <!-- Contenu principal -->
 <div class="max-w-7xl mx-auto px-4 py-5">
-    
+
     @if($matieres->isEmpty())
         <div class="text-center py-16">
             <div class="w-24 h-24 mx-auto mb-6 rounded-3xl flex items-center justify-center {{ $classeColor['light'] }}">
@@ -205,35 +205,35 @@
                     <p class="text-gray-500 text-sm">{{ $matieres->count() }} matières · {{ $matieres->sum('chapitres_count') }} chapitres · {{ $matieres->sum('contenus_count') }} contenus</p>
                 </div>
             </div>
-            
+
             <!-- Barre de recherche -->
             <div class="relative w-full md:w-64">
-                <input type="text" 
+                <input type="text"
                        id="searchMatiere"
-                       placeholder="Rechercher une matière..." 
+                       placeholder="Rechercher une matière..."
                        class="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent text-sm">
                 <i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm"></i>
             </div>
         </div>
-        
+
         <!-- Grille des matières -->
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6" id="matieresGrid">
             @foreach($matieres as $index => $matiere)
             @php
                 // Déterminer la couleur (base de données ou fallback)
                 $couleurMatiere = $matiere->couleur ?? ($defaultColors[$matiere->nom] ?? '#3b82f6');
-                
+
                 // Déterminer l'icône (base de données ou fallback)
                 if (!empty($matiere->icone)) {
                     $iconeMatiere = $matiere->icone;
                 } else {
                     // Chercher dans le tableau des icônes par défaut
                     $iconeMatiere = $defaultIcons[$matiere->nom] ?? 'fas fa-book';
-                    
+
                     // Si pas trouvé, essayer avec une correspondance partielle
                     if ($iconeMatiere == 'fas fa-book') {
                         foreach ($defaultIcons as $key => $icon) {
-                            if (str_contains(strtolower($matiere->nom), strtolower($key)) || 
+                            if (str_contains(strtolower($matiere->nom), strtolower($key)) ||
                                 str_contains(strtolower($key), strtolower($matiere->nom))) {
                                 $iconeMatiere = $icon;
                                 break;
@@ -241,19 +241,19 @@
                         }
                     }
                 }
-                
+
                 $chapitresCount = $matiere->chapitres_count ?? 0;
                 $contenusCount = $matiere->contenus_count ?? 0;
                 $progression = $chapitresCount > 0 ? rand(0, 100) : 0;
-                
+
                 // Déterminer si c'est une spécialité pour le lycée
                 $specialites = ['Mathématiques', 'Physique', 'Chimie', 'Physique-Chimie', 'SVT', 'NSI', 'SES', 'HLP', 'LLCE', 'Histoire-Géo', 'Géopolitique', 'Humanités', 'Littérature'];
                 $isSpecialite = in_array($classe->nom, ['Première', 'Terminale']) && in_array($matiere->nom, $specialites);
-                
+
                 // Tags dynamiques basés sur la matière
                 $tags = ['Cours', 'Exercices', 'Quiz'];
                 $nomMatiereLower = strtolower($matiere->nom);
-                
+
                 if(str_contains($nomMatiereLower, 'math')) {
                     $tags = ['Algèbre', 'Géométrie', 'Probabilités'];
                 } elseif(str_contains($nomMatiereLower, 'franc') || str_contains($nomMatiereLower, 'lettres')) {
@@ -278,25 +278,25 @@
                     $tags = ['Économie', 'Sociologie', 'Science politique'];
                 }
             @endphp
-            
+
             <div class="group bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-500 overflow-hidden hover:-translate-y-2"
                  data-aos="fade-up"
                  data-aos-delay="{{ $index * 50 }}"
                  data-matiere="{{ strtolower($matiere->nom) }}">
-                
+
                 <!-- En-tête avec dégradé (couleur de la matière) -->
-                <div class="relative h-32 overflow-hidden" 
+                <div class="relative h-32 overflow-hidden"
                      style="background: linear-gradient(135deg, {{ $couleurMatiere }} 0%, {{ $couleurMatiere }}dd 100%);">
-                    
+
                     <!-- Pattern de fond -->
-                    <div class="absolute inset-0 opacity-10" 
+                    <div class="absolute inset-0 opacity-10"
                          style="background-image: url('data:image/svg+xml,%3Csvg width="60" height="60" viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg"%3E%3Cg fill="none" fill-rule="evenodd"%3E%3Cg fill="%23ffffff" fill-opacity="0.4"%3E%3Cpath d="M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z"/%3E%3C/g%3E%3C/g%3E%3C/svg%3E'); background-size: 30px 30px;">
                     </div>
-                    
+
                     <!-- Cercles décoratifs -->
                     <div class="absolute -right-8 -top-8 w-32 h-32 bg-white/20 rounded-full"></div>
                     <div class="absolute -left-8 -bottom-8 w-32 h-32 bg-white/20 rounded-full"></div>
-                    
+
                     <!-- Badge spécialité -->
                     @if($isSpecialite)
                     <div class="absolute top-3 right-3 bg-yellow-400 text-yellow-900 px-3 py-1 rounded-full text-xs font-bold flex items-center gap-1 shadow-lg z-10">
@@ -304,7 +304,7 @@
                         Spécialité
                     </div>
                     @endif
-                    
+
                     <!-- Badge Bac pour Terminale -->
                     @if($classe->nom == 'Terminale' && in_array($matiere->nom, ['Mathématiques', 'Physique', 'Philosophie', 'SVT', 'Histoire-Géo']))
                     <div class="absolute top-3 right-3 bg-yellow-400 text-yellow-900 px-3 py-1 rounded-full text-xs font-bold flex items-center gap-1 shadow-lg z-10">
@@ -312,7 +312,7 @@
                         Bac
                     </div>
                     @endif
-                    
+
                     <!-- Icône et nom de la matière -->
                     <div class="absolute bottom-4 left-4">
                         <div class="flex items-center gap-3">
@@ -329,7 +329,7 @@
                         </div>
                     </div>
                 </div>
-                
+
                 <div class="p-5">
                     <!-- Description -->
                     @if(!empty($matiere->description))
@@ -337,7 +337,7 @@
                             {{ $matiere->description }}
                         </p>
                     @endif
-                    
+
                     <!-- Statistiques -->
                     <div class="grid grid-cols-3 gap-2 mb-4">
                         <div class="text-center p-2 bg-gray-50 rounded-lg">
@@ -353,18 +353,18 @@
                             <div class="text-xs text-gray-500">Exercices</div>
                         </div>
                     </div>
-                    
+
                     <!-- Tags des matières -->
                     <div class="flex flex-wrap gap-1.5 mb-4">
                         @foreach(array_slice($tags, 0, 3) as $tag)
-                        <span class="px-2 py-1 text-xs rounded-full" 
+                        <span class="px-2 py-1 text-xs rounded-full"
                               style="background-color: {{ $couleurMatiere }}15; color: {{ $couleurMatiere }};">
                             {{ $tag }}
                         </span>
                         @endforeach
                         <span class="px-2 py-1 text-xs rounded-full bg-gray-100 text-gray-600">+{{ rand(2, 5) }}</span>
                     </div>
-                    
+
                     <!-- Barre de progression -->
                     @if($chapitresCount > 0)
                     <div class="mb-4">
@@ -373,15 +373,15 @@
                             <span class="font-medium" style="color: {{ $couleurMatiere }};">{{ $progression }}%</span>
                         </div>
                         <div class="w-full bg-gray-200 rounded-full h-1.5 overflow-hidden">
-                            <div class="h-1.5 rounded-full transition-all duration-300" 
+                            <div class="h-1.5 rounded-full transition-all duration-300"
                                  style="width: {{ $progression }}%; background-color: {{ $couleurMatiere }};"></div>
                         </div>
                     </div>
                     @endif
-                    
+
                     <!-- Bouton d'action -->
                     @if($chapitresCount > 0)
-                        <a href="/cours/classe/{{ $classe->nom }}/matiere/{{ $matiere->nom }}" 
+                        <a href="/cours/classe/{{ $classe->nom }}/matiere/{{ $matiere->nom }}"
                            class="block w-full py-2.5 text-center rounded-xl font-medium transition-all duration-300 group-hover:shadow-md"
                            style="color: {{ $couleurMatiere }}; border: 2px solid {{ $couleurMatiere }}; background-color: transparent;"
                            onmouseover="this.style.backgroundColor='{{ $couleurMatiere }}'; this.style.color='white';"
@@ -390,7 +390,7 @@
                             <i class="fas fa-arrow-right ml-2 text-sm group-hover:translate-x-1 transition-transform inline-block"></i>
                         </a>
                     @else
-                        <button disabled 
+                        <button disabled
                                 class="block w-full py-2.5 text-center bg-gray-100 text-gray-400 rounded-xl font-medium cursor-not-allowed">
                             <i class="fas fa-clock mr-2"></i>
                             Bientôt disponible
@@ -400,7 +400,7 @@
             </div>
             @endforeach
         </div>
-        
+
         <!-- Message aucun résultat pour la recherche -->
         <div id="noResult" class="hidden text-center py-12">
             <div class="w-20 h-20 mx-auto mb-4 rounded-full bg-gray-100 flex items-center justify-center">
@@ -482,12 +482,12 @@ html {
         const matieres = document.querySelectorAll('[data-matiere]');
         const grid = document.getElementById('matieresGrid');
         const noResult = document.getElementById('noResult');
-        
+
         if (searchInput) {
             searchInput.addEventListener('input', function(e) {
                 const searchTerm = e.target.value.toLowerCase().trim();
                 let visibleCount = 0;
-                
+
                 matieres.forEach(matiere => {
                     const matiereName = matiere.dataset.matiere;
                     if (matiereName.includes(searchTerm) || searchTerm === '') {
@@ -497,7 +497,7 @@ html {
                         matiere.style.display = 'none';
                     }
                 });
-                
+
                 // Gérer l'affichage du message "aucun résultat"
                 if (visibleCount === 0 && searchTerm !== '') {
                     noResult.classList.remove('hidden');
@@ -508,35 +508,35 @@ html {
                 }
             });
         }
-        
+
         // Animation au scroll
         const animatedElements = document.querySelectorAll('[data-aos]');
-        
+
         function checkVisibility() {
             animatedElements.forEach(element => {
                 const rect = element.getBoundingClientRect();
                 const windowHeight = window.innerHeight;
-                
+
                 if (rect.top < windowHeight * 0.85) {
                     element.classList.add('aos-animate');
                 }
             });
         }
-        
+
         // Initial check
         checkVisibility();
-        
+
         // Check on scroll
         window.addEventListener('scroll', checkVisibility);
     });
-    
+
     // Réinitialiser la recherche
     function resetSearch() {
         const searchInput = document.getElementById('searchMatiere');
         const matieres = document.querySelectorAll('[data-matiere]');
         const grid = document.getElementById('matieresGrid');
         const noResult = document.getElementById('noResult');
-        
+
         if (searchInput) {
             searchInput.value = '';
             matieres.forEach(matiere => {

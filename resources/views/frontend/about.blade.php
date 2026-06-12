@@ -453,7 +453,7 @@
                         </p>
                     </div>
                     <div class="story-image">
-                        <img src="img/ima.png" alt="Maître Koundé">
+                        <img src="{{ asset('img/ima.png') }}" alt="Maître Koundé">
                     </div>
                 </div>
             </div>

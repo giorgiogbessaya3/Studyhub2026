@@ -246,108 +246,139 @@
                         </button>
 
                         @auth
-                            <!-- User Menu Desktop avec Avatar dynamique -->
+                            <!-- User Menu Desktop -->
                             <div class="relative" id="desktopUserMenuContainer">
-                                <button onclick="toggleDesktopUserMenu()" class="flex items-center gap-3 pl-2 pr-4 py-2 rounded-full hover:bg-slate-100 transition-colors border-2 border-transparent hover:border-primary-200 avatar-hover">
-                                    <img src="{{ Auth::user()->avatar_url }}" 
-                                         alt="{{ Auth::user()->name }}" 
-                                         class="w-10 h-10 rounded-full border-2 border-primary-200 object-cover"
-                                         onerror="this.src='https://ui-avatars.com/api/?name={{ urlencode(Auth::user()->name) }}&background=3b82f6&color=fff&size=40'">
-                                    <span class="font-medium text-slate-700 hidden xl:inline">{{ explode(' ', Auth::user()->name)[0] }}</span>
-                                    <i class="fas fa-chevron-down text-xs text-slate-400"></i>
+                                <button onclick="toggleDesktopUserMenu()"
+                                        class="flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-slate-100 border border-slate-200 hover:border-primary-200 transition-all group">
+                                    <!-- Avatar -->
+                                    <div class="relative flex-shrink-0">
+                                        <img src="{{ Auth::user()->avatar_url }}"
+                                             alt="{{ Auth::user()->name }}"
+                                             class="w-9 h-9 rounded-full border-2 border-primary-200 object-cover"
+                                             onerror="this.src='https://ui-avatars.com/api/?name={{ urlencode(Auth::user()->name) }}&background=3b82f6&color=fff&size=36'">
+                                        <span class="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-green-400 border-2 border-white rounded-full"></span>
+                                    </div>
+                                    <!-- Nom + rôle -->
+                                    <div class="text-left hidden xl:block">
+                                        <div class="text-sm font-semibold text-slate-800 leading-tight">{{ Str::limit(explode(' ', Auth::user()->name)[0], 14) }}</div>
+                                        <div class="text-xs capitalize
+                                            @if(Auth::user()->isAdmin()) text-purple-500
+                                            @elseif(Auth::user()->isEnseignant()) text-green-600
+                                            @else text-primary-500 @endif">
+                                            @if(Auth::user()->isAdmin()) Administrateur
+                                            @elseif(Auth::user()->isEnseignant()) Enseignant
+                                            @else Élève @endif
+                                        </div>
+                                    </div>
+                                    <i class="fas fa-chevron-down text-xs text-slate-400 transition-transform duration-200" id="desktopChevron"></i>
                                 </button>
-                                
-                                <!-- Dropdown Desktop amélioré -->
-                                <div id="desktopUserMenu" class="hidden absolute right-0 mt-2 w-72 bg-white rounded-2xl shadow-xl border border-slate-100 overflow-hidden z-50">
-                                    <!-- En-tête avec avatar plus grand -->
-                                    <div class="p-6 bg-gradient-to-r from-primary-600 to-primary-700 text-white">
-                                        <div class="flex items-center gap-4">
-                                            <img src="{{ Auth::user()->avatar_url }}" 
-                                                 alt="{{ Auth::user()->name }}" 
-                                                 class="w-16 h-16 rounded-full border-4 border-white/30 object-cover"
-                                                 onerror="this.src='https://ui-avatars.com/api/?name={{ urlencode(Auth::user()->name) }}&background=3b82f6&color=fff&size=64'">
-                                            <div>
-                                                <p class="font-bold text-lg">{{ Auth::user()->name }}</p>
-                                                <p class="text-sm text-primary-100">{{ Auth::user()->email }}</p>
-                                                <div class="mt-2">
+
+                                <!-- Dropdown Desktop -->
+                                <div id="desktopUserMenu" class="hidden absolute right-0 mt-2 w-80 bg-white rounded-2xl shadow-2xl border border-slate-100 overflow-hidden z-50">
+
+                                    <!-- En-tête identité -->
+                                    <div class="relative px-5 pt-5 pb-4 bg-gradient-to-br from-primary-600 to-primary-800">
+                                        <div class="absolute inset-0 opacity-10" style="background-image:radial-gradient(circle at 1px 1px,white 1px,transparent 0);background-size:24px 24px"></div>
+                                        <div class="relative flex items-center gap-4">
+                                            <div class="relative flex-shrink-0">
+                                                <img src="{{ Auth::user()->avatar_url }}"
+                                                     alt="{{ Auth::user()->name }}"
+                                                     class="w-16 h-16 rounded-2xl border-3 border-white/30 object-cover shadow-lg"
+                                                     onerror="this.src='https://ui-avatars.com/api/?name={{ urlencode(Auth::user()->name) }}&background=1d4ed8&color=fff&size=64'">
+                                                <span class="absolute -bottom-1 -right-1 w-4 h-4 bg-green-400 border-2 border-white rounded-full"></span>
+                                            </div>
+                                            <div class="flex-1 min-w-0">
+                                                <p class="font-bold text-white truncate">{{ Auth::user()->name }}</p>
+                                                <p class="text-primary-200 text-xs truncate mt-0.5">{{ Auth::user()->email }}</p>
+                                                <span class="inline-flex items-center gap-1 mt-2 px-2.5 py-1 rounded-full text-xs font-medium
+                                                    @if(Auth::user()->isAdmin()) bg-purple-500/30 text-purple-100
+                                                    @elseif(Auth::user()->isEnseignant()) bg-green-500/30 text-green-100
+                                                    @else bg-white/20 text-white @endif">
                                                     @if(Auth::user()->isAdmin())
-                                                        <span class="inline-flex items-center px-3 py-1 bg-purple-500/30 text-white text-xs rounded-full">
-                                                            <i class="fas fa-crown mr-1"></i> Administrateur
-                                                        </span>
+                                                        <i class="fas fa-crown text-[10px]"></i> Administrateur
                                                     @elseif(Auth::user()->isEnseignant())
-                                                        <span class="inline-flex items-center px-3 py-1 bg-green-500/30 text-white text-xs rounded-full">
-                                                            <i class="fas fa-chalkboard-teacher mr-1"></i> Enseignant
-                                                        </span>
+                                                        <i class="fas fa-chalkboard-teacher text-[10px]"></i> Enseignant
                                                     @else
-                                                        <span class="inline-flex items-center px-3 py-1 bg-blue-500/30 text-white text-xs rounded-full">
-                                                            <i class="fas fa-user-graduate mr-1"></i> Élève
-                                                        </span>
+                                                        <i class="fas fa-user-graduate text-[10px]"></i> Élève
                                                     @endif
-                                                </div>
+                                                </span>
                                             </div>
                                         </div>
                                     </div>
-                                    
-                                    <!-- Liens du menu -->
-                                    <div class="p-2">
-                                        <a href="{{ url('/dashboard') }}" class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-primary-50 text-slate-700 transition-colors group">
-                                            <div class="w-9 h-9 bg-primary-100 rounded-full flex items-center justify-center group-hover:bg-primary-200 transition-colors">
-                                                <i class="fas fa-chart-line text-primary-600"></i>
+
+                                    <!-- Liens rapides en grille -->
+                                    <div class="grid grid-cols-2 gap-1.5 p-3 border-b border-slate-100">
+                                        <a href="{{ url('/dashboard') }}" class="flex items-center gap-2.5 px-3 py-2.5 rounded-xl hover:bg-primary-50 text-slate-700 transition-colors group">
+                                            <div class="w-8 h-8 bg-primary-100 rounded-lg flex items-center justify-center flex-shrink-0 group-hover:bg-primary-200 transition-colors">
+                                                <i class="fas fa-chart-line text-primary-600 text-sm"></i>
                                             </div>
                                             <div>
-                                                <p class="font-medium">Tableau de bord</p>
-                                                <p class="text-xs text-slate-500">Votre activité</p>
+                                                <p class="text-xs font-semibold">Dashboard</p>
+                                                <p class="text-[10px] text-slate-400">Activité</p>
                                             </div>
                                         </a>
-                                        
-                                        <a href="{{ url('/profile') }}" class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-primary-50 text-slate-700 transition-colors group">
-                                            <div class="w-9 h-9 bg-primary-100 rounded-full flex items-center justify-center group-hover:bg-primary-200 transition-colors">
-                                                <i class="fas fa-user text-primary-600"></i>
+                                        <a href="{{ url('/profile') }}" class="flex items-center gap-2.5 px-3 py-2.5 rounded-xl hover:bg-primary-50 text-slate-700 transition-colors group">
+                                            <div class="w-8 h-8 bg-primary-100 rounded-lg flex items-center justify-center flex-shrink-0 group-hover:bg-primary-200 transition-colors">
+                                                <i class="fas fa-user-edit text-primary-600 text-sm"></i>
                                             </div>
                                             <div>
-                                                <p class="font-medium">Mon profil</p>
-                                                <p class="text-xs text-slate-500">Gérer vos informations</p>
+                                                <p class="text-xs font-semibold">Profil</p>
+                                                <p class="text-[10px] text-slate-400">Paramètres</p>
                                             </div>
                                         </a>
-                                        <a href="{{ url('/mes-resultats') }}" class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-primary-50 text-slate-700 transition-colors group">
-                                            <div class="w-9 h-9 bg-primary-100 rounded-full flex items-center justify-center group-hover:bg-primary-200 transition-colors">
-                                                <i class="fas fa-chart-bar text-primary-600"></i>
+                                        <a href="{{ url('/mes-resultats') }}" class="flex items-center gap-2.5 px-3 py-2.5 rounded-xl hover:bg-primary-50 text-slate-700 transition-colors group">
+                                            <div class="w-8 h-8 bg-primary-100 rounded-lg flex items-center justify-center flex-shrink-0 group-hover:bg-primary-200 transition-colors">
+                                                <i class="fas fa-chart-bar text-primary-600 text-sm"></i>
                                             </div>
                                             <div>
-                                                <p class="font-medium">Mes résultats</p>
-                                                <p class="text-xs text-slate-500">Quiz et évaluations</p>
+                                                <p class="text-xs font-semibold">Résultats</p>
+                                                <p class="text-[10px] text-slate-400">Quiz</p>
                                             </div>
                                         </a>
-                                        
-                                        <a href="{{ url('/mes-questions') }}" class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-primary-50 text-slate-700 transition-colors group">
-                                            <div class="w-9 h-9 bg-primary-100 rounded-full flex items-center justify-center group-hover:bg-primary-200 transition-colors">
-                                                <i class="fas fa-question text-primary-600"></i>
+                                        <a href="{{ url('/mes-questions') }}" class="flex items-center gap-2.5 px-3 py-2.5 rounded-xl hover:bg-primary-50 text-slate-700 transition-colors group">
+                                            <div class="w-8 h-8 bg-primary-100 rounded-lg flex items-center justify-center flex-shrink-0 group-hover:bg-primary-200 transition-colors">
+                                                <i class="fas fa-question-circle text-primary-600 text-sm"></i>
                                             </div>
                                             <div>
-                                                <p class="font-medium">Mes questions</p>
-                                                <p class="text-xs text-slate-500">Assistance</p>
+                                                <p class="text-xs font-semibold">Questions</p>
+                                                <p class="text-[10px] text-slate-400">Assistance</p>
                                             </div>
                                         </a>
                                     </div>
-                                    
-                                    <div class="border-t border-slate-100 p-2">
-                                        <button type="button" onclick="openLogoutModal()" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-red-50 text-red-600 transition-colors group">
-                                            <div class="w-9 h-9 bg-red-100 rounded-full flex items-center justify-center group-hover:bg-red-200 transition-colors">
-                                                <i class="fas fa-sign-out-alt text-red-600"></i>
+
+                                    @if(Auth::user()->isAdmin())
+                                    <div class="px-3 py-2 border-b border-slate-100">
+                                        <a href="{{ url('/admin/dashboard') }}" class="flex items-center gap-2.5 px-3 py-2.5 rounded-xl hover:bg-purple-50 text-purple-700 transition-colors">
+                                            <div class="w-8 h-8 bg-purple-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                                                <i class="fas fa-cog text-purple-600 text-sm"></i>
+                                            </div>
+                                            <div>
+                                                <p class="text-xs font-semibold">Administration</p>
+                                                <p class="text-[10px] text-purple-400">Panneau admin</p>
+                                            </div>
+                                        </a>
+                                    </div>
+                                    @endif
+
+                                    <div class="p-3">
+                                        <button type="button" onclick="openLogoutModal()"
+                                                class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-red-50 text-red-600 transition-colors group">
+                                            <div class="w-8 h-8 bg-red-100 rounded-lg flex items-center justify-center flex-shrink-0 group-hover:bg-red-200 transition-colors">
+                                                <i class="fas fa-sign-out-alt text-red-600 text-sm"></i>
                                             </div>
                                             <div class="text-left">
-                                                <p class="font-medium">Déconnexion</p>
-                                                <p class="text-xs text-red-400">Se déconnecter</p>
+                                                <p class="text-xs font-semibold">Déconnexion</p>
+                                                <p class="text-[10px] text-red-400">Quitter la session</p>
                                             </div>
                                         </button>
                                     </div>
                                 </div>
                             </div>
                         @else
-                            <a href="{{ route('login') }}" class="px-6 py-2.5 text-primary-600 font-medium hover:bg-primary-50 rounded-full transition-colors">
+                            <a href="{{ route('login') }}" class="px-5 py-2 text-primary-600 font-medium hover:bg-primary-50 rounded-xl transition-colors text-sm">
                                 Connexion
                             </a>
-                            <a href="{{ route('register') }}" class="px-6 py-2.5 bg-primary-600 hover:bg-primary-700 text-white font-medium rounded-full shadow-lg shadow-primary-500/30 transition-all hover:scale-105 btn-shine">
+                            <a href="{{ route('register') }}" class="px-5 py-2 bg-primary-600 hover:bg-primary-700 text-white font-medium rounded-xl shadow-lg shadow-primary-500/30 transition-all hover:scale-105 btn-shine text-sm">
                                 S'inscrire
                             </a>
                         @endauth
@@ -361,7 +392,7 @@
     <div class="lg:hidden fixed top-0 left-0 right-0 z-50">
         <div class="glass border-b border-white/20">
             <div class="px-4 h-16 flex items-center justify-between">
-                <!-- Nom de l'application -->
+                <!-- Logo -->
                 <a href="{{ url('/') }}" class="flex items-center gap-2">
                     <div class="w-9 h-9 bg-gradient-to-br from-primary-600 to-primary-800 rounded-xl flex items-center justify-center shadow-lg">
                         <i class="fas fa-graduation-cap text-white text-sm"></i>
@@ -369,17 +400,21 @@
                     <span class="font-display text-xl font-bold text-slate-900">StudyHub</span>
                 </a>
 
-                <!-- Recherche + Déconnexion -->
+                <!-- Actions droite -->
                 <div class="flex items-center gap-2">
                     <button onclick="toggleSearch()" class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-slate-100 transition-colors" aria-label="Rechercher">
-                        <i class="fas fa-search text-slate-600 text-lg"></i>
+                        <i class="fas fa-search text-slate-600"></i>
                     </button>
 
                     @auth
-                        <button type="button" onclick="openLogoutModal()"
-                                class="w-10 h-10 flex items-center justify-center rounded-full bg-red-50 hover:bg-red-100 transition-colors"
-                                aria-label="Déconnexion">
-                            <i class="fas fa-sign-out-alt text-red-600 text-base"></i>
+                        <!-- Avatar bouton → ouvre le menu mobile -->
+                        <button onclick="toggleMobileUserMenu()" id="mobileAvatarBtn"
+                                class="relative flex-shrink-0" aria-label="Menu utilisateur">
+                            <img src="{{ Auth::user()->avatar_url }}"
+                                 alt="{{ Auth::user()->name }}"
+                                 class="w-9 h-9 rounded-full border-2 border-primary-200 object-cover shadow"
+                                 onerror="this.src='https://ui-avatars.com/api/?name={{ urlencode(Auth::user()->name) }}&background=3b82f6&color=fff&size=36'">
+                            <span class="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-green-400 border-2 border-white rounded-full"></span>
                         </button>
                     @else
                         <a href="{{ route('login') }}"
@@ -390,6 +425,65 @@
                 </div>
             </div>
         </div>
+
+        {{-- Panneau utilisateur mobile (slide-down) --}}
+        @auth
+        <div id="mobileUserMenu" class="hidden glass border-b border-white/20 shadow-xl">
+            <!-- En-tête gradient -->
+            <div class="relative px-4 pt-4 pb-3 bg-gradient-to-br from-primary-600 to-primary-800">
+                <div class="absolute inset-0 opacity-10" style="background-image:radial-gradient(circle at 1px 1px,white 1px,transparent 0);background-size:20px 20px"></div>
+                <div class="relative flex items-center gap-3">
+                    <div class="relative flex-shrink-0">
+                        <img src="{{ Auth::user()->avatar_url }}"
+                             alt="{{ Auth::user()->name }}"
+                             class="w-14 h-14 rounded-2xl border-2 border-white/30 object-cover shadow-lg"
+                             onerror="this.src='https://ui-avatars.com/api/?name={{ urlencode(Auth::user()->name) }}&background=1d4ed8&color=fff&size=56'">
+                        <span class="absolute -bottom-1 -right-1 w-3.5 h-3.5 bg-green-400 border-2 border-white rounded-full"></span>
+                    </div>
+                    <div class="flex-1 min-w-0">
+                        <p class="font-bold text-white text-sm truncate">{{ Auth::user()->name }}</p>
+                        <p class="text-primary-200 text-xs truncate">{{ Auth::user()->email }}</p>
+                        <span class="inline-flex items-center gap-1 mt-1.5 px-2 py-0.5 rounded-full text-[11px] font-medium
+                            @if(Auth::user()->isAdmin()) bg-purple-500/30 text-purple-100
+                            @elseif(Auth::user()->isEnseignant()) bg-green-500/30 text-green-100
+                            @else bg-white/20 text-white @endif">
+                            @if(Auth::user()->isAdmin()) <i class="fas fa-crown text-[9px]"></i> Administrateur
+                            @elseif(Auth::user()->isEnseignant()) <i class="fas fa-chalkboard-teacher text-[9px]"></i> Enseignant
+                            @else <i class="fas fa-user-graduate text-[9px]"></i> Élève @endif
+                        </span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Liens rapides en grille 4 colonnes -->
+            <div class="grid grid-cols-4 gap-1 px-3 py-3 bg-white border-b border-slate-100">
+                <a href="{{ url('/dashboard') }}" class="flex flex-col items-center gap-1.5 p-2 rounded-xl hover:bg-primary-50 transition-colors">
+                    <div class="w-9 h-9 bg-primary-100 rounded-xl flex items-center justify-center">
+                        <i class="fas fa-chart-line text-primary-600 text-sm"></i>
+                    </div>
+                    <span class="text-[10px] font-semibold text-slate-600">Dashboard</span>
+                </a>
+                <a href="{{ url('/profile') }}" class="flex flex-col items-center gap-1.5 p-2 rounded-xl hover:bg-primary-50 transition-colors">
+                    <div class="w-9 h-9 bg-primary-100 rounded-xl flex items-center justify-center">
+                        <i class="fas fa-user-edit text-primary-600 text-sm"></i>
+                    </div>
+                    <span class="text-[10px] font-semibold text-slate-600">Profil</span>
+                </a>
+                <a href="{{ url('/mes-resultats') }}" class="flex flex-col items-center gap-1.5 p-2 rounded-xl hover:bg-primary-50 transition-colors">
+                    <div class="w-9 h-9 bg-primary-100 rounded-xl flex items-center justify-center">
+                        <i class="fas fa-chart-bar text-primary-600 text-sm"></i>
+                    </div>
+                    <span class="text-[10px] font-semibold text-slate-600">Résultats</span>
+                </a>
+                <button onclick="closeMobileUserMenu(); openLogoutModal();" class="flex flex-col items-center gap-1.5 p-2 rounded-xl hover:bg-red-50 transition-colors">
+                    <div class="w-9 h-9 bg-red-100 rounded-xl flex items-center justify-center">
+                        <i class="fas fa-sign-out-alt text-red-500 text-sm"></i>
+                    </div>
+                    <span class="text-[10px] font-semibold text-red-500">Quitter</span>
+                </button>
+            </div>
+        </div>
+        @endauth
     </div>
 
     <!-- Search Overlay -->
@@ -642,8 +736,23 @@
 
         // Toggle desktop user menu
         function toggleDesktopUserMenu() {
-            const menu = document.getElementById('desktopUserMenu');
-            if (menu) menu.classList.toggle('hidden');
+            const menu    = document.getElementById('desktopUserMenu');
+            const chevron = document.getElementById('desktopChevron');
+            if (!menu) return;
+            const isOpen = !menu.classList.contains('hidden');
+            menu.classList.toggle('hidden');
+            if (chevron) chevron.style.transform = isOpen ? '' : 'rotate(180deg)';
+        }
+
+        // Toggle mobile user menu (slide-down panel)
+        function toggleMobileUserMenu() {
+            const menu = document.getElementById('mobileUserMenu');
+            if (!menu) return;
+            menu.classList.toggle('hidden');
+        }
+        function closeMobileUserMenu() {
+            const menu = document.getElementById('mobileUserMenu');
+            if (menu) menu.classList.add('hidden');
         }
 
         // Logout confirmation modal
@@ -673,14 +782,27 @@
             document.getElementById('logout-form-confirm').submit();
         }
 
-        // Close desktop user menu when clicking outside
+        // Close menus when clicking outside
         document.addEventListener('click', (e) => {
+            // Desktop menu
             const desktopMenu = document.getElementById('desktopUserMenu');
-            const desktopButton = e.target.closest('[onclick="toggleDesktopUserMenu()"]');
-            if (!desktopButton && desktopMenu && !desktopMenu.classList.contains('hidden')) {
-                desktopMenu.classList.add('hidden');
+            const chevron = document.getElementById('desktopChevron');
+            if (desktopMenu && !desktopMenu.classList.contains('hidden')) {
+                const container = document.getElementById('desktopUserMenuContainer');
+                if (container && !container.contains(e.target)) {
+                    desktopMenu.classList.add('hidden');
+                    if (chevron) chevron.style.transform = '';
+                }
             }
-            // Close logout modal on backdrop click
+            // Mobile menu
+            const mobileMenu = document.getElementById('mobileUserMenu');
+            const mobileBtn  = document.getElementById('mobileAvatarBtn');
+            if (mobileMenu && !mobileMenu.classList.contains('hidden')) {
+                if (mobileBtn && !mobileBtn.contains(e.target) && !mobileMenu.contains(e.target)) {
+                    mobileMenu.classList.add('hidden');
+                }
+            }
+            // Logout modal backdrop
             const logoutModal = document.getElementById('logoutModal');
             if (logoutModal && !logoutModal.classList.contains('hidden') && e.target === logoutModal) {
                 closeLogoutModal();
@@ -693,7 +815,12 @@
                 const overlay = document.getElementById('searchOverlay');
                 if (overlay && !overlay.classList.contains('hidden')) toggleSearch();
                 const desktopMenu = document.getElementById('desktopUserMenu');
-                if (desktopMenu && !desktopMenu.classList.contains('hidden')) desktopMenu.classList.add('hidden');
+                const chevron = document.getElementById('desktopChevron');
+                if (desktopMenu && !desktopMenu.classList.contains('hidden')) {
+                    desktopMenu.classList.add('hidden');
+                    if (chevron) chevron.style.transform = '';
+                }
+                closeMobileUserMenu();
                 const logoutModal = document.getElementById('logoutModal');
                 if (logoutModal && !logoutModal.classList.contains('hidden')) closeLogoutModal();
             }

@@ -136,12 +136,16 @@ Route::get('recherche', [FrontendController::class, 'search'])->name('recherche'
 // ==========================================
 // AUTHENTIFICATION
 // ==========================================
-Auth::routes();
+Auth::routes(['verify' => true]);
 
 // ==========================================
 // ROUTES UTILISATEUR AUTHENTIFIÉ
 // ==========================================
 Route::middleware(['auth'])->group(function() {
+    Route::post('logout', [UserController::class, 'logout'])->name('logout');
+});
+
+Route::middleware(['auth', 'verified'])->group(function() {
     Route::get('dashboard', [UserController::class, 'dashboard'])->name('user.dashboard');
     Route::get('profile', [UserController::class, 'profile'])->name('profile');
     Route::post('profile', [UserController::class, 'updateProfile'])->name('profile.update');
@@ -154,7 +158,6 @@ Route::middleware(['auth'])->group(function() {
     Route::get('mes-resultats', [UserController::class, 'mesResultats'])->name('mes.resultats');
     Route::get('mes-resultats/{id}', [UserController::class, 'detailResultat'])->name('mes.resultats.detail');
     Route::get('mes-questions', [UserController::class, 'mesQuestions'])->name('mes.questions');
-    Route::post('logout', [UserController::class, 'logout'])->name('logout');
 });
 
 // ==========================================

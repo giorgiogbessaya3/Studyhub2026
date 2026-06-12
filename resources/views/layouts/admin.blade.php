@@ -5,16 +5,16 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>@yield('title', 'StudyHub - Espace Administration')</title>
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    
+
     <!-- Styles -->
     <link rel="stylesheet" href="{{ asset('admin/css/styles.min.css') }}">
-     <link rel="icon" type="image/png" href="{{ asset('img/logo.png') }}">
-    <link rel="shortcut icon" href="{{ asset('img/logo.png') }}">
-    <link rel="apple-touch-icon" href="{{ asset('img/logo.png') }}">
-    
+     <link rel="icon" type="image/png" href="{{ asset('studylogo.png') }}">
+    <link rel="shortcut icon" href="{{ asset('studylogo.png') }}">
+    <link rel="apple-touch-icon" href="{{ asset('studylogo.png') }}">
+
     <!-- Tabler Icons -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/dist/tabler-icons.min.css">
-    
+
     <style>
         :root {
             --primary: #2563eb;
@@ -28,20 +28,20 @@
             --sidebar-width: 280px;
             --header-height: 70px;
         }
-        
+
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
-        
+
         body {
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
             background: #f1f5f9;
             color: #334155;
             line-height: 1.6;
         }
-        
+
         /* Header */
         .main-header {
             position: fixed;
@@ -58,7 +58,7 @@
             padding: 0 25px;
             box-shadow: 0 1px 3px rgba(0,0,0,0.05);
         }
-        
+
         .header-brand {
             display: flex;
             align-items: center;
@@ -68,18 +68,18 @@
             color: var(--dark);
             text-decoration: none;
         }
-        
+
         .header-brand i {
             color: var(--primary);
             font-size: 1.8rem;
         }
-        
+
         .header-actions {
             display: flex;
             align-items: center;
             gap: 20px;
         }
-        
+
         .btn-icon {
             width: 40px;
             height: 40px;
@@ -94,12 +94,12 @@
             transition: all 0.2s;
             position: relative;
         }
-        
+
         .btn-icon:hover {
             background: #e2e8f0;
             color: var(--dark);
         }
-        
+
         .notification-badge {
             position: absolute;
             top: 8px;
@@ -110,7 +110,7 @@
             border-radius: 50%;
             border: 2px solid #f1f5f9;
         }
-        
+
         .user-profile {
             display: flex;
             align-items: center;
@@ -120,11 +120,11 @@
             cursor: pointer;
             transition: all 0.2s;
         }
-        
+
         .user-profile:hover {
             background: #f1f5f9;
         }
-        
+
         .user-avatar {
             width: 36px;
             height: 36px;
@@ -132,22 +132,22 @@
             object-fit: cover;
             border: 2px solid #e2e8f0;
         }
-        
+
         .user-info {
             line-height: 1.3;
         }
-        
+
         .user-name {
             font-weight: 600;
             font-size: 0.9rem;
             color: var(--dark);
         }
-        
+
         .user-role {
             font-size: 0.75rem;
             color: var(--secondary);
         }
-        
+
         /* Sidebar */
         .sidebar {
             position: fixed;
@@ -161,11 +161,11 @@
             z-index: 999;
             padding: 20px 0;
         }
-        
+
         .sidebar-section {
             margin-bottom: 25px;
         }
-        
+
         .sidebar-title {
             font-size: 0.7rem;
             text-transform: uppercase;
@@ -177,25 +177,25 @@
             align-items: center;
             gap: 8px;
         }
-        
+
         .sidebar-title::before {
             content: '';
             flex: 1;
             height: 1px;
             background: #e2e8f0;
         }
-        
+
         .sidebar-title::after {
             content: '';
             flex: 1;
             height: 1px;
             background: #e2e8f0;
         }
-        
+
         .nav-item {
             position: relative;
         }
-        
+
         .nav-link {
             display: flex;
             align-items: center;
@@ -208,20 +208,20 @@
             border-left: 3px solid transparent;
             gap: 12px;
         }
-        
+
         .nav-link:hover {
             background: #f8fafc;
             color: var(--dark);
             border-left-color: #cbd5e1;
         }
-        
+
         .nav-item.active > .nav-link {
             background: #eff6ff;
             color: var(--primary);
             border-left-color: var(--primary);
             font-weight: 600;
         }
-        
+
         .nav-icon {
             width: 22px;
             height: 22px;
@@ -230,16 +230,16 @@
             justify-content: center;
             font-size: 1.1rem;
         }
-        
+
         .nav-item.active > .nav-link .nav-icon {
             color: var(--primary);
         }
-        
+
         /* Dropdown arrow */
         .has-submenu > .nav-link {
             position: relative;
         }
-        
+
         .has-submenu > .nav-link::after {
             content: '\ea61';
             font-family: 'tabler-icons';
@@ -248,35 +248,35 @@
             transition: transform 0.3s;
             color: #94a3b8;
         }
-        
+
         .has-submenu.open > .nav-link::after {
             transform: rotate(90deg);
             color: var(--primary);
         }
-        
+
         .submenu {
             max-height: 0;
             overflow: hidden;
             transition: max-height 0.3s ease;
             background: #f8fafc;
         }
-        
+
         .has-submenu.open > .submenu {
             max-height: 500px;
         }
-        
+
         .submenu .nav-link {
             padding-left: 54px;
             font-size: 0.85rem;
             color: #7c8ba1;
         }
-        
+
         .submenu .nav-item.active > .nav-link {
             background: #dbeafe;
             color: var(--primary-dark);
             border-left-color: var(--primary);
         }
-        
+
         /* Main Content */
         .main-content {
             margin-left: var(--sidebar-width);
@@ -284,19 +284,19 @@
             padding: 25px;
             min-height: calc(100vh - var(--header-height));
         }
-        
+
         /* Page Header */
         .page-header {
             margin-bottom: 25px;
         }
-        
+
         .page-title {
             font-size: 1.6rem;
             font-weight: 700;
             color: var(--dark);
             margin-bottom: 8px;
         }
-        
+
         .breadcrumb {
             display: flex;
             align-items: center;
@@ -304,57 +304,57 @@
             font-size: 0.85rem;
             color: var(--secondary);
         }
-        
+
         .breadcrumb a {
             color: var(--primary);
             text-decoration: none;
         }
-        
+
         .breadcrumb a:hover {
             text-decoration: underline;
         }
-        
+
         /* Responsive */
         @media (max-width: 1024px) {
             .sidebar {
                 transform: translateX(-100%);
                 transition: transform 0.3s;
             }
-            
+
             .sidebar.show {
                 transform: translateX(0);
             }
-            
+
             .main-content {
                 margin-left: 0;
             }
-            
+
             .mobile-toggle {
                 display: flex;
             }
         }
-        
+
         @media (min-width: 1025px) {
             .mobile-toggle {
                 display: none;
             }
         }
-        
+
         /* Scrollbar */
         .sidebar::-webkit-scrollbar {
             width: 6px;
         }
-        
+
         .sidebar::-webkit-scrollbar-track {
             background: transparent;
         }
-        
+
         .sidebar::-webkit-scrollbar-thumb {
             background: #cbd5e1;
             border-radius: 3px;
         }
     </style>
-    
+
     @stack('styles')
 </head>
 <body>
@@ -369,7 +369,7 @@
                 <span>StudyHub Admin</span>
             </a>
         </div>
-        
+
         <div class="header-actions">
             <!-- Notifications -->
             <div style="position: relative;">
@@ -395,7 +395,7 @@
                     </a>
                 </div>
             </div>
-            
+
             <!-- User Profile -->
             <div style="position: relative;">
                 <div class="user-profile" id="userProfileBtn">
@@ -434,7 +434,7 @@
 
     <!-- Sidebar Navigation -->
     <aside class="sidebar" id="sidebar">
-        
+
         <!-- 1. TABLEAU DE BORD -->
         <div class="sidebar-section">
             <div class="sidebar-title">Vue d'ensemble</div>
@@ -449,7 +449,7 @@
         <!-- 2. GESTION DES UTILISATEURS -->
         <div class="sidebar-section">
             <div class="sidebar-title">Utilisateurs</div>
-            
+
             <div class="nav-item {{ request()->routeIs('admin.users.*') ? 'active' : '' }} has-submenu {{ request()->routeIs('admin.users.*') ? 'open' : '' }}">
                 <a href="javascript:void(0)" class="nav-link" onclick="toggleSubmenu(this)">
                     <span class="nav-icon"><i class="ti ti-users"></i></span>
@@ -475,28 +475,28 @@
         <!-- 3. ORGANISATION -->
         <div class="sidebar-section">
             <div class="sidebar-title">Organisation</div>
-            
+
             <div class="nav-item {{ request()->routeIs('admin.classes.*') ? 'active' : '' }}">
                 <a href="{{ route('admin.classes.index') }}" class="nav-link">
                     <span class="nav-icon"><i class="ti ti-school"></i></span>
                     <span>Classes</span>
                 </a>
             </div>
-            
+
             <div class="nav-item {{ request()->routeIs('admin.matieres.*') ? 'active' : '' }}">
                 <a href="{{ route('admin.matieres.index') }}" class="nav-link">
                     <span class="nav-icon"><i class="ti ti-book"></i></span>
                     <span>Matières</span>
                 </a>
             </div>
-            
+
             <div class="nav-item {{ request()->routeIs('admin.chapitres.*') ? 'active' : '' }}">
                 <a href="{{ route('admin.chapitres.index') }}" class="nav-link">
                     <span class="nav-icon"><i class="ti ti-book-2"></i></span>
                     <span>Chapitres</span>
                 </a>
             </div>
-            
+
             <div class="nav-item {{ request()->routeIs('admin.contenus.*') ? 'active' : '' }}">
                 <a href="{{ route('admin.contenus.index') }}" class="nav-link">
                     <span class="nav-icon"><i class="ti ti-file-text"></i></span>
@@ -508,7 +508,7 @@
         <!-- 4. BANQUE D'ÉPREUVES -->
         <div class="sidebar-section">
             <div class="sidebar-title">Banque d'épreuves</div>
-            
+
             <div class="nav-item {{ request()->routeIs('admin.epreuves.*') || request()->routeIs('admin.types-epreuves.*') || request()->routeIs('admin.corrections') ? 'active' : '' }} has-submenu {{ request()->routeIs('admin.epreuves.*') || request()->routeIs('admin.types-epreuves.*') || request()->routeIs('admin.corrections') ? 'open' : '' }}">
                 <a href="javascript:void(0)" class="nav-link" onclick="toggleSubmenu(this)">
                     <span class="nav-icon"><i class="ti ti-file-text"></i></span>
@@ -529,7 +529,7 @@
                     </div>
                 </div>
             </div>
-            
+
             <div class="nav-item {{ request()->routeIs('admin.dashboard.epreuves') ? 'active' : '' }}">
                 <a href="{{ route('admin.dashboard.epreuves') }}" class="nav-link">
                     <span class="nav-icon"><i class="ti ti-chart-bar"></i></span>
@@ -541,7 +541,7 @@
         <!-- 5. ÉVALUATIONS/QUIZ -->
         <div class="sidebar-section">
             <div class="sidebar-title">Évaluations</div>
-            
+
             <div class="nav-item {{ request()->routeIs('admin.quiz.*') || request()->routeIs('admin.questions.*') || request()->routeIs('admin.resultats') ? 'active' : '' }} has-submenu {{ request()->routeIs('admin.quiz.*') || request()->routeIs('admin.questions.*') || request()->routeIs('admin.resultats') ? 'open' : '' }}">
                 <a href="javascript:void(0)" class="nav-link" onclick="toggleSubmenu(this)">
                     <span class="nav-icon"><i class="ti ti-clipboard-check"></i></span>
@@ -567,7 +567,7 @@
         <!-- 6. ASSISTANCE PÉDAGOGIQUE -->
         <div class="sidebar-section">
             <div class="sidebar-title">Assistance</div>
-            
+
             <div class="nav-item {{ request()->routeIs('admin.assistance.*') ? 'active' : '' }} has-submenu {{ request()->routeIs('admin.assistance.*') ? 'open' : '' }}">
                 <a href="javascript:void(0)" class="nav-link" onclick="toggleSubmenu(this)">
                     <span class="nav-icon"><i class="ti ti-help-circle"></i></span>
@@ -587,14 +587,14 @@
         <!-- 7. COMMUNICATION -->
         <div class="sidebar-section">
             <div class="sidebar-title">Communication</div>
-            
+
             <div class="nav-item {{ request()->routeIs('admin.contacts.*') ? 'active' : '' }}">
                 <a href="{{ route('admin.contacts.index') }}" class="nav-link">
                     <span class="nav-icon"><i class="ti ti-mail"></i></span>
                     <span>Messages de contact</span>
                 </a>
             </div>
-            
+
             <div class="nav-item {{ request()->routeIs('admin.newsletter.*') ? 'active' : '' }}">
                 <a href="{{ route('admin.newsletter.index') }}" class="nav-link">
                     <span class="nav-icon"><i class="ti ti-send"></i></span>
@@ -606,7 +606,7 @@
         <!-- 8. PARAMÈTRES -->
         <div class="sidebar-section">
             <div class="sidebar-title">Configuration</div>
-            
+
             <div class="nav-item {{ request()->routeIs('admin.settings.*') ? 'active' : '' }} has-submenu {{ request()->routeIs('admin.settings.*') ? 'open' : '' }}">
                 <a href="javascript:void(0)" class="nav-link" onclick="toggleSubmenu(this)">
                     <span class="nav-icon"><i class="ti ti-settings"></i></span>
@@ -630,7 +630,7 @@
                     </div>
                 </div>
             </div>
-            
+
             <div class="nav-item {{ request()->routeIs('admin.logs') ? 'active' : '' }}">
                 <a href="{{ route('admin.logs') }}" class="nav-link">
                     <span class="nav-icon"><i class="ti ti-file-analytics"></i></span>
@@ -643,7 +643,7 @@
 
     <!-- Main Content -->
     <main class="main-content">
-        
+
         <!-- Alertes -->
         @if(session('success'))
             <div class="alert alert-success" style="display: flex; align-items: flex-start; gap: 12px; padding: 16px 20px; border-radius: 10px; margin-bottom: 20px; border-left: 4px solid var(--success); background: #f0fdf4; color: #166534;">
@@ -706,13 +706,13 @@
     <!-- Scripts -->
     <script src="{{ asset('admin/libs/jquery/dist/jquery.min.js') }}"></script>
     <script src="{{ asset('admin/libs/bootstrap/dist/js/bootstrap.bundle.min.js') }}"></script>
-    
+
     <script>
         // Toggle submenu
         function toggleSubmenu(element) {
             const navItem = element.closest('.has-submenu');
             const isOpen = navItem.classList.contains('open');
-            
+
             // Fermer tous les autres sous-menus au même niveau
             const siblings = navItem.parentElement.querySelectorAll('.has-submenu');
             siblings.forEach(sibling => {
@@ -720,11 +720,11 @@
                     sibling.classList.remove('open');
                 }
             });
-            
+
             // Toggle current
             navItem.classList.toggle('open');
         }
-        
+
         // Auto-ouvrir les sous-menus actifs au chargement
         document.addEventListener('DOMContentLoaded', function() {
             const activeItems = document.querySelectorAll('.nav-item.active');
@@ -735,7 +735,7 @@
                     parent = parent.parentElement.closest('.has-submenu');
                 }
             });
-            
+
             // Auto-fermeture des alertes après 5 secondes
             setTimeout(() => {
                 document.querySelectorAll('.alert').forEach(alert => {
@@ -745,11 +745,11 @@
                     setTimeout(() => alert.remove(), 300);
                 });
             }, 5000);
-            
+
             // Dropdown notifications
             const notificationBtn = document.getElementById('notificationBtn');
             const notificationMenu = document.getElementById('notificationMenu');
-            
+
             if (notificationBtn && notificationMenu) {
                 notificationBtn.addEventListener('click', (e) => {
                     e.stopPropagation();
@@ -757,11 +757,11 @@
                     document.getElementById('userProfileMenu').style.display = 'none';
                 });
             }
-            
+
             // Dropdown user profile
             const userProfileBtn = document.getElementById('userProfileBtn');
             const userProfileMenu = document.getElementById('userProfileMenu');
-            
+
             if (userProfileBtn && userProfileMenu) {
                 userProfileBtn.addEventListener('click', (e) => {
                     e.stopPropagation();
@@ -769,17 +769,17 @@
                     notificationMenu.style.display = 'none';
                 });
             }
-            
+
             // Fermer les dropdowns en cliquant ailleurs
             document.addEventListener('click', () => {
                 notificationMenu.style.display = 'none';
                 userProfileMenu.style.display = 'none';
             });
-            
+
             // Mobile sidebar toggle
             const sidebarToggle = document.getElementById('sidebarToggle');
             const sidebar = document.getElementById('sidebar');
-            
+
             if (sidebarToggle && sidebar) {
                 sidebarToggle.addEventListener('click', () => {
                     sidebar.classList.toggle('show');
@@ -787,7 +787,7 @@
             }
         });
     </script>
-    
+
     @stack('scripts')
 </body>
 </html>

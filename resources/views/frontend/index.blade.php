@@ -7,14 +7,14 @@
 <!-- HERO SECTION - Version améliorée et responsive -->
 <section class="relative bg-gradient-to-br from-slate-900 via-primary-900 to-primary-800 min-h-[400px] md:min-h-[500px] flex items-center overflow-hidden">
     <!-- Background dots pattern -->
-    <div class="absolute inset-0 opacity-20" 
+    <div class="absolute inset-0 opacity-20"
          style="background-image: radial-gradient(circle at 1px 1px, white 1px, transparent 0); background-size: 40px 40px;">
     </div>
-    
+
     <!-- Blobs décoratifs -->
     <div class="absolute top-10 left-10 w-48 h-48 md:w-72 md:h-72 bg-primary-500/20 rounded-full blur-3xl animate-pulse"></div>
     <div class="absolute bottom-10 right-10 w-64 h-64 md:w-96 md:h-96 bg-secondary-500/20 rounded-full blur-3xl animate-pulse animation-delay-2000"></div>
-    
+
     <div class="container mx-auto px-4 relative z-10 py-8 md:py-0">
         <div class="flex flex-col lg:flex-row items-center gap-6 lg:gap-8">
             <!-- Texte -->
@@ -23,20 +23,20 @@
                     Apprenez, <span class="text-transparent bg-clip-text bg-gradient-to-r from-primary-300 to-secondary-300">Révisez</span>,<br class="hidden sm:block">
                     <span class="text-transparent bg-clip-text bg-gradient-to-r from-primary-300 to-secondary-300">Réussissez</span>
                 </h1>
-                
+
                 <p class="text-slate-300 text-sm sm:text-base md:text-lg mb-5 md:mb-6 max-w-xl mx-auto lg:mx-0 leading-relaxed px-2 sm:px-0">
                     Accédez à des milliers de cours, exercices et examens corrigés pour exceller dans vos études.
                 </p>
-                
+
                 <!-- Search bar -->
-                <form action="{{ route('search') }}" method="GET" 
+                <form action="{{ route('search') }}" method="GET"
                       class="flex flex-col sm:flex-row items-stretch sm:items-center bg-white rounded-xl shadow-2xl p-1 max-w-lg mx-auto lg:mx-0 hover:shadow-2xl transition-shadow gap-2 sm:gap-0">
                     <div class="flex items-center flex-1 bg-white rounded-xl sm:rounded-none">
                         <i class="fas fa-search text-primary-400 ml-3"></i>
-                        <input type="text" 
-                               name="q" 
+                        <input type="text"
+                               name="q"
                                value="{{ request('q') }}"
-                               placeholder="Rechercher une matière, un cours..." 
+                               placeholder="Rechercher une matière, un cours..."
                                class="w-full px-3 py-3 sm:py-2.5 text-slate-700 focus:outline-none text-sm rounded-xl sm:rounded-none"
                                minlength="2"
                                required>
@@ -46,15 +46,15 @@
                     </button>
                 </form>
             </div>
-            
+
             <!-- Image (cachée sur mobile) -->
             <div class="hidden lg:block flex-1">
                 <div class="relative">
-                    <img src="{{ asset('img/car1.png') }}" 
-                         alt="Student" 
+                    <img src="{{ asset('studycar1.png') }}"
+                         alt="Student"
                          class="w-full max-w-md mx-auto animate-float"
                          onerror="this.src='https://placehold.co/600x400/3b82f6/white?text=StudyHub'">
-                    
+
                     <!-- Floating cards -->
                     <div class="absolute -top-10 -left-10 bg-white rounded-2xl p-3 shadow-2xl animate-float">
                         <div class="flex items-center gap-2">
@@ -67,7 +67,7 @@
                             </div>
                         </div>
                     </div>
-                    
+
                     <div class="absolute -bottom-5 -right-5 bg-white rounded-2xl p-3 shadow-2xl animate-float animation-delay-2000">
                         <div class="flex items-center gap-2">
                             <div class="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
@@ -83,7 +83,7 @@
             </div>
         </div>
     </div>
-    
+
     <!-- Wave separator -->
     <div class="absolute bottom-0 left-0 right-0">
         <svg viewBox="0 0 1440 120" fill="none" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none" class="w-full h-12 md:h-20">
@@ -185,7 +185,7 @@
                 <i class="fas fa-arrow-right text-xs md:text-sm group-hover:translate-x-1 transition-transform"></i>
             </a>
         </div>
-        
+
         @if(isset($quickClasses) && $quickClasses->count() > 0)
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
             @foreach($quickClasses as $index => $classe)
@@ -197,28 +197,28 @@
                     ['from' => '#f59e0b', 'to' => '#d97706', 'light' => '#fffbeb'], // Orange
                 ];
                 $color = $colors[$index % count($colors)];
-                
+
                 // Statistiques simulées (à remplacer par des vraies données si disponibles)
                 $matieresCount = $classe->matieres_count ?? $classe->matieres->count() ?? rand(6, 10);
                 $chapitresCount = $classe->chapitres_count ?? rand(20, 40);
                 $exercicesCount = rand(80, 150);
             @endphp
-            <div class="group bg-white rounded-xl md:rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-500 overflow-hidden hover:-translate-y-1 md:hover:-translate-y-2" 
-                 data-aos="fade-up" 
+            <div class="group bg-white rounded-xl md:rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-500 overflow-hidden hover:-translate-y-1 md:hover:-translate-y-2"
+                 data-aos="fade-up"
                  data-aos-delay="{{ $index * 50 }}">
                 <!-- En-tête avec dégradé -->
-                <div class="relative h-28 md:h-40 overflow-hidden" 
+                <div class="relative h-28 md:h-40 overflow-hidden"
                      style="background: linear-gradient(135deg, {{ $color['from'] }} 0%, {{ $color['to'] }} 100%);">
-                    
+
                     <!-- Pattern de fond -->
-                    <div class="absolute inset-0 opacity-10" 
+                    <div class="absolute inset-0 opacity-10"
                          style="background-image: url('data:image/svg+xml,%3Csvg width="60" height="60" viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg"%3E%3Cg fill="none" fill-rule="evenodd"%3E%3Cg fill="%23ffffff" fill-opacity="0.4"%3E%3Cpath d="M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z"/%3E%3C/g%3E%3C/g%3E%3C/svg%3E'); background-size: 30px 30px;">
                     </div>
-                    
+
                     <!-- Cercles décoratifs -->
                     <div class="absolute -right-8 -top-8 w-24 h-24 md:w-32 md:h-32 bg-white/20 rounded-full"></div>
                     <div class="absolute -left-8 -bottom-8 w-24 h-24 md:w-32 md:h-32 bg-white/20 rounded-full"></div>
-                    
+
                     <!-- Icône et titre -->
                     <div class="absolute left-3 md:left-5 bottom-3 md:bottom-5">
                         <div class="flex items-center gap-2 md:gap-3">
@@ -238,7 +238,7 @@
                         </div>
                     </div>
                 </div>
-                
+
                 <div class="p-4 md:p-6">
                     <!-- Statistiques -->
                     <div class="grid grid-cols-2 gap-2 md:gap-4 mb-4 md:mb-6">
@@ -251,7 +251,7 @@
                             <div class="text-xs text-gray-500">Exercices</div>
                         </div>
                     </div>
-                    
+
                     <!-- Tags matières -->
                     <div class="flex flex-wrap gap-1 md:gap-2 mb-4 md:mb-6">
                         @php
@@ -271,9 +271,9 @@
                         @endforeach
                         <span class="px-2 md:px-3 py-1 text-xs rounded-full bg-gray-100 text-gray-600">+{{ rand(2, 4) }}</span>
                     </div>
-                    
+
                     <!-- Bouton d'action -->
-                    <a href="{{ url('/cours/classe/' . $classe->nom) }}" 
+                    <a href="{{ url('/cours/classe/' . $classe->nom) }}"
                        class="block w-full py-2 md:py-3 text-center rounded-lg md:rounded-xl text-sm md:text-base font-medium transition-all duration-300"
                        style="color: {{ $color['from'] }}; border: 1px solid {{ $color['from'] }};"
                        onmouseover="this.style.backgroundColor='{{ $color['from'] }}'; this.style.color='white';"
@@ -332,7 +332,7 @@
                 <i class="fas fa-arrow-right text-xs md:text-sm group-hover:translate-x-1 transition-transform"></i>
             </a>
         </div>
-        
+
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             @foreach($recentEpreuves as $epreuve)
             <div class="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-shadow" data-aos="fade-up" data-aos-delay="{{ $loop->index * 50 }}">
@@ -427,7 +427,7 @@
     [data-aos] {
         transition-duration: 0.4s;
     }
-    
+
     [data-aos="fade-up"] {
         transform: translateY(20px);
     }
@@ -456,21 +456,21 @@ img, svg, video {
     // Animation au scroll
     document.addEventListener('DOMContentLoaded', function() {
         const animatedElements = document.querySelectorAll('[data-aos]');
-        
+
         function checkVisibility() {
             animatedElements.forEach(element => {
                 const rect = element.getBoundingClientRect();
                 const windowHeight = window.innerHeight;
                 const threshold = window.innerWidth < 640 ? 0.9 : 0.85;
-                
+
                 if (rect.top < windowHeight * threshold) {
                     element.classList.add('aos-animate');
                 }
             });
         }
-        
+
         checkVisibility();
-        
+
         let ticking = false;
         window.addEventListener('scroll', function() {
             if (!ticking) {
@@ -481,7 +481,7 @@ img, svg, video {
                 ticking = true;
             }
         });
-        
+
         window.addEventListener('resize', checkVisibility);
     });
 </script>

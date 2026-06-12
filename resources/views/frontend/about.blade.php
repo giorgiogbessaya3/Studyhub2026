@@ -9,11 +9,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    
+
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
     <link rel="stylesheet" href="style.css">
-    
+
     <title>Kounde Avocats - À Propos</title>
     <style>
         .about-page-body {
@@ -25,7 +25,7 @@
             background: linear-gradient(135deg, #1a2942 0%, #2d4a6b 100%);
             color: white;
             padding: 140px 0 80px;
-           
+
             position: relative;
             overflow: hidden;
         }
@@ -349,21 +349,21 @@
             .about-hero-title {
                 font-size: 2.5rem;
             }
-            
+
             .section-title {
                 font-size: 2rem;
             }
-            
+
             .story-content {
                 grid-template-columns: 1fr;
                 gap: 30px;
             }
-            
+
             .values-grid {
                 grid-template-columns: 1fr;
                 gap: 20px;
             }
-            
+
             .stats-grid {
                 grid-template-columns: repeat(2, 1fr);
                 gap: 20px;
@@ -390,7 +390,7 @@
             .about-hero-section {
                 padding: 100px 0 40px;
             }
-            
+
             .main-about-section,
             .values-section,
             .experience-section,
@@ -398,15 +398,15 @@
             .cta-section {
                 padding: 40px 0;
             }
-            
+
             .about-hero-title {
                 font-size: 2rem;
             }
-            
+
             .about-story-section {
                 padding: 30px;
             }
-            
+
             .cta-title {
                 font-size: 2rem;
             }
@@ -436,7 +436,7 @@
                 <h2 class="section-title">
                     Maître Koundé : <span class="text-orange">20 ans d'expertise</span> au service de vos droits
                 </h2>
-                
+
                 <div class="story-content">
                     <div class="story-text">
                         <p>
@@ -453,7 +453,7 @@
                         </p>
                     </div>
                     <div class="story-image">
-                        <img src="{{ asset('img/ima.png') }}" alt="Maître Koundé">
+                        <img src="{{ asset('studyima.png') }}" alt="Maître Koundé">
                     </div>
                 </div>
             </div>
@@ -469,7 +469,7 @@
             <h2 class="section-title text-center mb-5">
                 Les principes qui <span class="text-orange">guident mon action</span>
             </h2>
-            
+
             <div class="values-grid">
                 <div class="value-card">
                     <div class="value-icon">
@@ -480,7 +480,7 @@
                         Je m'engage à exercer mon métier avec la plus grande éthique professionnelle, en toute transparence et honnêteté.
                     </p>
                 </div>
-                
+
                 <div class="value-card">
                     <div class="value-icon">
                         <i class="fas fa-users"></i>
@@ -490,7 +490,7 @@
                         Chaque situation est unique. Je prends le temps de comprendre vos besoins spécifiques pour vous proposer la meilleure stratégie.
                     </p>
                 </div>
-                
+
                 <div class="value-card">
                     <div class="value-icon">
                         <i class="fas fa-trophy"></i>
@@ -513,7 +513,7 @@
             <h2 class="section-title text-center mb-5">
                 20 ans d'<span class="text-orange">expérience</span> et de réussites
             </h2>
-            
+
             <div class="experience-timeline">
                 <div class="timeline-item">
                     <div class="timeline-year">2005</div>
@@ -524,7 +524,7 @@
                         </p>
                     </div>
                 </div>
-                
+
                 <div class="timeline-item">
                     <div class="timeline-year">2010</div>
                     <div class="timeline-content">
@@ -534,7 +534,7 @@
                         </p>
                     </div>
                 </div>
-                
+
                 <div class="timeline-item">
                     <div class="timeline-year">2015</div>
                     <div class="timeline-content">
@@ -544,7 +544,7 @@
                         </p>
                     </div>
                 </div>
-                
+
                 <div class="timeline-item">
                     <div class="timeline-year">2020</div>
                     <div class="timeline-content">
@@ -565,17 +565,17 @@
                     <span class="stat-number">20+</span>
                     <span class="stat-label">Ans d'Expérience</span>
                 </div>
-                
+
                 <div class="stat-item">
                     <span class="stat-number">500+</span>
                     <span class="stat-label">Dossiers Traités</span>
                 </div>
-                
+
                 <div class="stat-item">
                     <span class="stat-number">1000+</span>
                     <span class="stat-label">Clients Accompagnés</span>
                 </div>
-                
+
                 <div class="stat-item">
                     <span class="stat-number">95%</span>
                     <span class="stat-label">Taux de Satisfaction</span>
@@ -609,7 +609,7 @@
                 threshold: 0.1,
                 rootMargin: '0px 0px -50px 0px'
             };
-            
+
             const observer = new IntersectionObserver(function(entries) {
                 entries.forEach(entry => {
                     if (entry.isIntersecting) {
@@ -618,7 +618,7 @@
                     }
                 });
             }, observerOptions);
-            
+
             // Observer les éléments à animer
             const animatedElements = document.querySelectorAll('.value-card, .timeline-content, .stat-item');
             animatedElements.forEach(element => {

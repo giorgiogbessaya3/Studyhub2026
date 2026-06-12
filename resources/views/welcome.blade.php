@@ -1303,57 +1303,57 @@
             .blog-section {
                 padding: 60px 30px;
             }
-            
+
             .stats-container,
             .expertise-grid {
                 grid-template-columns: repeat(2, 1fr);
             }
-            
+
             .blog-grid {
                 grid-template-columns: repeat(2, 1fr);
             }
-            
+
             .expertise-header {
                 flex-direction: column;
                 align-items: flex-start;
                 margin-bottom: 40px;
             }
-            
+
             .expertise-title {
                 font-size: 32px;
                 margin-top: 10px;
                 margin-bottom: 20px;
             }
-            
+
             .whyme-main-content {
                 flex-direction: column;
                 gap: 30px;
             }
-            
+
             .whyme-image-col {
                 min-width: 100%;
             }
-            
+
             .whyme-features-grid {
                 grid-template-columns: 1fr;
             }
-            
+
             .process-header {
                 flex-direction: column;
                 align-items: flex-start;
                 margin-bottom: 40px;
             }
-            
+
             .process-main-content {
                 flex-direction: column-reverse;
                 gap: 40px;
             }
-            
+
             .process-image-col {
                 width: 100%;
                 max-width: none;
             }
-            
+
             .process-stats-bar {
                 width: 100%;
                 position: static;
@@ -1384,39 +1384,39 @@
             .blog-section {
                 padding: 50px 20px;
             }
-            
+
             .hero-section {
                 flex-direction: column;
                 text-align: center;
                 gap: 40px;
                 min-height: auto;
             }
-            
+
             .about-container {
                 flex-direction: column;
                 gap: 40px;
             }
-            
+
             .stats-container,
             .expertise-grid,
             .blog-grid {
                 grid-template-columns: 1fr;
                 gap: 20px;
             }
-            
+
             .expertise-card,
             .blog-post-card {
                 height: 350px;
             }
-            
+
             .hero-title {
                 font-size: 38px;
             }
-            
+
             .hero-subtitle {
                 font-size: 20px;
             }
-            
+
             .about-title,
             .expertise-title,
             .whyme-main-title,
@@ -1424,55 +1424,55 @@
             .blog-main-title {
                 font-size: 32px;
             }
-            
+
             .hero-buttons {
                 flex-direction: column;
                 align-items: center;
                 width: 100%;
             }
-            
+
             .btn-orange,
             .btn-white {
                 width: 100%;
                 max-width: 300px;
                 justify-content: center;
             }
-            
+
             .whyme-header-content {
                 flex-direction: column;
                 align-items: flex-start;
                 margin-bottom: 30px;
             }
-            
+
             .whyme-main-title {
                 margin-bottom: 20px;
             }
-            
+
             .process-step-item {
                 gap: 15px;
             }
-            
+
             .stat-box {
                 padding: 20px 15px;
             }
-            
+
             .stat-value {
                 font-size: 28px;
             }
-            
+
             .blog-header {
                 flex-direction: column;
                 align-items: flex-start;
                 margin-bottom: 30px;
             }
-            
+
             .experience-badge {
                 position: relative;
                 top: 0;
                 right: 0;
                 margin: 20px auto;
             }
-            
+
             .floating-testimonial {
                 position: relative;
                 right: 0;
@@ -1480,7 +1480,7 @@
                 max-width: 100%;
                 margin-top: 20px;
             }
-            
+
             .play-button {
                 width: 60px;
                 height: 60px;
@@ -1529,26 +1529,26 @@
     <section class="hero-section" id="accueil">
         <div class="hero-content">
             <div class="hero-badge">
-                <i class="fas fa-award"></i> 
+                <i class="fas fa-award"></i>
                 <span>Expertise reconnue depuis 20 ans</span>
             </div>
             <h1 class="hero-title">Maître Koundé,</h1>
             <h2 class="hero-subtitle">Votre Avocat en Droit Immobilier, Bancaire et de la Construction à Toulouse</h2>
             <p class="hero-description">
-                <i class="fas fa-shield-alt"></i> 
+                <i class="fas fa-shield-alt"></i>
                 <span>Fort de plus de 20 ans d'expérience, Maître Koundé défend, conseille et vous accompagne avec détermination pour sécuriser vos intérêts et résoudre vos litiges avec efficacité.</span>
             </p>
             <div class="hero-buttons">
                 <button class="btn-orange" id="rdv-btn">
-                    <i class="fas fa-calendar-check"></i> 
+                    <i class="fas fa-calendar-check"></i>
                     <span>Prendre RDV</span>
                 </button>
                 <button class="btn-white" id="call-btn">
-                    <i class="fas fa-phone"></i> 
+                    <i class="fas fa-phone"></i>
                     <span>Appeler le cabinet</span>
                 </button>
             </div>
-            
+
             <div class="hero-features">
                 <div class="hero-feature">
                     <i class="fas fa-check-circle"></i>
@@ -1567,7 +1567,7 @@
 
         <div class="hero-image">
             <div class="image-frame">
-                <img src="{{ asset('img/im.png') }}" alt="Maître Koundé" onerror="this.src='https://images.unsplash.com/photo-1589829545856-d10d557cf95f?w=800'">
+                <img src="{{ asset('studyim.png') }}" alt="Maître Koundé" onerror="this.src='https://images.unsplash.com/photo-1589829545856-d10d557cf95f?w=800'">
                 <div class="image-badge">
                     <i class="fas fa-star"></i>
                     <span>20+ ans d'expérience</span>
@@ -1580,7 +1580,7 @@
         <div class="about-container">
             <div class="about-image-wrapper">
                 <div class="image-container">
-                    <img src="{{ asset('img/ima.png') }}" alt="Expert juridique" class="about-image" onerror="this.src='https://images.unsplash.com/photo-1556157382-97eda2f9e2bf?w=600'">
+                    <img src="{{ asset('studyima.png') }}" alt="Expert juridique" class="about-image" onerror="this.src='https://images.unsplash.com/photo-1556157382-97eda2f9e2bf?w=600'">
                     <div class="experience-badge">
                         <div class="badge-content">
                             <i class="fas fa-trophy"></i>
@@ -1599,10 +1599,10 @@
                     Un expert juridique <span class="text-orange">engagé</span> à défendre vos intérêts
                 </h2>
                 <p class="about-description">
-                    <i class="fas fa-quote-left"></i> 
+                    <i class="fas fa-quote-left"></i>
                     <span>Reconnu pour sa rigueur et son accompagnement personnalisé, Maître Koundé met son expertise au service de vos droits avec détermination, écoute et efficacité dans les domaines immobilier, bancaire et de la construction.</span>
                 </p>
-                
+
                 <div class="about-features">
                     <div class="feature-item">
                         <div class="feature-icon">
@@ -1625,7 +1625,7 @@
                 </div>
 
                 <button class="btn-orange" id="about-btn">
-                    <i class="fas fa-book-open"></i> 
+                    <i class="fas fa-book-open"></i>
                     <span>Découvrir mon parcours</span>
                 </button>
             </div>
@@ -1681,7 +1681,7 @@
                     </h2>
                 </div>
                 <a href="{{ url('/expertises') }}" class="btn-orange">
-                    <i class="fas fa-clipboard-list"></i> 
+                    <i class="fas fa-clipboard-list"></i>
                     <span>Tous mes services</span>
                 </a>
             </header>
@@ -1691,40 +1691,40 @@
                     <div class="card-icon">
                         <i class="fas fa-building"></i>
                     </div>
-                    <img src="{{ asset('img/imobil.png') }}" alt="Droit Immobilier" class="card-image" onerror="this.src='https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=600'">
+                    <img src="{{ asset('studyimobil.png') }}" alt="Droit Immobilier" class="card-image" onerror="this.src='https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=600'">
                     <div class="card-overlay">
                         <span class="card-text">Droit Immobilier</span>
                         <p class="card-description">Achat, vente, litiges, copropriété</p>
                     </div>
                 </div>
-                
+
                 <div class="expertise-card" onclick="window.location.href='{{ url('/droitbancaire') }}'">
                     <div class="card-icon">
                         <i class="fas fa-landmark"></i>
                     </div>
-                    <img src="{{ asset('img/bancaire.png') }}" alt="Droit Bancaire" class="card-image" onerror="this.src='https://images.unsplash.com/photo-1541354329998-f4d9a9f9297f?w=600'">
+                    <img src="{{ asset('studybancaire.png') }}" alt="Droit Bancaire" class="card-image" onerror="this.src='https://images.unsplash.com/photo-1541354329998-f4d9a9f9297f?w=600'">
                     <div class="card-overlay">
                         <span class="card-text">Droit Bancaire</span>
                         <p class="card-description">Crédits, surendettement, litiges bancaires</p>
                     </div>
                 </div>
-                
+
                 <div class="expertise-card" onclick="window.location.href='{{ url('/droitconstruction') }}'">
                     <div class="card-icon">
                         <i class="fas fa-hard-hat"></i>
                     </div>
-                    <img src="{{ asset('img/Construction.png') }}" alt="Droit de la Construction" class="card-image" onerror="this.src='https://images.unsplash.com/photo-1503387762-592deb58ef4e?w=600'">
+                    <img src="{{ asset('studyConstruction.png') }}" alt="Droit de la Construction" class="card-image" onerror="this.src='https://images.unsplash.com/photo-1503387762-592deb58ef4e?w=600'">
                     <div class="card-overlay">
                         <span class="card-text">Droit de la Construction</span>
                         <p class="card-description">Marchés, responsabilité, garanties</p>
                     </div>
                 </div>
-                
+
                 <div class="expertise-card" onclick="window.location.href='{{ url('/droitfamille') }}'">
                     <div class="card-icon">
                         <i class="fas fa-shopping-cart"></i>
                     </div>
-                    <img src="{{ asset('img/reu1.png') }}" alt="Droit de la Consommation" class="card-image" onerror="this.src='https://images.unsplash.com/photo-1556742502-ec7c0e9f34b1?w=600'">
+                    <img src="{{ asset('studyreu1.png') }}" alt="Droit de la Consommation" class="card-image" onerror="this.src='https://images.unsplash.com/photo-1556742502-ec7c0e9f34b1?w=600'">
                     <div class="card-overlay">
                         <span class="card-text">Droit de la Famille</span>
                         <p class="card-description">Divorce, succession, protection</p>
@@ -1733,7 +1733,7 @@
             </div>
         </div>
     </section>
-    
+
     <section class="whyme-section">
         <div class="whyme-container">
             <div class="whyme-header-content">
@@ -1747,7 +1747,7 @@
                     </h2>
                 </div>
                 <a href="{{ url('/contact') }}" class="btn-orange">
-                    <i class="fas fa-comments"></i> 
+                    <i class="fas fa-comments"></i>
                     <span>Échanger ensemble</span>
                 </a>
             </div>
@@ -1755,7 +1755,7 @@
             <div class="whyme-main-content">
                 <div class="whyme-image-col">
                     <div class="image-wrapper">
-                        <img src="{{ asset('img/image.png') }}" alt="Maître Koundé expliquant" class="whyme-image" onerror="this.src='https://images.unsplash.com/photo-1507679799987-c73779587ccf?w=600'">
+                        <img src="{{ asset('studyimage.png') }}" alt="Maître Koundé expliquant" class="whyme-image" onerror="this.src='https://images.unsplash.com/photo-1507679799987-c73779587ccf?w=600'">
                         <div class="floating-testimonial">
                             <div class="testimonial-content">
                                 <i class="fas fa-quote-left"></i>
@@ -1817,7 +1817,7 @@
             </div>
         </div>
     </section>
-   
+
     <section class="process-section">
         <div class="process-container">
             <header class="process-header">
@@ -1831,7 +1831,7 @@
                     </h2>
                 </div>
                 <a href="{{ url('/contact') }}" class="btn-orange">
-                    <i class="fas fa-play-circle"></i> 
+                    <i class="fas fa-play-circle"></i>
                     <span>Démarrer mon projet</span>
                 </a>
             </header>
@@ -1884,7 +1884,7 @@
                             <span class="stat-label">Clients <br> Satisfaits</span>
                         </span>
                     </div>
-                    <img src="{{ asset('img/kj.png') }}" alt="Processus juridique" class="process-image" onerror="this.src='https://images.unsplash.com/photo-1450101499163-c8848c66ca85?w=800'">
+                    <img src="{{ asset('studykj.png') }}" alt="Processus juridique" class="process-image" onerror="this.src='https://images.unsplash.com/photo-1450101499163-c8848c66ca85?w=800'">
                 </div>
             </div>
         </div>
@@ -1904,7 +1904,7 @@
                     </h2>
                 </div>
                 <a href="{{ url('/blog') }}" class="btn-orange">
-                    <i class="fas fa-arrow-right"></i> 
+                    <i class="fas fa-arrow-right"></i>
                     <span>Voir tous les articles</span>
                 </a>
             </header>
@@ -1912,37 +1912,37 @@
             @if($blogs && $blogs->count() > 0)
                 <div class="blog-grid">
                     @foreach($blogs->take(3) as $blog)
-                    <div class="blog-post-card" 
+                    <div class="blog-post-card"
                          onclick="handleBlogClick({{ $blog->id }}, {{ $blog->youtube_url ? 'true' : 'false' }})"
                          data-blog-id="{{ $blog->id }}"
                          data-has-video="{{ $blog->youtube_url ? 'true' : 'false' }}">
-                        
+
                         <!-- Catégorie -->
                         <div class="post-category {{ $blog->youtube_url ? 'video-category' : '' }}">
-                            <i class="fas {{ $blog->youtube_url ? 'fa-play' : 'fa-newspaper' }}"></i> 
+                            <i class="fas {{ $blog->youtube_url ? 'fa-play' : 'fa-newspaper' }}"></i>
                             {{ $blog->youtube_url ? 'Vidéo' : 'Article' }}
                         </div>
-                        
+
                         <!-- Contenu média : Vidéo YouTube avec lecteur intégré ou Image -->
                         @if($blog->youtube_url)
                             <!-- Lecteur YouTube intégré -->
                             <div class="video-container" id="video-container-{{ $blog->id }}">
                                 <!-- Miniature de la vidéo -->
-                                <img 
-                                    src="https://img.youtube.com/vi/{{ $blog->getYouTubeId() }}/hqdefault.jpg" 
+                                <img
+                                    src="https://img.youtube.com/vi/{{ $blog->getYouTubeId() }}/hqdefault.jpg"
                                     alt="{{ $blog->title }}"
                                     class="video-thumbnail"
                                 >
-                                
+
                                 <!-- Overlay de lecture -->
                                 <div class="video-play-overlay" onclick="event.stopPropagation(); playVideo({{ $blog->id }}, '{{ $blog->getYouTubeId() }}')">
                                     <div class="play-button">
                                         <i class="fas fa-play"></i>
                                     </div>
                                 </div>
-                                
+
                                 <!-- Iframe YouTube (caché au départ) -->
-                                <iframe 
+                                <iframe
                                     id="youtube-iframe-{{ $blog->id }}"
                                     class="youtube-embed"
                                     src=""
@@ -1963,7 +1963,7 @@
                                 </div>
                             @endif
                         @endif
-                        
+
                         <!-- Overlay avec contenu -->
                         <div class="post-content-overlay">
                             <h3 class="post-title">
@@ -2098,7 +2098,7 @@
                     description: 'Un aperçu complet des changements législatifs majeurs',
                     content: `
                         <p>L'année 2025 marque un tournant important dans le droit immobilier français avec plusieurs réformes majeures qui impactent directement les propriétaires, locataires et investisseurs.</p>
-                        
+
                         <h4>Les points clés à retenir :</h4>
                         <ul>
                             <li>Nouvelles obligations en matière de performance énergétique</li>
@@ -2106,7 +2106,7 @@
                             <li>Simplification des procédures de vente</li>
                             <li>Modifications des règles de copropriété</li>
                         </ul>
-                        
+
                         <p>Notre cabinet vous accompagne pour naviguer ces changements et protéger vos intérêts dans toutes vos transactions immobilières.</p>
                     `,
                     author: 'Maître Koundé',
@@ -2117,7 +2117,7 @@
                     description: 'Guide complet sur la garantie décennale et les recours possibles',
                     content: `
                         <p>La garantie décennale est une protection essentielle pour tout propriétaire d'un bien immobilier neuf ou rénové. Elle couvre les dommages qui compromettent la solidité de l'ouvrage ou le rendent impropre à sa destination.</p>
-                        
+
                         <h4>Que couvre la garantie décennale ?</h4>
                         <ul>
                             <li>Les défauts structurels majeurs</li>
@@ -2125,7 +2125,7 @@
                             <li>Les vices affectant la solidité du bâtiment</li>
                             <li>Les désordres rendant le bien inhabitable</li>
                         </ul>
-                        
+
                         <h4>Comment faire valoir vos droits ?</h4>
                         <p>En cas de découverte d'un désordre, il est crucial d'agir rapidement. Notre cabinet vous guide dans les démarches pour faire valoir vos droits et obtenir réparation.</p>
                     `,
@@ -2193,11 +2193,11 @@
         function playVideo(blogId, videoId) {
             const container = document.getElementById(`video-container-${blogId}`);
             const iframe = document.getElementById(`youtube-iframe-${blogId}`);
-            
+
             // Afficher l'iframe et masquer la miniature
             iframe.style.display = 'block';
             iframe.src = `https://www.youtube.com/embed/${videoId}?autoplay=1&rel=0&modestbranding=1`;
-            
+
             // Marquer comme en cours de lecture
             container.classList.add('video-playing');
         }
@@ -2205,14 +2205,14 @@
         document.addEventListener('DOMContentLoaded', function() {
             // Animation des statistiques
             const statNumbers = document.querySelectorAll('.stat-number');
-            
+
             const animateStats = () => {
                 statNumbers.forEach(stat => {
                     const target = parseInt(stat.getAttribute('data-count'));
                     const duration = 2000;
                     const step = target / (duration / 16);
                     let current = 0;
-                    
+
                     const timer = setInterval(() => {
                         current += step;
                         if (current >= target) {
@@ -2224,7 +2224,7 @@
                     }, 16);
                 });
             };
-            
+
             const statsObserver = new IntersectionObserver((entries) => {
                 entries.forEach(entry => {
                     if (entry.isIntersecting) {
@@ -2233,17 +2233,17 @@
                     }
                 });
             }, { threshold: 0.5 });
-            
+
             if (document.querySelector('.stats-section')) {
                 statsObserver.observe(document.querySelector('.stats-section'));
             }
-            
+
             // Animation des cartes au défilement
             const observerOptions = {
                 threshold: 0.1,
                 rootMargin: '0px 0px -50px 0px'
             };
-            
+
             const observer = new IntersectionObserver(function(entries) {
                 entries.forEach(entry => {
                     if (entry.isIntersecting) {
@@ -2253,19 +2253,19 @@
                     }
                 });
             }, observerOptions);
-            
+
             // Observer les cartes de blog et d'expertise
             const blogCards = document.querySelectorAll('.blog-post-card');
             const expertiseCards = document.querySelectorAll('.expertise-card');
             const featureCards = document.querySelectorAll('.whyme-feature-card');
-            
+
             [...blogCards, ...expertiseCards, ...featureCards].forEach(card => {
                 card.style.opacity = '0';
                 card.style.transform = 'translateY(20px)';
                 card.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
                 observer.observe(card);
             });
-            
+
             // Gestion des boutons
             document.querySelectorAll('.btn-orange, .btn-white').forEach(btn => {
                 btn.addEventListener('click', function(e) {
@@ -2285,15 +2285,15 @@
                     }
                 });
             });
-            
+
             // Navigation fluide
             document.querySelectorAll('a[href^="#"]').forEach(anchor => {
                 anchor.addEventListener('click', function(e) {
                     e.preventDefault();
-                    
+
                     const targetId = this.getAttribute('href');
                     if (targetId === '#') return;
-                    
+
                     const targetElement = document.querySelector(targetId);
                     if (targetElement) {
                         window.scrollTo({
@@ -2322,5 +2322,5 @@
     </script>
 </body>
 </html>
-    
+
 @endsection

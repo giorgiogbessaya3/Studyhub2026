@@ -6,12 +6,12 @@
     <title>Page non trouvée - StudyHub</title>
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <meta name="description" content="Page non trouvée sur StudyHub - Retournez à l'accueil et continuez votre apprentissage">
-    
+
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-     <link rel="icon" type="image/png" href="{{ asset('img/logo.png') }}">
-    <link rel="shortcut icon" href="{{ asset('img/logo.png') }}">
-    <link rel="apple-touch-icon" href="{{ asset('img/logo.png') }}">
+     <link rel="icon" type="image/png" href="{{ asset('studylogo.png') }}">
+    <link rel="shortcut icon" href="{{ asset('studylogo.png') }}">
+    <link rel="apple-touch-icon" href="{{ asset('studylogo.png') }}">
     <style>
         :root {
             --primary: #2563eb;
@@ -23,13 +23,13 @@
             --dark: #1e293b;
             --light: #f8fafc;
         }
-        
+
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
-        
+
         body {
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
@@ -41,7 +41,7 @@
             position: relative;
             overflow-x: hidden;
         }
-        
+
         /* Background pattern (comme dans l'index) */
         .bg-pattern {
             position: absolute;
@@ -51,7 +51,7 @@
             background-size: 40px 40px;
             pointer-events: none;
         }
-        
+
         /* Blobs décoratifs (comme dans l'index) */
         .blob {
             position: absolute;
@@ -60,7 +60,7 @@
             opacity: 0.3;
             pointer-events: none;
         }
-        
+
         .blob-1 {
             top: 10%;
             left: 10%;
@@ -69,7 +69,7 @@
             background: var(--primary);
             animation: float 8s ease-in-out infinite;
         }
-        
+
         .blob-2 {
             bottom: 10%;
             right: 10%;
@@ -78,7 +78,7 @@
             background: var(--warning);
             animation: float 10s ease-in-out infinite reverse;
         }
-        
+
         .blob-3 {
             top: 50%;
             left: 50%;
@@ -88,7 +88,7 @@
             animation: float 12s ease-in-out infinite;
             opacity: 0.2;
         }
-        
+
         @keyframes float {
             0%, 100% {
                 transform: translateY(0) translateX(0);
@@ -97,7 +97,7 @@
                 transform: translateY(-20px) translateX(10px);
             }
         }
-        
+
         /* Container principal */
         .error-container {
             position: relative;
@@ -106,7 +106,7 @@
             width: 100%;
             animation: fadeInUp 0.6s ease-out;
         }
-        
+
         @keyframes fadeInUp {
             from {
                 opacity: 0;
@@ -117,7 +117,7 @@
                 transform: translateY(0);
             }
         }
-        
+
         /* Carte principale (style cards de l'index) */
         .error-card {
             background: white;
@@ -126,12 +126,12 @@
             overflow: hidden;
             transition: transform 0.3s ease, box-shadow 0.3s ease;
         }
-        
+
         .error-card:hover {
             transform: translateY(-5px);
             box-shadow: 0 30px 60px -12px rgba(0, 0, 0, 0.3);
         }
-        
+
         /* En-tête avec dégradé (style des cartes de classe) */
         .error-header {
             background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
@@ -140,7 +140,7 @@
             position: relative;
             overflow: hidden;
         }
-        
+
         /* Pattern dans l'en-tête (comme dans l'index) */
         .error-header::before {
             content: '';
@@ -151,7 +151,7 @@
             background-size: 30px 30px;
             pointer-events: none;
         }
-        
+
         /* Cercles décoratifs (comme dans l'index) */
         .circle-decoration {
             position: absolute;
@@ -159,21 +159,21 @@
             background: rgba(255, 255, 255, 0.1);
             pointer-events: none;
         }
-        
+
         .circle-1 {
             width: 150px;
             height: 150px;
             top: -50px;
             right: -50px;
         }
-        
+
         .circle-2 {
             width: 100px;
             height: 100px;
             bottom: -30px;
             left: -30px;
         }
-        
+
         .error-code {
             font-size: 7rem;
             font-weight: 800;
@@ -184,16 +184,16 @@
             letter-spacing: 8px;
             margin-bottom: 15px;
         }
-        
+
         .error-code span {
             display: inline-block;
             animation: bounce 2s ease-in-out infinite;
         }
-        
+
         .error-code span:nth-child(1) { animation-delay: 0s; }
         .error-code span:nth-child(2) { animation-delay: 0.2s; }
         .error-code span:nth-child(3) { animation-delay: 0.4s; }
-        
+
         @keyframes bounce {
             0%, 100% {
                 transform: translateY(0);
@@ -202,7 +202,7 @@
                 transform: translateY(-10px);
             }
         }
-        
+
         .error-title {
             font-size: 1.8rem;
             color: white;
@@ -210,21 +210,21 @@
             z-index: 1;
             font-weight: 600;
         }
-        
+
         .error-title i {
             margin-right: 10px;
         }
-        
+
         /* Corps de la carte */
         .error-body {
             padding: 40px;
             text-align: center;
         }
-        
+
         .error-message {
             margin-bottom: 35px;
         }
-        
+
         .error-message i {
             font-size: 3rem;
             color: var(--warning);
@@ -232,7 +232,7 @@
             display: inline-block;
             animation: shake 1s ease-in-out infinite;
         }
-        
+
         @keyframes shake {
             0%, 100% {
                 transform: translateX(0);
@@ -244,18 +244,18 @@
                 transform: translateX(5px);
             }
         }
-        
+
         .error-message p {
             font-size: 1.1rem;
             color: var(--secondary);
             line-height: 1.6;
         }
-        
+
         /* Suggestions (style des cartes de services) */
         .suggestions {
             margin: 30px 0;
         }
-        
+
         .suggestions-title {
             font-size: 1rem;
             font-weight: 600;
@@ -268,17 +268,17 @@
             padding: 8px 20px;
             border-radius: 40px;
         }
-        
+
         .suggestions-title i {
             color: var(--primary);
         }
-        
+
         .suggestions-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
             gap: 15px;
         }
-        
+
         .suggestion-item {
             background: white;
             border: 1px solid #e2e8f0;
@@ -290,13 +290,13 @@
             transition: all 0.3s ease;
             text-align: left;
         }
-        
+
         .suggestion-item:hover {
             transform: translateY(-3px);
             border-color: var(--primary);
             box-shadow: 0 10px 25px -5px rgba(37, 99, 235, 0.2);
         }
-        
+
         .suggestion-icon {
             width: 45px;
             height: 45px;
@@ -307,16 +307,16 @@
             justify-content: center;
             flex-shrink: 0;
         }
-        
+
         .suggestion-icon i {
             color: white;
             font-size: 1.2rem;
         }
-        
+
         .suggestion-content {
             flex: 1;
         }
-        
+
         .suggestion-content a {
             color: var(--dark);
             text-decoration: none;
@@ -325,16 +325,16 @@
             display: block;
             margin-bottom: 4px;
         }
-        
+
         .suggestion-content a:hover {
             color: var(--primary);
         }
-        
+
         .suggestion-content span {
             font-size: 0.75rem;
             color: var(--secondary);
         }
-        
+
         /* Boutons d'action (style des boutons de l'index) */
         .action-buttons {
             display: flex;
@@ -343,7 +343,7 @@
             flex-wrap: wrap;
             margin: 30px 0;
         }
-        
+
         .btn {
             display: inline-flex;
             align-items: center;
@@ -356,37 +356,37 @@
             font-size: 0.95rem;
             cursor: pointer;
         }
-        
+
         .btn-primary {
             background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
             color: white;
             border: none;
         }
-        
+
         .btn-primary:hover {
             transform: translateY(-2px);
             box-shadow: 0 10px 25px -5px rgba(37, 99, 235, 0.4);
         }
-        
+
         .btn-outline {
             background: transparent;
             color: var(--primary);
             border: 2px solid var(--primary);
         }
-        
+
         .btn-outline:hover {
             background: var(--primary);
             color: white;
             transform: translateY(-2px);
         }
-        
+
         /* Section de recherche (style de la barre de recherche de l'index) */
         .search-section {
             margin-top: 30px;
             padding-top: 30px;
             border-top: 2px solid #e2e8f0;
         }
-        
+
         .search-label {
             font-size: 0.9rem;
             color: var(--secondary);
@@ -396,11 +396,11 @@
             justify-content: center;
             gap: 8px;
         }
-        
+
         .search-label i {
             color: var(--primary);
         }
-        
+
         .search-form {
             display: flex;
             gap: 10px;
@@ -412,12 +412,12 @@
             padding: 5px;
             transition: all 0.3s ease;
         }
-        
+
         .search-form:focus-within {
             border-color: var(--primary);
             box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
         }
-        
+
         .search-input {
             flex: 1;
             padding: 12px 18px;
@@ -428,7 +428,7 @@
             font-family: inherit;
             background: transparent;
         }
-        
+
         .search-btn {
             background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
             border: none;
@@ -442,12 +442,12 @@
             gap: 8px;
             font-weight: 600;
         }
-        
+
         .search-btn:hover {
             transform: translateY(-2px);
             box-shadow: 0 5px 15px rgba(37, 99, 235, 0.3);
         }
-        
+
         /* Footer (comme dans l'index) */
         .error-footer {
             background: var(--light);
@@ -455,22 +455,22 @@
             text-align: center;
             border-top: 1px solid #e2e8f0;
         }
-        
+
         .error-footer p {
             color: var(--secondary);
             font-size: 0.85rem;
         }
-        
+
         .error-footer a {
             color: var(--primary);
             text-decoration: none;
             font-weight: 500;
         }
-        
+
         .error-footer a:hover {
             text-decoration: underline;
         }
-        
+
         /* Conseils supplémentaires (style des statistiques) */
         .tips {
             margin-top: 25px;
@@ -480,7 +480,7 @@
             gap: 20px;
             flex-wrap: wrap;
         }
-        
+
         .tip {
             display: flex;
             align-items: center;
@@ -491,63 +491,63 @@
             background: var(--light);
             border-radius: 40px;
         }
-        
+
         .tip i {
             color: var(--success);
             font-size: 0.9rem;
         }
-        
+
         /* Responsive */
         @media (max-width: 768px) {
             .error-code {
                 font-size: 4rem;
                 letter-spacing: 4px;
             }
-            
+
             .error-title {
                 font-size: 1.3rem;
             }
-            
+
             .error-body {
                 padding: 25px;
             }
-            
+
             .suggestions-grid {
                 grid-template-columns: 1fr;
             }
-            
+
             .action-buttons {
                 flex-direction: column;
             }
-            
+
             .btn {
                 justify-content: center;
             }
-            
+
             .search-form {
                 flex-direction: column;
                 border-radius: 20px;
                 padding: 10px;
             }
-            
+
             .search-input {
                 text-align: center;
             }
-            
+
             .search-btn {
                 justify-content: center;
                 padding: 10px;
             }
-            
+
             .tips {
                 gap: 10px;
             }
-            
+
             .tip {
                 font-size: 0.7rem;
             }
         }
-        
+
         /* Animation pour les éléments */
         @keyframes pulse {
             0%, 100% {
@@ -557,7 +557,7 @@
                 opacity: 0.5;
             }
         }
-        
+
         .animate-pulse {
             animation: pulse 2s ease-in-out infinite;
         }
@@ -566,12 +566,12 @@
 <body>
     <!-- Background pattern (comme l'index) -->
     <div class="bg-pattern"></div>
-    
+
     <!-- Blobs décoratifs (comme l'index) -->
     <div class="blob blob-1"></div>
     <div class="blob blob-2"></div>
     <div class="blob blob-3"></div>
-    
+
     <div class="error-container">
         <div class="error-card">
             <!-- En-tête avec dégradé (style des cartes de classe) -->
@@ -588,7 +588,7 @@
                     Oups ! Page introuvable
                 </div>
             </div>
-            
+
             <!-- Corps -->
             <div class="error-body">
                 <div class="error-message">
@@ -596,7 +596,7 @@
                     <p>La page que vous recherchez semble avoir disparu dans le néant numérique.<br>
                     Mais ne vous inquiétez pas, nous sommes là pour vous guider !</p>
                 </div>
-                
+
                 <!-- Suggestions (style des cartes de services) -->
                 <div class="suggestions">
                     <div class="suggestions-title">
@@ -660,7 +660,7 @@
                         </div>
                     </div>
                 </div>
-                
+
                 <!-- Boutons d'action -->
                 <div class="action-buttons">
                     <a href="{{ route('home') }}" class="btn btn-primary">
@@ -672,7 +672,7 @@
                         Page précédente
                     </a>
                 </div>
-                
+
                 <!-- Barre de recherche (style de l'index) -->
                 <div class="search-section">
                     <div class="search-label">
@@ -680,9 +680,9 @@
                         <span>Rechercher sur StudyHub</span>
                     </div>
                     <form action="{{ route('search') }}" method="GET" class="search-form">
-                        <input type="text" 
-                               name="q" 
-                               class="search-input" 
+                        <input type="text"
+                               name="q"
+                               class="search-input"
                                placeholder="Rechercher un cours, une matière, un chapitre..."
                                autocomplete="off">
                         <button type="submit" class="search-btn">
@@ -691,7 +691,7 @@
                         </button>
                     </form>
                 </div>
-                
+
                 <!-- Conseils supplémentaires (style des statistiques) -->
                 <div class="tips">
                     <div class="tip">
@@ -708,19 +708,19 @@
                     </div>
                 </div>
             </div>
-            
+
             <!-- Footer -->
             <div class="error-footer">
                 <p>
                     <i class="fas fa-info-circle"></i>
-                    Vous pensez qu'il s'agit d'une erreur ? 
-                    <a href="{{ route('contact') }}">Contactez-nous</a> 
+                    Vous pensez qu'il s'agit d'une erreur ?
+                    <a href="{{ route('contact') }}">Contactez-nous</a>
                     et nous ferons le nécessaire pour améliorer StudyHub !
                 </p>
             </div>
         </div>
     </div>
-    
+
     <script>
         // Animation au chargement
         document.addEventListener('DOMContentLoaded', function() {
@@ -731,7 +731,7 @@
                     searchInput.focus();
                 }, 300);
             }
-            
+
             // Validation du formulaire de recherche
             const searchForm = document.querySelector('.search-form');
             if (searchForm) {
@@ -748,13 +748,13 @@
                     }
                 });
             }
-            
+
             // Animation des suggestions au scroll
             const observerOptions = {
                 threshold: 0.1,
                 rootMargin: '0px 0px -50px 0px'
             };
-            
+
             const observer = new IntersectionObserver((entries) => {
                 entries.forEach(entry => {
                     if (entry.isIntersecting) {
@@ -763,7 +763,7 @@
                     }
                 });
             }, observerOptions);
-            
+
             const items = document.querySelectorAll('.suggestion-item');
             items.forEach((item, index) => {
                 item.style.opacity = '0';
@@ -771,7 +771,7 @@
                 item.style.transition = `opacity 0.3s ease ${index * 0.05}s, transform 0.3s ease ${index * 0.05}s`;
                 observer.observe(item);
             });
-            
+
             // Message console
             console.log('%c🔍 Page 404 - StudyHub', 'color: #2563eb; font-size: 16px; font-weight: bold;');
             console.log('%cUtilisez la barre de recherche pour trouver ce que vous cherchez !', 'color: #64748b; font-size: 12px;');

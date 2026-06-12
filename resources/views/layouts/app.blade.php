@@ -6,21 +6,21 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
     <meta name="theme-color" content="#0642a3">
     <title>@yield('title', 'StudyHub - Plateforme Éducative')</title>
-    
+
     <!-- Favicon -->
-    <link rel="icon" type="image/png" href="{{ asset('img/logo.png') }}">
-    <link rel="shortcut icon" href="{{ asset('img/logo.png') }}">
-    <link rel="apple-touch-icon" href="{{ asset('img/logo.png') }}">
-    
+    <link rel="icon" type="image/png" href="{{ asset('studylogo.png') }}">
+    <link rel="shortcut icon" href="{{ asset('studylogo.png') }}">
+    <link rel="apple-touch-icon" href="{{ asset('studylogo.png') }}">
+
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    
+
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    
+
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
+
     <!-- AOS Animation Library -->
     <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
     <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
@@ -191,7 +191,7 @@
         .animation-delay-2000 { animation-delay: 2s; }
         .animation-delay-4000 { animation-delay: 4s; }
     </style>
-    
+
     @yield('styles')
 </head>
 <body class="font-sans antialiased bg-slate-50 text-slate-800 overflow-x-hidden">
@@ -228,7 +228,7 @@
                         <a href="{{ url('/assistance') }}" class="px-4 py-2 rounded-lg text-slate-600 hover:text-primary-600 hover:bg-primary-50 transition-all {{ request()->is('assistance*') ? 'text-primary-600 bg-primary-50 font-medium' : '' }}">
                             Assistance
                         </a>
-                        
+
                         @auth
                             @if(Auth::user()->isAdmin())
                                 <a href="{{ url('/admin/dashboard') }}" class="px-4 py-2 rounded-lg text-purple-600 hover:text-purple-700 hover:bg-purple-50 transition-all {{ request()->is('admin*') ? 'text-purple-600 bg-purple-50 font-medium' : '' }}">
@@ -598,7 +598,7 @@
         <div class="absolute inset-0 opacity-5">
             <div class="absolute inset-0" style="background-image: radial-gradient(circle at 2px 2px, white 1px, transparent 0); background-size: 40px 40px;"></div>
         </div>
-        
+
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 relative z-10">
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12">
                 <!-- Brand -->
@@ -665,7 +665,7 @@
                             <span>Paris, France</span>
                         </li>
                     </ul>
-                    
+
                     <!-- Newsletter -->
                     <div class="mt-6">
                         <p class="text-sm text-slate-400 mb-3">Restez informé</p>
@@ -717,7 +717,7 @@
             const overlay = document.getElementById('searchOverlay');
             const box = document.getElementById('searchBox');
             const input = document.getElementById('searchInput');
-            
+
             if (overlay.classList.contains('hidden')) {
                 overlay.classList.remove('hidden');
                 setTimeout(() => {
@@ -826,11 +826,11 @@
             }
         });
     </script>
-    
+
     <!-- CKEditor 5 -->
     <script src="https://cdn.ckeditor.com/ckeditor5/39.0.1/classic/ckeditor.js"></script>
     <script src="https://cdn.ckeditor.com/ckeditor5/39.0.1/classic/translations/fr.js"></script>
-    
+
     @yield('scripts')
-</body> 
-</html> 
+</body>
+</html>

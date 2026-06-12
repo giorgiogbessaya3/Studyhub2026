@@ -151,7 +151,7 @@ Route::middleware(['auth', 'verified'])->group(function() {
     Route::post('profile', [UserController::class, 'updateProfile'])->name('profile.update');
     Route::post('profile/avatar', [UserController::class, 'updateAvatar'])->name('profile.avatar');
     Route::get('change-password', [UserController::class, 'changePassword'])->name('password.change');
-    Route::post('profile/password', [UserController::class, 'updatePassword'])->name('password.update');
+    Route::post('profile/password', [UserController::class, 'updatePassword'])->name('profile.password.update');
     Route::delete('profile/delete', [UserController::class, 'deleteAccount'])->name('profile.delete');
     Route::get('mes-cours', [UserController::class, 'mesCours'])->name('mes.cours');
     Route::get('mes-epreuves', [UserController::class, 'mesEpreuves'])->name('mes.epreuves');
